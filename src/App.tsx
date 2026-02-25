@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Star, Apple, Heart, Smile, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle } from 'lucide-react';
-import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString } from './lib/db';
+import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo } from './lib/db';
 import { DailyRing } from './components/DailyRing';
 import { ParentDashboard } from './components/ParentDashboard';
 
@@ -472,9 +472,7 @@ export default function App() {
       // Handle streak logic
       const today = getTodayDateString();
       if (profile.lastPlayedDate !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const yesterdayStr = getDateStringDaysAgo(1);
         
         if (profile.lastPlayedDate === yesterdayStr) {
           profile.streak += 1;
