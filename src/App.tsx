@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { Star, Apple, Heart, Smile, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle } from 'lucide-react';
+import { Star, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle } from 'lucide-react';
 import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { DailyRing } from './components/DailyRing';
@@ -61,8 +61,91 @@ const playSound = (type: 'success' | 'error' | 'levelUp' | 'speedBump') => {
   }
 };
 
-const ICONS = [Star, Apple, Heart, Smile, Rocket];
-const COLORS = ['text-yellow-400', 'text-red-500', 'text-pink-500', 'text-blue-500', 'text-purple-500'];
+type TokenTheme = {
+  name: string;
+  fillA: string;
+  fillB: string;
+  glow: string;
+  stroke: string;
+  accent: string;
+  ornament: 'spark' | 'orb' | 'leaf';
+};
+
+const TOKEN_THEMES: TokenTheme[] = [
+  { name: 'Stelar', fillA: '#fde047', fillB: '#f59e0b', glow: '#fef08a', stroke: '#7c2d12', accent: '#fff7cc', ornament: 'spark' },
+  { name: 'Rubin', fillA: '#fb7185', fillB: '#e11d48', glow: '#fecdd3', stroke: '#881337', accent: '#ffe4e6', ornament: 'orb' },
+  { name: 'Lagună', fillA: '#38bdf8', fillB: '#1d4ed8', glow: '#bae6fd', stroke: '#1e3a8a', accent: '#eff6ff', ornament: 'leaf' },
+  { name: 'Ametist', fillA: '#c084fc', fillB: '#7e22ce', glow: '#e9d5ff', stroke: '#4c1d95', accent: '#faf5ff', ornament: 'spark' },
+  { name: 'Smarald', fillA: '#4ade80', fillB: '#15803d', glow: '#bbf7d0', stroke: '#14532d', accent: '#dcfce7', ornament: 'leaf' },
+];
+
+function DetailedToken({ theme, delay }: { theme: TokenTheme; delay: number }) {
+  const gradientId = `${theme.name}-grad`;
+  const glowId = `${theme.name}-glow`;
+
+  return (
+    <motion.div
+      initial={{ scale: 0, rotate: -14, opacity: 0 }}
+      animate={{ scale: 1, rotate: 0, opacity: 1 }}
+      transition={{ delay, type: 'spring', stiffness: 380, damping: 16 }}
+      className="relative"
+      title={`Figurină ${theme.name}`}
+    >
+      <svg viewBox="0 0 88 88" className="w-11 h-11 drop-shadow-[0_10px_10px_rgba(15,23,42,0.35)]">
+        <defs>
+          <radialGradient id={gradientId} cx="35%" cy="25%" r="70%">
+            <stop offset="0%" stopColor={theme.fillA} />
+            <stop offset="55%" stopColor={theme.fillB} />
+            <stop offset="100%" stopColor={theme.stroke} />
+          </radialGradient>
+          <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={theme.glow} stopOpacity="0.95" />
+            <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        <circle cx="44" cy="44" r="40" fill={`url(#${glowId})`} opacity="0.6" />
+        <path
+          d="M44 7 L56 29 L81 33 L63 51 L67 78 L44 65 L21 78 L25 51 L7 33 L32 29 Z"
+          fill={`url(#${gradientId})`}
+          stroke={theme.stroke}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M44 14 L52 30 L69 33 L56 46 L59 63 L44 55 L29 63 L32 46 L19 33 L36 30 Z"
+          fill={theme.accent}
+          opacity="0.28"
+        />
+        <ellipse cx="34" cy="30" rx="11" ry="6" fill="#ffffff" opacity="0.45" />
+        <ellipse cx="52" cy="54" rx="13" ry="8" fill="#0f172a" opacity="0.16" />
+
+        {theme.ornament === 'spark' && (
+          <>
+            <path d="M65 18 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill={theme.accent} opacity="0.8" />
+            <circle cx="68" cy="58" r="2.5" fill={theme.accent} />
+          </>
+        )}
+
+        {theme.ornament === 'orb' && (
+          <>
+            <circle cx="67" cy="22" r="6" fill={theme.accent} opacity="0.85" />
+            <circle cx="63" cy="21" r="2" fill="#fff" opacity="0.8" />
+            <circle cx="22" cy="61" r="4" fill={theme.glow} opacity="0.7" />
+          </>
+        )}
+
+        {theme.ornament === 'leaf' && (
+          <>
+            <path d="M64 20 C72 18 76 28 68 34 C60 30 58 22 64 20Z" fill={theme.accent} opacity="0.9" />
+            <path d="M68 34 C66 37 63 39 60 40" stroke={theme.stroke} strokeWidth="1.8" fill="none" opacity="0.65" />
+            <path d="M25 66 C20 63 18 57 22 53 C27 55 29 61 25 66Z" fill={theme.glow} opacity="0.85" />
+          </>
+        )}
+      </svg>
+    </motion.div>
+  );
+}
 
 export default function App() {
   const [num1, setNum1] = useState(1);
@@ -111,7 +194,7 @@ export default function App() {
     }
     opts.sort(() => Math.random() - 0.5);
     setOptions(opts);
-    setIconIndex(Math.floor(Math.random() * ICONS.length));
+    setIconIndex(Math.floor(Math.random() * TOKEN_THEMES.length));
     setShowSuccess(false);
     setWrongAnswer(null);
     setProblemStartTime(Date.now());
@@ -261,8 +344,7 @@ export default function App() {
     await saveDailyStats(updatedStats);
   };
 
-  const Icon = ICONS[iconIndex];
-  const iconColor = COLORS[iconIndex];
+  const activeTokenTheme = TOKEN_THEMES[iconIndex];
 
   if (!dailyStats || !userProfile) return null;
   const chestProgress = getChestProgress(userProfile.score);
@@ -386,14 +468,7 @@ export default function App() {
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
-                  <motion.div
-                    key={`n1-${i}`}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <Icon className={`w-8 h-8 ${iconColor} fill-current`} />
-                  </motion.div>
+                  <div key={`n1-${i}`}><DetailedToken theme={activeTokenTheme} delay={i * 0.08} /></div>
                 ))}
               </div>
               <span className="text-5xl text-sky-500">{num1}</span>
@@ -404,14 +479,7 @@ export default function App() {
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
                 {Array.from({ length: num2 }).map((_, i) => (
-                  <motion.div
-                    key={`n2-${i}`}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <Icon className={`w-8 h-8 ${iconColor} fill-current`} />
-                  </motion.div>
+                  <div key={`n2-${i}`}><DetailedToken theme={activeTokenTheme} delay={i * 0.08} /></div>
                 ))}
               </div>
               <span className="text-5xl text-sky-500">{num2}</span>
