@@ -64,85 +64,136 @@ const COLORS = ['text-yellow-400', 'text-red-500', 'text-pink-500', 'text-blue-5
 
 // High-Fidelity SVG Components for Treasures
 const GoldCoin = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.4))' }}>
-    <circle cx="50" cy="50" r="45" fill="#F59E0B" stroke="#B45309" strokeWidth="4" />
-    <circle cx="50" cy="50" r="35" fill="#FBBF24" />
-    <path d="M50 25 L55 45 L75 50 L55 55 L50 75 L45 55 L25 50 L45 45 Z" fill="#FEF08A" opacity="0.8" />
-    <circle cx="35" cy="35" r="8" fill="#FEF08A" opacity="0.6" />
+  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 6px 8px rgba(0,0,0,0.5))' }}>
+    <circle cx="50" cy="50" r="45" fill="url(#coin-edge)" />
+    <circle cx="50" cy="50" r="38" fill="url(#coin-face)" />
+    <path d="M50 25 L55 45 L75 50 L55 55 L50 75 L45 55 L25 50 L45 45 Z" fill="#FFFBEB" opacity="0.9" />
+    <circle cx="35" cy="35" r="8" fill="#FFFFFF" opacity="0.8" />
+    <defs>
+      <linearGradient id="coin-edge" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FDE047" />
+        <stop offset="50%" stopColor="#B45309" />
+        <stop offset="100%" stopColor="#78350F" />
+      </linearGradient>
+      <linearGradient id="coin-face" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FEF08A" />
+        <stop offset="50%" stopColor="#F59E0B" />
+        <stop offset="100%" stopColor="#D97706" />
+      </linearGradient>
+    </defs>
   </svg>
 );
 
 const RubyGem = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.4))' }}>
-    <polygon points="50,95 10,40 30,10 70,10 90,40" fill="#E11D48" stroke="#881337" strokeWidth="3" strokeLinejoin="round" />
-    <polygon points="50,95 10,40 50,40" fill="#BE123C" />
-    <polygon points="50,95 90,40 50,40" fill="#9F1239" />
-    <polygon points="10,40 30,10 50,40" fill="#F43F5E" />
-    <polygon points="90,40 70,10 50,40" fill="#FB7185" />
-    <polygon points="30,10 70,10 50,40" fill="#FDA4AF" />
-    <polygon points="35,15 65,15 50,35" fill="#FFF1F2" opacity="0.7" />
+  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 8px 12px rgba(225,29,72,0.6))' }}>
+    <polygon points="50,95 10,40 30,10 70,10 90,40" fill="url(#ruby-dark)" />
+    <polygon points="50,95 10,40 50,40" fill="url(#ruby-mid)" />
+    <polygon points="50,95 90,40 50,40" fill="url(#ruby-darker)" />
+    <polygon points="10,40 30,10 50,40" fill="url(#ruby-light)" />
+    <polygon points="90,40 70,10 50,40" fill="url(#ruby-mid)" />
+    <polygon points="30,10 70,10 50,40" fill="url(#ruby-highlight)" />
+    <polygon points="35,15 65,15 50,35" fill="#FFFFFF" opacity="0.9" />
+    <defs>
+      <linearGradient id="ruby-dark" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#BE123C"/><stop offset="100%" stopColor="#4C0519"/></linearGradient>
+      <linearGradient id="ruby-mid" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E11D48"/><stop offset="100%" stopColor="#9F1239"/></linearGradient>
+      <linearGradient id="ruby-darker" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#9F1239"/><stop offset="100%" stopColor="#4C0519"/></linearGradient>
+      <linearGradient id="ruby-light" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FB7185"/><stop offset="100%" stopColor="#E11D48"/></linearGradient>
+      <linearGradient id="ruby-highlight" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#FDA4AF"/><stop offset="100%" stopColor="#F43F5E"/></linearGradient>
+    </defs>
   </svg>
 );
 
 const EmeraldGem = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.4))' }}>
-    <polygon points="50,10 90,50 50,90 10,50" fill="#10B981" stroke="#064E3B" strokeWidth="3" strokeLinejoin="round" />
-    <polygon points="50,10 90,50 50,50" fill="#34D399" />
-    <polygon points="90,50 50,90 50,50" fill="#059669" />
-    <polygon points="50,90 10,50 50,50" fill="#047857" />
-    <polygon points="10,50 50,10 50,50" fill="#6EE7B7" />
-    <polygon points="40,25 60,25 60,45 40,45" fill="#D1FAE5" opacity="0.8" transform="rotate(45 50 35)" />
+  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 8px 12px rgba(16,185,129,0.6))' }}>
+    <polygon points="50,10 90,50 50,90 10,50" fill="url(#emerald-bg)" />
+    <polygon points="50,10 90,50 50,50" fill="url(#emerald-light)" />
+    <polygon points="90,50 50,90 50,50" fill="url(#emerald-dark)" />
+    <polygon points="50,90 10,50 50,50" fill="url(#emerald-darker)" />
+    <polygon points="10,50 50,10 50,50" fill="url(#emerald-mid)" />
+    <polygon points="40,25 60,25 60,45 40,45" fill="#FFFFFF" opacity="0.9" transform="rotate(45 50 35)" />
+    <defs>
+      <linearGradient id="emerald-bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#059669"/><stop offset="100%" stopColor="#022C22"/></linearGradient>
+      <linearGradient id="emerald-light" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#6EE7B7"/><stop offset="100%" stopColor="#10B981"/></linearGradient>
+      <linearGradient id="emerald-mid" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#34D399"/><stop offset="100%" stopColor="#059669"/></linearGradient>
+      <linearGradient id="emerald-dark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#059669"/><stop offset="100%" stopColor="#064E3B"/></linearGradient>
+      <linearGradient id="emerald-darker" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#047857"/><stop offset="100%" stopColor="#022C22"/></linearGradient>
+    </defs>
   </svg>
 );
 
 const SapphireGem = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.4))' }}>
-    <polygon points="30,10 70,10 90,30 90,70 70,90 30,90 10,70 10,30" fill="#3B82F6" stroke="#1E3A8A" strokeWidth="3" strokeLinejoin="round" />
-    <polygon points="30,10 70,10 50,50" fill="#60A5FA" />
-    <polygon points="70,10 90,30 50,50" fill="#2563EB" />
-    <polygon points="90,30 90,70 50,50" fill="#1D4ED8" />
-    <polygon points="90,70 70,90 50,50" fill="#1E40AF" />
-    <polygon points="70,90 30,90 50,50" fill="#1E3A8A" />
-    <polygon points="30,90 10,70 50,50" fill="#172554" />
-    <polygon points="10,70 10,30 50,50" fill="#3B82F6" />
-    <polygon points="10,30 30,10 50,50" fill="#93C5FD" />
-    <circle cx="35" cy="35" r="10" fill="#DBEAFE" opacity="0.8" />
+  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 8px 12px rgba(59,130,246,0.6))' }}>
+    <polygon points="30,10 70,10 90,30 90,70 70,90 30,90 10,70 10,30" fill="url(#sapphire-bg)" />
+    <polygon points="30,10 70,10 50,50" fill="url(#sapphire-light)" />
+    <polygon points="70,10 90,30 50,50" fill="url(#sapphire-mid)" />
+    <polygon points="90,30 90,70 50,50" fill="url(#sapphire-dark)" />
+    <polygon points="90,70 70,90 50,50" fill="url(#sapphire-darker)" />
+    <polygon points="70,90 30,90 50,50" fill="url(#sapphire-darkest)" />
+    <polygon points="30,90 10,70 50,50" fill="url(#sapphire-darker)" />
+    <polygon points="10,70 10,30 50,50" fill="url(#sapphire-mid)" />
+    <polygon points="10,30 30,10 50,50" fill="url(#sapphire-light)" />
+    <circle cx="35" cy="35" r="10" fill="#FFFFFF" opacity="0.9" />
+    <defs>
+      <linearGradient id="sapphire-bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1D4ED8"/><stop offset="100%" stopColor="#172554"/></linearGradient>
+      <linearGradient id="sapphire-light" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#93C5FD"/><stop offset="100%" stopColor="#3B82F6"/></linearGradient>
+      <linearGradient id="sapphire-mid" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#60A5FA"/><stop offset="100%" stopColor="#2563EB"/></linearGradient>
+      <linearGradient id="sapphire-dark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2563EB"/><stop offset="100%" stopColor="#1D4ED8"/></linearGradient>
+      <linearGradient id="sapphire-darker" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1E40AF"/><stop offset="100%" stopColor="#1E3A8A"/></linearGradient>
+      <linearGradient id="sapphire-darkest" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1E3A8A"/><stop offset="100%" stopColor="#172554"/></linearGradient>
+    </defs>
   </svg>
 );
 
 const RoyalCrown = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 5px 8px rgba(0,0,0,0.5))' }}>
-    <path d="M10,80 L90,80 L90,90 L10,90 Z" fill="#B45309" />
-    <path d="M15,70 L85,70 L90,80 L10,80 Z" fill="#F59E0B" stroke="#92400E" strokeWidth="2" />
-    <path d="M15,70 L10,30 L30,50 L50,15 L70,50 L90,30 L85,70 Z" fill="#FBBF24" stroke="#B45309" strokeWidth="2" strokeLinejoin="round" />
-    <path d="M15,70 L10,30 L30,50 L50,15 L70,50 L90,30 L85,70 Z" fill="url(#gold-gradient)" opacity="0.5" />
-    <circle cx="10" cy="30" r="6" fill="#E11D48" />
-    <circle cx="50" cy="15" r="8" fill="#3B82F6" />
-    <circle cx="90" cy="30" r="6" fill="#E11D48" />
-    <circle cx="30" cy="60" r="5" fill="#10B981" />
-    <circle cx="50" cy="60" r="6" fill="#E11D48" />
-    <circle cx="70" cy="60" r="5" fill="#10B981" />
+  <svg viewBox="0 0 100 100" className={className} style={{ filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.6))' }}>
+    {/* Back of crown */}
+    <path d="M15,70 L85,70 L90,80 L10,80 Z" fill="url(#crown-dark)" />
+    {/* Front of crown */}
+    <path d="M15,70 L10,20 L30,45 L50,10 L70,45 L90,20 L85,70 Z" fill="url(#crown-gold)" stroke="#B45309" strokeWidth="2" strokeLinejoin="round" />
+    {/* Highlights */}
+    <path d="M15,70 L10,20 L30,45 L50,10 L70,45 L90,20 L85,70 Z" fill="url(#crown-highlight)" opacity="0.6" />
+    {/* Base rim */}
+    <rect x="10" y="70" width="80" height="15" rx="5" fill="url(#crown-gold)" stroke="#B45309" strokeWidth="2" />
+    <rect x="12" y="72" width="76" height="5" fill="#FEF08A" opacity="0.5" rx="2" />
+    
+    {/* Jewels */}
+    <circle cx="10" cy="20" r="8" fill="url(#ruby-mid)" stroke="#FEF08A" strokeWidth="2" />
+    <circle cx="50" cy="10" r="10" fill="url(#sapphire-mid)" stroke="#FEF08A" strokeWidth="2" />
+    <circle cx="90" cy="20" r="8" fill="url(#ruby-mid)" stroke="#FEF08A" strokeWidth="2" />
+    
+    <circle cx="30" cy="77" r="5" fill="url(#emerald-mid)" />
+    <circle cx="50" cy="77" r="6" fill="url(#ruby-mid)" />
+    <circle cx="70" cy="77" r="5" fill="url(#emerald-mid)" />
+    
     <defs>
-      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crown-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FDE047" />
+        <stop offset="50%" stopColor="#F59E0B" />
+        <stop offset="100%" stopColor="#B45309" />
+      </linearGradient>
+      <linearGradient id="crown-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#92400E" />
+        <stop offset="100%" stopColor="#451A03" />
+      </linearGradient>
+      <linearGradient id="crown-highlight" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="#FEF08A" />
-        <stop offset="50%" stopColor="transparent" />
-        <stop offset="100%" stopColor="#92400E" />
+        <stop offset="100%" stopColor="transparent" />
       </linearGradient>
     </defs>
   </svg>
 );
 
 const TREASURE_ITEMS = [
-  { component: GoldCoin, left: '20%', bottom: '20%', rotate: -15, size: 'w-16 h-16' },
-  { component: EmeraldGem, left: '60%', bottom: '15%', rotate: 20, size: 'w-14 h-14' },
-  { component: RoyalCrown, left: '35%', bottom: '30%', rotate: 0, size: 'w-20 h-20' },
-  { component: SapphireGem, left: '15%', bottom: '45%', rotate: 45, size: 'w-14 h-14' },
-  { component: RubyGem, left: '70%', bottom: '40%', rotate: -20, size: 'w-14 h-14' },
-  { component: GoldCoin, left: '30%', bottom: '55%', rotate: 10, size: 'w-16 h-16' },
-  { component: SapphireGem, left: '55%', bottom: '65%', rotate: -30, size: 'w-14 h-14' },
-  { component: RoyalCrown, left: '20%', bottom: '75%', rotate: 15, size: 'w-20 h-20' },
-  { component: GoldCoin, left: '65%', bottom: '80%', rotate: -45, size: 'w-16 h-16' },
-  { component: RubyGem, left: '45%', bottom: '85%', rotate: 0, size: 'w-14 h-14' },
+  { component: GoldCoin, left: '15%', bottom: '10%', rotate: -15, size: 'w-20 h-20' },
+  { component: EmeraldGem, left: '55%', bottom: '5%', rotate: 20, size: 'w-16 h-16' },
+  { component: RoyalCrown, left: '30%', bottom: '20%', rotate: -5, size: 'w-24 h-24' },
+  { component: SapphireGem, left: '10%', bottom: '35%', rotate: 45, size: 'w-16 h-16' },
+  { component: RubyGem, left: '70%', bottom: '30%', rotate: -20, size: 'w-16 h-16' },
+  { component: GoldCoin, left: '25%', bottom: '45%', rotate: 10, size: 'w-20 h-20' },
+  { component: SapphireGem, left: '50%', bottom: '55%', rotate: -30, size: 'w-16 h-16' },
+  { component: RoyalCrown, left: '15%', bottom: '65%', rotate: 15, size: 'w-24 h-24' },
+  { component: GoldCoin, left: '65%', bottom: '70%', rotate: -45, size: 'w-20 h-20' },
+  { component: RubyGem, left: '40%', bottom: '80%', rotate: 0, size: 'w-16 h-16' },
 ];
 
 function TreasureChest({ score, latestItem }: { score: number, latestItem: number | null }) {
@@ -167,54 +218,81 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
   }, [score, itemsCount]);
 
   return (
-    <div className="relative w-full max-w-md mx-auto mt-16 h-64 flex items-end justify-center perspective-[1500px]">
+    <div className="relative w-full max-w-md mx-auto mt-16 h-72 flex items-end justify-center perspective-[2000px]">
       
-      {/* Background Glow */}
-      <div className="absolute bottom-0 w-80 h-48 bg-yellow-400/40 blur-[50px] rounded-full"></div>
+      {/* Magical Background Glow */}
+      <div className="absolute bottom-10 w-96 h-64 bg-purple-500/30 blur-[60px] rounded-full animate-pulse"></div>
+      <div className="absolute bottom-0 w-80 h-48 bg-yellow-400/40 blur-[40px] rounded-full"></div>
 
-      {/* The Chest Container - Isometric Top-Down View */}
-      <div className="relative w-80 h-56 z-10" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(20deg)' }}>
+      {/* The Chest Container - High Fidelity 3D */}
+      <div className="relative w-80 h-64 z-10" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg)' }}>
         
         {/* Chest Lid (Animated) */}
         <motion.div 
           animate={{ 
-            rotateX: justCompleted ? 0 : -120,
-            y: justCompleted ? 0 : -20,
-            z: justCompleted ? 0 : -40
+            rotateX: justCompleted ? 0 : -110,
+            y: justCompleted ? 0 : -10,
           }}
-          transition={{ type: "spring", bounce: 0.3, duration: 1 }}
-          className="absolute top-0 w-full h-32 origin-bottom z-0"
+          transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
+          className="absolute top-0 w-full h-40 origin-bottom z-0"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          <svg viewBox="0 0 320 140" className="w-full h-full drop-shadow-2xl overflow-visible">
-            {/* Inner Lid (Visible when open) */}
-            <path d="M20,130 C20,50 50,20 160,20 C270,20 300,50 300,130 Z" fill="#5C2E00" stroke="#3E1F00" strokeWidth="4" />
+          <svg viewBox="0 0 320 160" className="w-full h-full drop-shadow-2xl overflow-visible">
+            {/* Inner Lid Glow */}
+            <path d="M20,150 C20,60 50,20 160,20 C270,20 300,60 300,150 Z" fill="url(#lid-glow)" />
+            
+            {/* Inner Lid Wood */}
+            <path d="M20,150 C20,60 50,20 160,20 C270,20 300,60 300,150 Z" fill="#4A2500" stroke="#2D1600" strokeWidth="4" opacity="0.9" />
             
             {/* Inner Wood Planks */}
-            <path d="M25,110 C40,60 70,40 160,40 C250,40 280,60 295,110" fill="none" stroke="#3E1F00" strokeWidth="2" opacity="0.5" />
-            <path d="M35,90 C60,50 90,60 160,60 C230,60 260,50 285,90" fill="none" stroke="#3E1F00" strokeWidth="2" opacity="0.5" />
+            <path d="M25,130 C40,70 70,40 160,40 C250,40 280,70 295,130" fill="none" stroke="#2D1600" strokeWidth="3" opacity="0.6" />
+            <path d="M35,110 C60,60 90,60 160,60 C230,60 260,60 285,110" fill="none" stroke="#2D1600" strokeWidth="3" opacity="0.6" />
             
-            {/* Outer Lid Edge (Thickness) */}
-            <path d="M10,140 C10,40 40,10 160,10 C280,10 310,40 310,140 L300,130 C300,50 270,20 160,20 C50,20 20,50 20,130 Z" fill="#8B4513" stroke="#3E1F00" strokeWidth="2" />
+            {/* Outer Lid Edge (Gold Trim) */}
+            <path d="M10,160 C10,50 40,10 160,10 C280,10 310,50 310,160 L300,150 C300,60 270,20 160,20 C50,20 20,60 20,150 Z" fill="url(#gold-trim)" stroke="#78350F" strokeWidth="2" />
+            
+            <defs>
+              <linearGradient id="lid-glow" x1="50%" y1="100%" x2="50%" y2="0%">
+                <stop offset="0%" stopColor="#A855F7" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#FBBF24" stopOpacity="0.2" />
+              </linearGradient>
+              <linearGradient id="gold-trim" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#F59E0B" />
+                <stop offset="20%" stopColor="#FEF08A" />
+                <stop offset="50%" stopColor="#D97706" />
+                <stop offset="80%" stopColor="#FEF08A" />
+                <stop offset="100%" stopColor="#B45309" />
+              </linearGradient>
+            </defs>
           </svg>
         </motion.div>
 
         {/* Chest Base (Back & Bottom Inside) */}
-        <div className="absolute bottom-0 w-full h-40 z-10">
-          <svg viewBox="0 0 320 160" className="w-full h-full">
+        <div className="absolute bottom-0 w-full h-48 z-10">
+          <svg viewBox="0 0 320 180" className="w-full h-full">
             {/* Inside Bottom (Floor of the chest) */}
-            <path d="M30,140 L290,140 L270,40 L50,40 Z" fill="#4A2500" stroke="#2D1600" strokeWidth="2" />
+            <path d="M30,160 L290,160 L270,40 L50,40 Z" fill="#2D1600" />
+            {/* Magical Pool inside */}
+            <path d="M40,150 L280,150 L260,50 L60,50 Z" fill="url(#magic-pool)" opacity="0.8" />
             {/* Inside Back Wall */}
-            <path d="M50,40 L270,40 L270,10 L50,10 Z" fill="#3E1F00" />
+            <path d="M50,40 L270,40 L270,10 L50,10 Z" fill="#1A0D00" />
             {/* Inside Left Wall */}
-            <path d="M30,140 L50,40 L50,10 L30,110 Z" fill="#2D1600" />
+            <path d="M30,160 L50,40 L50,10 L30,130 Z" fill="#241100" />
             {/* Inside Right Wall */}
-            <path d="M290,140 L270,40 L270,10 L290,110 Z" fill="#2D1600" />
+            <path d="M290,160 L270,40 L270,10 L290,130 Z" fill="#241100" />
+            
+            <defs>
+              <radialGradient id="magic-pool" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#C084FC" stopOpacity="1" />
+                <stop offset="50%" stopColor="#9333EA" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#4C1D95" stopOpacity="0" />
+              </radialGradient>
+            </defs>
           </svg>
         </div>
 
         {/* Accumulated Treasures (Placed inside the 3D space) */}
-        <div className="absolute bottom-6 left-10 right-10 h-32 z-20" style={{ transform: 'rotateX(-20deg)' }}>
+        <div className="absolute bottom-8 left-8 right-8 h-40 z-20" style={{ transform: 'rotateX(-15deg)' }}>
           <AnimatePresence>
             {!justCompleted && Array.from({ length: itemsCount }).map((_, i) => {
               const item = TREASURE_ITEMS[i % TREASURE_ITEMS.length];
@@ -224,65 +302,76 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
               return (
                 <motion.div
                   key={`${totalChests}-${i}`}
-                  initial={isLatest ? { y: -500, scale: 2, rotate: 180, opacity: 0 } : false}
+                  initial={isLatest ? { y: -600, scale: 3, rotate: 180, opacity: 0 } : false}
                   animate={isLatest ? { y: 0, scale: 1, rotate: item.rotate, opacity: 1 } : { rotate: item.rotate }}
-                  transition={isLatest ? { type: "spring", bounce: 0.4, duration: 1.5 } : { duration: 0 }}
+                  transition={isLatest ? { type: "spring", bounce: 0.5, duration: 1.5 } : { duration: 0 }}
                   className={`absolute`}
                   style={{ left: item.left, bottom: item.bottom, zIndex: i }}
                 >
-                  {/* Glow effect for the latest item */}
+                  {/* Intense Glow effect for the latest item */}
                   {isLatest && (
                     <motion.div 
-                      initial={{ opacity: 1, scale: 1 }}
-                      animate={{ opacity: 0, scale: 2 }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                      className="absolute inset-0 bg-white rounded-full blur-xl"
+                      initial={{ opacity: 1, scale: 0.5 }}
+                      animate={{ opacity: 0, scale: 3 }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                      className="absolute inset-0 bg-white rounded-full blur-2xl"
                     />
                   )}
-                  <ItemComponent className={`${item.size} drop-shadow-2xl`} />
+                  <ItemComponent className={`${item.size}`} />
                 </motion.div>
               );
             })}
           </AnimatePresence>
         </div>
 
-        {/* Chest Front Wall (Outer) */}
-        <div className="absolute bottom-0 w-full h-24 z-30 drop-shadow-[0_30px_30px_rgba(0,0,0,0.7)]">
-          <svg viewBox="0 0 320 100" className="w-full h-full overflow-visible">
+        {/* Chest Front Wall (Outer) - High Fidelity */}
+        <div className="absolute bottom-0 w-full h-32 z-30 drop-shadow-[0_35px_35px_rgba(0,0,0,0.8)]">
+          <svg viewBox="0 0 320 120" className="w-full h-full overflow-visible">
             {/* Front Wood Panel */}
-            <path d="M20,0 L300,0 L310,90 C310,95 305,100 300,100 L20,100 C15,100 10,95 10,90 Z" fill="#A0522D" stroke="#3E1F00" strokeWidth="4" />
+            <path d="M20,0 L300,0 L310,100 C310,110 305,115 295,115 L25,115 C15,115 10,110 10,100 Z" fill="url(#wood-front)" stroke="#3E1F00" strokeWidth="4" />
             
             {/* Wood Planks Lines */}
-            <line x1="15" y1="25" x2="305" y2="25" stroke="#5C2E00" strokeWidth="3" opacity="0.6" />
-            <line x1="12" y1="55" x2="308" y2="55" stroke="#5C2E00" strokeWidth="3" opacity="0.6" />
-            <line x1="10" y1="85" x2="310" y2="85" stroke="#5C2E00" strokeWidth="3" opacity="0.6" />
+            <path d="M15,30 Q160,35 305,30" fill="none" stroke="#5C2E00" strokeWidth="4" opacity="0.7" />
+            <path d="M12,65 Q160,70 308,65" fill="none" stroke="#5C2E00" strokeWidth="4" opacity="0.7" />
+            <path d="M10,95 Q160,100 310,95" fill="none" stroke="#5C2E00" strokeWidth="4" opacity="0.7" />
             
-            {/* Metal Bands */}
-            <path d="M50,0 L90,0 L92,100 L48,100 Z" fill="url(#metal-grad-front)" stroke="#111" strokeWidth="2" />
-            <path d="M230,0 L270,0 L272,100 L228,100 Z" fill="url(#metal-grad-front)" stroke="#111" strokeWidth="2" />
-            
-            {/* Rivets */}
-            <circle cx="70" cy="15" r="4" fill="#333" />
-            <circle cx="70" cy="50" r="4" fill="#333" />
-            <circle cx="70" cy="85" r="4" fill="#333" />
-            
-            <circle cx="250" cy="15" r="4" fill="#333" />
-            <circle cx="250" cy="50" r="4" fill="#333" />
-            <circle cx="250" cy="85" r="4" fill="#333" />
+            {/* Gold Edge Trim */}
+            <path d="M20,0 L300,0 L300,8 L20,8 Z" fill="url(#gold-trim)" />
+            <path d="M10,100 L20,0 L28,0 L18,100 Z" fill="url(#gold-trim)" />
+            <path d="M310,100 L300,0 L292,0 L302,100 Z" fill="url(#gold-trim)" />
+            <path d="M10,100 L310,100 L305,115 L15,115 Z" fill="url(#gold-trim)" />
 
-            {/* Lock Base */}
-            <path d="M135,0 L185,0 L185,40 C185,60 135,60 135,40 Z" fill="url(#metal-grad-front)" stroke="#111" strokeWidth="3" />
+            {/* Metal Bands (Gold/Brass) */}
+            <path d="M60,0 L100,0 L102,115 L58,115 Z" fill="url(#gold-trim)" stroke="#78350F" strokeWidth="2" />
+            <path d="M220,0 L260,0 L262,115 L218,115 Z" fill="url(#gold-trim)" stroke="#78350F" strokeWidth="2" />
+            
+            {/* Large Rivets */}
+            <circle cx="80" cy="20" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+            <circle cx="80" cy="60" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+            <circle cx="80" cy="100" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+            
+            <circle cx="240" cy="20" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+            <circle cx="240" cy="60" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+            <circle cx="240" cy="100" r="6" fill="url(#rivet-grad)" stroke="#78350F" strokeWidth="1" />
+
+            {/* Ornate Lock Base */}
+            <path d="M120,0 L200,0 L200,30 C200,80 160,90 160,90 C160,90 120,80 120,30 Z" fill="url(#gold-trim)" stroke="#78350F" strokeWidth="3" />
+            <path d="M130,10 L190,10 L190,30 C190,65 160,75 160,75 C160,75 130,65 130,30 Z" fill="#8B4513" stroke="#5C2E00" strokeWidth="2" />
             
             {/* Keyhole */}
-            <circle cx="160" cy="25" r="6" fill="#111" />
-            <path d="M157,25 L163,25 L165,40 L155,40 Z" fill="#111" />
+            <circle cx="160" cy="35" r="8" fill="#1A0D00" />
+            <path d="M155,35 L165,35 L168,60 L152,60 Z" fill="#1A0D00" />
             
             <defs>
-              <linearGradient id="metal-grad-front" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#71717A" />
-                <stop offset="50%" stopColor="#E4E4E7" />
-                <stop offset="100%" stopColor="#52525B" />
+              <linearGradient id="wood-front" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#B45309" />
+                <stop offset="50%" stopColor="#92400E" />
+                <stop offset="100%" stopColor="#78350F" />
               </linearGradient>
+              <radialGradient id="rivet-grad" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stopColor="#FEF08A" />
+                <stop offset="100%" stopColor="#B45309" />
+              </radialGradient>
             </defs>
           </svg>
         </div>
@@ -291,14 +380,15 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
       
       {/* Completed Chests Counter Badge */}
       <motion.div 
-        animate={justCompleted ? { scale: [1, 1.4, 1], rotate: [0, -15, 15, 0] } : {}}
-        transition={{ duration: 0.6 }}
-        className="absolute bottom-0 -right-8 bg-gradient-to-br from-yellow-300 to-yellow-500 px-5 py-3 rounded-2xl font-black text-amber-900 shadow-[0_15px_30px_rgba(0,0,0,0.4)] border-4 border-white flex items-center gap-3 z-50"
+        animate={justCompleted ? { scale: [1, 1.5, 1], rotate: [0, -20, 20, 0] } : {}}
+        transition={{ duration: 0.8 }}
+        className="absolute bottom-4 -right-6 md:-right-12 bg-gradient-to-br from-purple-600 to-indigo-900 px-6 py-3 rounded-3xl font-black text-white shadow-[0_20px_40px_rgba(76,29,149,0.6)] border-4 border-yellow-400 flex items-center gap-4 z-50"
       >
-        <div className="w-8 h-6 bg-amber-600 rounded-sm border-2 border-amber-900 relative">
-          <div className="absolute -top-3 -inset-x-0.5 h-4 bg-amber-500 rounded-t-lg border-2 border-amber-900"></div>
+        <div className="w-10 h-8 bg-amber-600 rounded-md border-2 border-amber-900 relative shadow-inner">
+          <div className="absolute -top-4 -inset-x-1 h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-t-xl border-2 border-amber-900"></div>
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-3 bg-zinc-800 rounded-full"></div>
         </div>
-        <span className="text-3xl drop-shadow-sm">x {totalChests}</span>
+        <span className="text-4xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">x {totalChests}</span>
       </motion.div>
 
       {/* Chest Complete Animation Overlay */}
@@ -306,11 +396,12 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
         {justCompleted && (
           <motion.div
             initial={{ opacity: 0, y: 0, scale: 0.5 }}
-            animate={{ opacity: 1, y: -120, scale: 1.2 }}
-            exit={{ opacity: 0, y: -150, scale: 1.5 }}
-            className="absolute bottom-24 z-50 text-4xl font-black text-yellow-300 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] whitespace-nowrap flex flex-col items-center"
+            animate={{ opacity: 1, y: -150, scale: 1.2 }}
+            exit={{ opacity: 0, y: -200, scale: 1.5 }}
+            className="absolute bottom-32 z-50 text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-500 drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)] whitespace-nowrap flex flex-col items-center"
+            style={{ WebkitTextStroke: '2px #78350F' }}
           >
-            <span className="text-white text-xl mb-1 drop-shadow-md">Cufăr Nou!</span>
+            <span className="text-white text-2xl mb-2 drop-shadow-md" style={{ WebkitTextStroke: '1px #000' }}>Cufăr Nou!</span>
             +1 📦
           </motion.div>
         )}
