@@ -1,372 +1,530 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import confetti from 'canvas-confetti';
-import { ChestProgress } from '../../lib/chestProgress';
+/**
+ * TreasureChest.tsx — AAA-style game chest component
+ *
+ * Key insight: the lid uses scaleY compression (transform-origin at bottom
+ * hinge) to simulate "opening backward" — exactly how 2D game sprites look.
+ * Gems pile up in the opening (y ≈ 60-98) and become visible as the lid
+ * compresses / opens.
+ *
+ * Z-order (bottom → top in SVG):
+ *   1. Drop shadow ellipse
+ *   2. Chest body (rect y=98, gold bands, latch)
+ *   3. Gem pile (y ≈ 60-98, above body rim but below lid when closed)
+ *   4. Lid (dome shape, scaleY 1→0 as chest fills)
+ *   5. Dropping gem animation overlay
+ */
 
-type TreasureChestProps = {
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import confetti from 'canvas-confetti';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface ChestProgress {
+  filled?: number;
+  total?: number;
+  chestCount?: number;
+  // legacy API compat
+  itemsCount?: number;
+  totalChests?: number;
+}
+
+interface Props {
   progress: ChestProgress;
   latestItem: number | null;
-};
-
-type GemColor = {
-  name: string;
-  center: string;
-  mid: string;
-  edge: string;
-};
-
-type Position = {
-  x: number;
-  y: number;
-};
-
-const GEM_COLORS: GemColor[] = [
-  { name: 'cyan', center: '#80FFFF', mid: '#00CCDD', edge: '#005566' },
-  { name: 'magenta', center: '#FFB0FF', mid: '#DD00CC', edge: '#550055' },
-  { name: 'gold', center: '#FFFF80', mid: '#FFCC00', edge: '#664400' },
-  { name: 'green', center: '#A0FFB0', mid: '#00DD66', edge: '#004422' },
-  { name: 'purple', center: '#D0A0FF', mid: '#9933FF', edge: '#330066' },
-  { name: 'red', center: '#FFB0B0', mid: '#FF3333', edge: '#660000' },
-];
-
-const GEM_POSITIONS: Position[] = [
-  { x: 0, y: 0 },
-  { x: -18, y: 4 },
-  { x: 18, y: 4 },
-  { x: -9, y: -14 },
-  { x: 9, y: -14 },
-  { x: -28, y: -4 },
-  { x: 28, y: -4 },
-  { x: 0, y: -26 },
-  { x: -20, y: -22 },
-  { x: 20, y: -22 },
-];
-
-const EXTERNAL_GEMS: Array<Position & { colorIndex: number }> = [
-  { x: 52, y: 194, colorIndex: 1 },
-  { x: 144, y: 198, colorIndex: 2 },
-  { x: 160, y: 190, colorIndex: 0 },
-];
-
-const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
-
-function MiniChestIcon({ highlight }: { highlight: boolean }) {
-  return (
-    <div
-      className={`relative h-8 w-10 rounded-md border-2 ${highlight ? 'border-yellow-200 shadow-[0_0_16px_rgba(250,204,21,0.75)]' : 'border-amber-800'} bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800`}
-    >
-      <div className="absolute -top-3 left-0 right-0 h-4 rounded-t-md border-2 border-amber-900 bg-gradient-to-b from-amber-300 to-amber-700" />
-      <div className="absolute left-1 right-1 top-3 h-[3px] rounded-full bg-amber-900/60" />
-      <div className="absolute left-1/2 top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border border-yellow-100/40 bg-zinc-800" />
-    </div>
-  );
 }
 
-const Gem: React.FC<{ x: number; y: number; colorIndex: number; scale?: number }> = ({ x, y, colorIndex, scale = 1 }) => {
-  const color = GEM_COLORS[colorIndex % GEM_COLORS.length];
+// ─── Gem palette ─────────────────────────────────────────────────────────────
+
+const GEM_COLORS: Array<{ light: string; mid: string; dark: string }> = [
+  { light: '#80FFFF', mid: '#00BBDD', dark: '#004455' }, // cyan
+  { light: '#FFB0FF', mid: '#CC00BB', dark: '#440044' }, // magenta
+  { light: '#FFFF80', mid: '#FFCC00', dark: '#664400' }, // gold
+  { light: '#A0FFB0', mid: '#00CC55', dark: '#004422' }, // green
+  { light: '#D0A0FF', mid: '#8822FF', dark: '#220055' }, // purple
+  { light: '#FFB0B0', mid: '#FF2222', dark: '#550000' }, // red
+  { light: '#FFCC80', mid: '#FF8800', dark: '#552200' }, // orange
+];
+
+// Fixed gem pile positions (x, y) — clustered at the chest opening area.
+// y < 101 means they're at/above the body top rim, visible when lid opens.
+const GEM_SLOTS: ReadonlyArray<readonly [number, number]> = [
+  [100,  95] as const, // center-bottom
+  [ 84,  92] as const, // left of centre
+  [116,  92] as const, // right of centre
+  [100,  79] as const, // mid-centre
+  [ 85,  77] as const, // mid-left
+  [115,  77] as const, // mid-right
+  [ 71,  89] as const, // far-left
+  [129,  89] as const, // far-right
+  [100,  64] as const, // top-centre
+  [ 85,  63] as const, // top-left
+];
+
+// ─── Gem shape ───────────────────────────────────────────────────────────────
+
+let _gradId = 0;
+
+function Gem({
+  cx, cy, colorIdx, size = 9,
+}: {
+  cx: number;
+  cy: number;
+  colorIdx: number;
+  size?: number;
+  key?: React.Key;
+}) {
+  const c = GEM_COLORS[colorIdx % GEM_COLORS.length];
+  // Stable id scoped to this component instance
+  const id = useRef(`gem-grad-${++_gradId}`).current;
+  const s = size;
+
+  // 6-sided faceted gem polygon
+  const pts = [
+    `${cx},${cy - s}`,
+    `${cx + s * 0.85},${cy - s * 0.3}`,
+    `${cx + s * 0.85},${cy + s * 0.45}`,
+    `${cx},${cy + s}`,
+    `${cx - s * 0.85},${cy + s * 0.45}`,
+    `${cx - s * 0.85},${cy - s * 0.3}`,
+  ].join(' ');
+
+  // Inner facet line for depth
+  const facetPts = [
+    `${cx},${cy - s * 0.55}`,
+    `${cx + s * 0.45},${cy}`,
+    `${cx},${cy + s * 0.55}`,
+    `${cx - s * 0.45},${cy}`,
+  ].join(' ');
 
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+    <g>
+      <defs>
+        <radialGradient id={id} cx="33%" cy="28%" r="70%">
+          <stop offset="0%"   stopColor={c.light} />
+          <stop offset="50%"  stopColor={c.mid}   />
+          <stop offset="100%" stopColor={c.dark}  />
+        </radialGradient>
+      </defs>
+      {/* Main gem body */}
       <polygon
-        points="0,-10 6,-3 10,4 0,8 -10,4 -6,-3"
-        fill={`url(#gem-${color.name})`}
-        stroke={color.edge}
-        strokeWidth="1"
+        points={pts}
+        fill={`url(#${id})`}
+        stroke={c.dark}
+        strokeWidth="0.7"
       />
-      <ellipse cx="-3" cy="-4" rx="3" ry="2" fill="white" fillOpacity="0.8" />
+      {/* Inner facet */}
+      <polygon
+        points={facetPts}
+        fill="none"
+        stroke={c.light}
+        strokeWidth="0.5"
+        opacity="0.5"
+      />
+      {/* Specular highlight */}
+      <ellipse
+        cx={cx - s * 0.22}
+        cy={cy - s * 0.32}
+        rx={s * 0.28}
+        ry={s * 0.18}
+        fill="white"
+        opacity="0.75"
+      />
     </g>
   );
-};
+}
 
-export function TreasureChest({ progress, latestItem }: TreasureChestProps) {
-  const prevLatestRef = useRef<number | null>(null);
-  const prevFillRatioRef = useRef(0);
+// ─── Sparkle ─────────────────────────────────────────────────────────────────
 
-  const [newGemActive, setNewGemActive] = useState(false);
-  const [pulseGem, setPulseGem] = useState(false);
-  const [completeRays, setCompleteRays] = useState(false);
-  const [forceClose, setForceClose] = useState(false);
-
-  const filled = (progress as ChestProgress & { filled?: number }).filled ?? progress.itemsCount;
-  const total = (progress as ChestProgress & { total?: number }).total ?? 10;
-  const chestCount = (progress as ChestProgress & { chestCount?: number }).chestCount ?? progress.totalChests;
-  const fillRatio = total === 0 ? 0 : clamp(filled / total, 0, 1);
-
-  useEffect(() => {
-    if (fillRatio < 1) {
-      setForceClose(false);
-      setCompleteRays(false);
-    }
-  }, [fillRatio]);
-
-  useEffect(() => {
-    if (latestItem !== null && latestItem !== prevLatestRef.current && filled > 0) {
-      setNewGemActive(true);
-      setPulseGem(false);
-
-      const pulseTimer = setTimeout(() => setPulseGem(true), 420);
-      const clearTimer = setTimeout(() => {
-        setNewGemActive(false);
-        setPulseGem(false);
-      }, 920);
-
-      prevLatestRef.current = latestItem;
-      return () => {
-        clearTimeout(pulseTimer);
-        clearTimeout(clearTimer);
-      };
-    }
-
-    prevLatestRef.current = latestItem;
-    return undefined;
-  }, [latestItem, filled]);
-
-  useEffect(() => {
-    const justCompleted = prevFillRatioRef.current < 1 && fillRatio >= 1;
-    prevFillRatioRef.current = fillRatio;
-
-    if (!justCompleted) {
-      return undefined;
-    }
-
-    setCompleteRays(true);
-    confetti({
-      colors: ['#FFD700', '#FF00CC', '#00FFCC'],
-      particleCount: 180,
-      spread: 118,
-      startVelocity: 46,
-      origin: { x: 0.5, y: 0.48 },
-    });
-
-    const closeTimer = setTimeout(() => {
-      setForceClose(true);
-    }, 1500);
-
-    const clearRayTimer = setTimeout(() => {
-      setCompleteRays(false);
-    }, 1600);
-
-    return () => {
-      clearTimeout(closeTimer);
-      clearTimeout(clearRayTimer);
-    };
-  }, [fillRatio]);
-
-  const lidRatio = forceClose ? 0 : fillRatio;
-  const visibleGemCount = Math.ceil(fillRatio * 10);
-  const showExtraGems = fillRatio >= 0.8;
-
-  const visibleGems = useMemo(
-    () => GEM_POSITIONS.slice(0, visibleGemCount).map((position, index) => ({ ...position, colorIndex: index % GEM_COLORS.length })),
-    [visibleGemCount],
+function Sparkle({ cx, cy, delay = 0 }: { cx: number; cy: number; delay?: number }) {
+  return (
+    <motion.g
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
+      transition={{ duration: 0.7, delay, ease: 'easeOut' }}
+      style={{ transformOrigin: `${cx}px ${cy}px` }}
+    >
+      {/* 4-point star */}
+      <polygon
+        points={`${cx},${cy - 7} ${cx + 1.5},${cy - 1.5} ${cx + 7},${cy} ${cx + 1.5},${cy + 1.5} ${cx},${cy + 7} ${cx - 1.5},${cy + 1.5} ${cx - 7},${cy} ${cx - 1.5},${cy - 1.5}`}
+        fill="#FFE566"
+      />
+    </motion.g>
   );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+let _dropKey = 0;
+
+export function TreasureChest({ progress, latestItem }: Props) {
+  // Support both API shapes
+  const filled     = progress.filled     ?? (progress as any).itemsCount  ?? 0;
+  const total      = progress.total      ?? 10;
+  const chestCount = progress.chestCount ?? (progress as any).totalChests ?? 0;
+
+  const fillRatio   = Math.min(Math.max(filled / total, 0), 1);
+  const gemsVisible = Math.round(fillRatio * 10);
+
+  // Lid scaleY: 1 = fully closed, ≈0 = fully open
+  // We keep a minimum of 0.04 so the gold rim is still visible
+  const lidScaleY = Math.max(0.04, 1 - fillRatio * 1.06);
+  const isOpen    = fillRatio > 0.05;
+
+  // Inner glow intensity
+  const glowAlpha = fillRatio * 0.9;
+
+  // ── Dropping gem state ────────────────────────────────────────────────────
+  const [drops, setDrops] = useState<Array<{ id: number; slotIdx: number; sparkles: boolean }>>([]);
+  const prevLatestRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (latestItem !== null && latestItem !== prevLatestRef.current) {
+      prevLatestRef.current = latestItem;
+      const id = ++_dropKey;
+      setDrops(prev => [...prev, { id, slotIdx: latestItem % 10, sparkles: false }]);
+
+      // Show sparkles after gem lands (~450ms)
+      setTimeout(() => {
+        setDrops(prev => prev.map(d => d.id === id ? { ...d, sparkles: true } : d));
+      }, 450);
+
+      // Remove after animation completes
+      setTimeout(() => {
+        setDrops(prev => prev.filter(d => d.id !== id));
+      }, 1200);
+    }
+  }, [latestItem]);
+
+  // ── Completion confetti ───────────────────────────────────────────────────
+  const prevFillRef = useRef(fillRatio);
+  useEffect(() => {
+    if (fillRatio >= 1.0 && prevFillRef.current < 1.0) {
+      confetti({
+        particleCount: 180,
+        spread: 130,
+        colors: ['#FFD700', '#FF00CC', '#00FFCC', '#FF6600', '#9933FF'],
+        origin: { y: 0.65 },
+      });
+    }
+    prevFillRef.current = fillRatio;
+  }, [fillRatio]);
 
   return (
-    <div className="relative mx-auto mt-8 flex h-64 w-56 min-w-56 items-end justify-center overflow-visible">
-      <motion.svg
-        viewBox="0 0 200 230"
-        className="h-64 w-56 overflow-visible"
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <defs>
-          <linearGradient id="woodBody" x1="0" y1="120" x2="0" y2="210" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#8B4513" />
-            <stop offset="55%" stopColor="#5C2E0A" />
-            <stop offset="100%" stopColor="#3D1A05" />
-          </linearGradient>
-          <linearGradient id="goldBand" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#DAA520" />
-            <stop offset="52%" stopColor="#FFD700" />
-            <stop offset="100%" stopColor="#B8860B" />
-          </linearGradient>
-          <linearGradient id="lidWood" x1="20" y1="58" x2="20" y2="122" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#8B4513" />
-            <stop offset="60%" stopColor="#5C2E0A" />
-            <stop offset="100%" stopColor="#3D1A05" />
-          </linearGradient>
-          <radialGradient id="pileGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(180,100,255,0.5)" />
-            <stop offset="100%" stopColor="rgba(180,100,255,0)" />
-          </radialGradient>
-          {GEM_COLORS.map((gemColor) => (
-            <radialGradient key={gemColor.name} id={`gem-${gemColor.name}`} cx="40%" cy="35%" r="70%">
-              <stop offset="0%" stopColor={gemColor.center} stopOpacity="0.6" />
-              <stop offset="55%" stopColor={gemColor.mid} />
-              <stop offset="100%" stopColor={gemColor.edge} />
-            </radialGradient>
-          ))}
-        </defs>
+    <div className="relative flex flex-col items-center">
 
-        {completeRays && (
-          <g>
-            {Array.from({ length: 8 }).map((_, index) => {
-              const angle = (index * Math.PI) / 4;
-              const x2 = 100 + Math.cos(angle) * 50;
-              const y2 = 150 + Math.sin(angle) * 50;
-              return (
-                <motion.line
-                  key={`ray-${index}`}
-                  x1="100"
-                  y1="150"
-                  x2={x2}
-                  y2={y2}
-                  stroke="#FFE58A"
-                  strokeWidth="2"
-                  strokeDasharray="40 40"
-                  initial={{ strokeDashoffset: 40, opacity: 1 }}
-                  animate={{ strokeDashoffset: 0, opacity: [1, 0] }}
-                  transition={{ duration: 0.7, ease: 'easeOut' }}
-                />
-              );
-            })}
-          </g>
-        )}
-
-        {/* GROUP 1 — drop shadow */}
-        <ellipse cx="100" cy="210" rx="80" ry="14" fill="rgba(0,0,0,0.25)" />
-
-        {/* GROUP 2 — chest body */}
-        <g>
-          <rect x="20" y="120" width="160" height="90" rx="16" fill="url(#woodBody)" stroke="#2a1005" strokeWidth="2" />
-          <path d="M20 132 L10 142 L10 200 L20 210 Z" fill="#3D1A05" />
-
-          {[142, 164, 186].map((y) => (
-            <line key={`plank-${y}`} x1="24" y1={y} x2="176" y2={y} stroke="#2a1005" strokeOpacity="0.6" strokeWidth="2" />
-          ))}
-
-          {[48, 134].map((x) => (
-            <g key={`gold-column-${x}`}>
-              <rect x={x} y="124" width="18" height="82" rx="6" fill="url(#goldBand)" stroke="#8B6914" strokeWidth="1.3" />
-              {Array.from({ length: 6 }).map((_, rivetIndex) => (
-                <circle
-                  key={`rivet-${x}-${rivetIndex}`}
-                  cx={x + 9}
-                  cy={133 + rivetIndex * 13.2}
-                  r="3"
-                  fill="#FFF8DC"
-                  stroke="#8B6914"
-                  strokeWidth="1"
-                />
-              ))}
-            </g>
-          ))}
-
-          <rect x="20" y="120" width="160" height="10" rx="5" fill="url(#goldBand)" />
-          <rect x="20" y="198" width="160" height="12" rx="6" fill="url(#goldBand)" />
-
-          <g>
-            <rect x="85" y="168" width="30" height="20" rx="5" fill="url(#goldBand)" stroke="#8B6914" strokeWidth="1.2" />
-            <circle cx="100" cy="176" r="5" fill="#1a0a00" />
-            <rect x="98.5" y="176" width="3" height="7" rx="1" fill="#1a0a00" />
-          </g>
-        </g>
-
-        {/* GROUP 3 — gem pile */}
-        {fillRatio > 0 && (
-          <g>
-            <motion.ellipse
-              cx="100"
-              cy="110"
-              rx="40"
-              ry="25"
-              fill="url(#pileGlow)"
-              animate={fillRatio >= 0.8 ? { opacity: [0.5, 1, 0.5] } : { opacity: 0.6 }}
-              transition={fillRatio >= 0.8 ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
-            />
-
-            <g transform="translate(100 120)">
-              {visibleGems.map((gem, index) => (
-                <Gem key={`pile-gem-${index}`} x={gem.x} y={gem.y - 10} colorIndex={gem.colorIndex} />
-              ))}
-            </g>
-
-            <AnimatePresence>
-              {newGemActive && (
-                <motion.g
-                  initial={{ x: 100, y: 120 - 100, scale: 0, opacity: 0 }}
-                  animate={{ x: 100, y: 120, scale: pulseGem ? [1, 1.4, 0.9, 1] : 1, opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={
-                    pulseGem
-                      ? { duration: 0.3, times: [0, 0.35, 0.7, 1] }
-                      : { type: 'spring', stiffness: 300, damping: 20 }
-                  }
-                >
-                  <Gem x={0} y={-20} colorIndex={filled} scale={1.05} />
-                  {Array.from({ length: 4 }).map((_, index) => {
-                    const angle = (index * Math.PI) / 2;
-                    return (
-                      <motion.path
-                        key={`burst-${index}`}
-                        d="M0 -4 L1.5 0 L0 4 L-1.5 0 Z"
-                        fill="white"
-                        initial={{ x: 0, y: -20, opacity: 0 }}
-                        animate={{
-                          x: Math.cos(angle) * 14,
-                          y: -20 + Math.sin(angle) * 14,
-                          opacity: [0, 1, 0],
-                        }}
-                        transition={{ duration: 0.4, delay: 0.25 }}
-                      />
-                    );
-                  })}
-                </motion.g>
-              )}
-            </AnimatePresence>
-
-            {showExtraGems &&
-              EXTERNAL_GEMS.map((gem, index) => (
-                <g key={`external-gem-${index}`}>
-                  <Gem x={gem.x} y={gem.y} colorIndex={gem.colorIndex} scale={0.95} />
-                  <motion.path
-                    d={`M ${gem.x + 10} ${gem.y - 14} L ${gem.x + 12} ${gem.y - 10} L ${gem.x + 16} ${gem.y - 8} L ${gem.x + 12} ${gem.y - 6} L ${gem.x + 10} ${gem.y - 2} L ${gem.x + 8} ${gem.y - 6} L ${gem.x + 4} ${gem.y - 8} L ${gem.x + 8} ${gem.y - 10} Z`}
-                    fill="white"
-                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
-                    transition={{ duration: 1.2, repeat: Infinity, delay: index * 0.2 }}
-                  />
-                </g>
-              ))}
-          </g>
-        )}
-
-        {/* GROUP 4 — lid */}
-        <motion.g
-          animate={{ rotate: -lidRatio * 75 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 14 }}
-          style={{ transformOrigin: '100px 190px' }}
+      {/* ── Chest counter badge ────────────────────────────────────────────── */}
+      {chestCount > 0 && (
+        <motion.div
+          className="absolute -top-3 right-2 z-20 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-xl"
+          style={{
+            background: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
+            border: '2.5px solid #FACC15',
+          }}
+          animate={{ scale: [1, 1.06, 1] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <path d="M 20,190 Q 20,130 100,125 Q 180,130 180,190 Z" fill="url(#lidWood)" stroke="#2a1005" strokeWidth="2" />
-          <rect x="30" y="146" width="140" height="10" rx="5" fill="url(#goldBand)" />
-          {Array.from({ length: 7 }).map((_, index) => (
-            <circle
-              key={`lid-rivet-${index}`}
-              cx={35 + index * 22}
-              cy="151"
-              r="2.2"
-              fill="#FFF8DC"
-              stroke="#8B6914"
-              strokeWidth="0.8"
-            />
-          ))}
+          {/* Tiny chest icon */}
+          <svg viewBox="0 0 20 16" className="w-5 h-4">
+            <rect x="1" y="6" width="18" height="9" rx="2" fill="#c8721a" />
+            <rect x="0" y="5" width="20" height="4" rx="2" fill="#f09030" />
+            <rect x="8" y="8" width="4" height="4" rx="1" fill="#7a3a0a" />
+            <circle cx="10" cy="9" r="1.5" fill="#FACC15" />
+          </svg>
+          <span className="text-white font-black text-sm tracking-wide">x {chestCount}</span>
+        </motion.div>
+      )}
 
-          {lidRatio > 20 / 75 && (
+      {/* ── Idle float wrapper ────────────────────────────────────────────── */}
+      <motion.div
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <svg
+          viewBox="0 0 200 175"
+          className="w-52 h-44"
+          style={{ overflow: 'visible' }}
+          aria-label="Treasure chest"
+        >
+          <defs>
+            {/* ── Gradients ─────────────────────────────────────────────── */}
+            <linearGradient id="tc-wood-body" x1="5%" y1="0%" x2="15%" y2="100%">
+              <stop offset="0%"   stopColor="#9B6030" />
+              <stop offset="35%"  stopColor="#7A4418" />
+              <stop offset="100%" stopColor="#3E1A06" />
+            </linearGradient>
+
+            <linearGradient id="tc-wood-lid" x1="10%" y1="0%" x2="20%" y2="100%">
+              <stop offset="0%"   stopColor="#B07035" />
+              <stop offset="45%"  stopColor="#7A4418" />
+              <stop offset="100%" stopColor="#3E1A06" />
+            </linearGradient>
+
+            <linearGradient id="tc-gold-v" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#FFE870" />
+              <stop offset="30%"  stopColor="#DAA520" />
+              <stop offset="75%"  stopColor="#AA8010" />
+              <stop offset="100%" stopColor="#886600" />
+            </linearGradient>
+
+            <linearGradient id="tc-gold-h" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stopColor="#AA8010" />
+              <stop offset="25%"  stopColor="#FFE870" />
+              <stop offset="50%"  stopColor="#DAA520" />
+              <stop offset="75%"  stopColor="#FFE870" />
+              <stop offset="100%" stopColor="#AA8010" />
+            </linearGradient>
+
+            <radialGradient id="tc-glow" cx="50%" cy="90%" r="65%">
+              <stop offset="0%"  stopColor="#FFD700" stopOpacity={glowAlpha}       />
+              <stop offset="45%" stopColor="#CC44FF" stopOpacity={glowAlpha * 0.6} />
+              <stop offset="100%" stopColor="#CC44FF" stopOpacity="0"              />
+            </radialGradient>
+
+            <radialGradient id="tc-lid-inner" cx="50%" cy="70%" r="70%">
+              <stop offset="0%"   stopColor="#FF9900" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#FF9900" stopOpacity="0"    />
+            </radialGradient>
+
+            <filter id="tc-shadow">
+              <feDropShadow dx="0" dy="5" stdDeviation="8" floodColor="rgba(0,0,0,0.45)" />
+            </filter>
+          </defs>
+
+          {/* ── Floor shadow ─────────────────────────────────────────────── */}
+          <ellipse cx="100" cy="169" rx="75" ry="7" fill="rgba(0,0,0,0.22)" />
+
+          {/* ═══════════════════════════════════════════════════════════════
+              LAYER 1 — CHEST BODY (static)
+          ═══════════════════════════════════════════════════════════════ */}
+          <g filter="url(#tc-shadow)">
+
+            {/* Main wooden body */}
+            <rect x="22" y="97" width="156" height="66" rx="5" fill="url(#tc-wood-body)" />
+
+            {/* Horizontal plank lines */}
+            <line x1="22"  y1="119" x2="178" y2="119" stroke="#2a1005" strokeWidth="1.3" opacity="0.55" />
+            <line x1="22"  y1="141" x2="178" y2="141" stroke="#2a1005" strokeWidth="1.3" opacity="0.55" />
+
+            {/* Subtle vertical grain */}
+            {([65, 80, 120, 135] as const).map(x => (
+              <line key={x} x1={x} y1="98" x2={x} y2="162" stroke="#2a1005" strokeWidth="0.6" opacity="0.18" />
+            ))}
+
+            {/* Inner glow at top of body (shows when open) */}
+            <rect x="22" y="97" width="156" height="45" rx="5" fill="url(#tc-glow)" />
+
+            {/* Bottom gold rim */}
+            <rect x="13" y="153" width="174" height="14" rx="5" fill="url(#tc-gold-v)" />
+            <line x1="13" y1="159" x2="187" y2="159" stroke="rgba(255,240,120,0.4)" strokeWidth="1" />
+
+            {/* Top gold rim (body) */}
+            <rect x="13" y="93" width="174" height="11" rx="4" fill="url(#tc-gold-h)" />
+            <line x1="13" y1="96" x2="187" y2="96" stroke="rgba(255,248,180,0.5)" strokeWidth="1" />
+
+            {/* Left vertical gold band */}
+            <rect x="45" y="93" width="18" height="74" fill="url(#tc-gold-v)" />
+            <line x1="49" y1="94" x2="49" y2="166" stroke="rgba(255,248,180,0.45)" strokeWidth="1.2" />
+
+            {/* Right vertical gold band */}
+            <rect x="137" y="93" width="18" height="74" fill="url(#tc-gold-v)" />
+            <line x1="141" y1="94" x2="141" y2="166" stroke="rgba(255,248,180,0.45)" strokeWidth="1.2" />
+
+            {/* Rivets — left band */}
+            {([108, 124, 140, 155] as const).map(y => (
+              <g key={`rl-${y}`}>
+                <circle cx="54" cy={y} r="4.2" fill="#FFF5C0" />
+                <circle cx="54" cy={y} r="2.8" fill="#C89800" />
+                <circle cx="53" cy={y - 1} r="1.1" fill="rgba(255,255,200,0.75)" />
+              </g>
+            ))}
+
+            {/* Rivets — right band */}
+            {([108, 124, 140, 155] as const).map(y => (
+              <g key={`rr-${y}`}>
+                <circle cx="146" cy={y} r="4.2" fill="#FFF5C0" />
+                <circle cx="146" cy={y} r="2.8" fill="#C89800" />
+                <circle cx="145" cy={y - 1} r="1.1" fill="rgba(255,255,200,0.75)" />
+              </g>
+            ))}
+
+            {/* Center latch plate */}
+            <rect x="84" y="111" width="32" height="24" rx="5" fill="url(#tc-gold-v)" />
+            <line x1="85" y1="114" x2="115" y2="114" stroke="rgba(255,248,160,0.6)" strokeWidth="1" />
+            {/* Keyhole */}
+            <circle cx="100" cy="119" r="6"   fill="#1a0800" />
+            <rect   x="97"  y="119" width="6" height="9" rx="1.5" fill="#1a0800" />
+          </g>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              LAYER 2 — GEM PILE
+              Sits above body rim (y ≈ 60–98) but UNDER the lid.
+              Revealed as the lid scaleY → 0.
+          ═══════════════════════════════════════════════════════════════ */}
+          {gemsVisible > 0 && (
             <g>
-              <path d="M 30,186 Q 100,156 170,186 L 170,190 L 30,190 Z" fill="#2a1005" fillOpacity="0.85" />
-              <path d="M 34,186 Q 100,160 166,186" stroke="#C9A227" strokeOpacity="0.45" strokeWidth="2" fill="none" />
+              {/* Glow aura behind pile */}
+              <motion.ellipse
+                cx="100"
+                cy="84"
+                rx="52"
+                ry="26"
+                fill="url(#tc-glow)"
+                animate={fillRatio >= 0.7
+                  ? { opacity: [0.7, 1, 0.7] }
+                  : { opacity: 0.85 }
+                }
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              />
+
+              {/* Gem pile */}
+              {GEM_SLOTS.slice(0, gemsVisible).map(([gx, gy], i) => (
+                <Gem key={i} cx={gx} cy={gy} colorIdx={i} size={9} />
+              ))}
+
+              {/* Overflow gems at base when very full */}
+              {fillRatio >= 0.8 && (
+                <>
+                  <Gem cx={27}  cy={157} colorIdx={2} size={7} />
+                  <Gem cx={172} cy={154} colorIdx={4} size={7} />
+                  <Gem cx={18}  cy={145} colorIdx={0} size={5.5} />
+                  <Gem cx={182} cy={144} colorIdx={5} size={5.5} />
+                </>
+              )}
             </g>
           )}
-        </motion.g>
-      </motion.svg>
 
-      <motion.div
-        className="absolute right-0 top-2 z-40 flex items-center gap-3 rounded-3xl border-4 border-yellow-400 bg-gradient-to-br from-purple-600 via-indigo-700 to-indigo-950 px-5 py-3 font-black text-white shadow-[0_20px_40px_rgba(76,29,149,0.55)]"
-        animate={fillRatio >= 1 ? { scale: [1, 1.12, 1], rotate: [0, -7, 6, 0] } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <MiniChestIcon highlight={fillRatio >= 1} />
-        <span className="text-3xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">x {chestCount}</span>
+          {/* ═══════════════════════════════════════════════════════════════
+              LAYER 3 — LID  (scaleY compresses toward hinge = opens)
+              transformOrigin at bottom-centre of lid (100, 101).
+              scaleY: 1 = closed  →  ≈0 = fully open / flat
+          ═══════════════════════════════════════════════════════════════ */}
+          <motion.g
+            style={{ transformOrigin: '100px 101px' }}
+            animate={{ scaleY: lidScaleY }}
+            transition={{ type: 'spring', stiffness: 130, damping: 15 }}
+          >
+            {/* Dome shape */}
+            <path
+              d="M 17,101 Q 17,30 100,26 Q 183,30 183,101 Z"
+              fill="url(#tc-wood-lid)"
+            />
+
+            {/* Lid inner warm glow (subtle baked-in lighting) */}
+            <path
+              d="M 25,101 Q 25,38 100,34 Q 175,38 175,101 Z"
+              fill="url(#tc-lid-inner)"
+            />
+
+            {/* Lid plank curve lines */}
+            <path d="M 28,91 Q 100,77 172,91" stroke="#2a1005" strokeWidth="1.2" fill="none" opacity="0.55" />
+            <path d="M 34,79 Q 100,62 166,79" stroke="#2a1005" strokeWidth="1.2" fill="none" opacity="0.45" />
+            <path d="M 42,67 Q 100,50 158,67" stroke="#2a1005" strokeWidth="1"   fill="none" opacity="0.35" />
+
+            {/* Sheen highlight on dome */}
+            <path
+              d="M 50,62 Q 100,43 150,62"
+              stroke="rgba(255,255,255,0.17)"
+              strokeWidth="11"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d="M 60,55 Q 100,40 140,55"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
+
+            {/* Lid bottom gold rim */}
+            <rect x="13" y="95" width="174" height="10" rx="3" fill="url(#tc-gold-h)" />
+
+            {/* Lid vertical gold bands */}
+            <path d="M 45,101 Q 46,52 54,42 L 63,42 Q 63,52 63,101 Z" fill="url(#tc-gold-v)" />
+            <path d="M 137,101 Q 137,52 145,42 L 154,42 Q 154,52 155,101 Z" fill="url(#tc-gold-v)" />
+
+            {/* Lid top arc gold trim */}
+            <path
+              d="M 17,101 Q 17,30 100,26 Q 183,30 183,101"
+              fill="none"
+              stroke="url(#tc-gold-h)"
+              strokeWidth="9"
+              strokeLinecap="round"
+            />
+
+            {/* Lid rivets */}
+            {([84, 65] as const).map((y, i) => (
+              <g key={`lid-l-${i}`}>
+                <circle cx="54"  cy={y} r="4.2" fill="#FFF5C0" />
+                <circle cx="54"  cy={y} r="2.8" fill="#C89800" />
+                <circle cx="53"  cy={y - 1} r="1.1" fill="rgba(255,255,200,0.75)" />
+              </g>
+            ))}
+            {([84, 65] as const).map((y, i) => (
+              <g key={`lid-r-${i}`}>
+                <circle cx="146" cy={y} r="4.2" fill="#FFF5C0" />
+                <circle cx="146" cy={y} r="2.8" fill="#C89800" />
+                <circle cx="145" cy={y - 1} r="1.1" fill="rgba(255,255,200,0.75)" />
+              </g>
+            ))}
+
+            {/* Hinge pins at bottom of lid */}
+            <ellipse cx="65"  cy="101" rx="6" ry="4" fill="#C89800" stroke="#886600" strokeWidth="1" />
+            <ellipse cx="135" cy="101" rx="6" ry="4" fill="#C89800" stroke="#886600" strokeWidth="1" />
+          </motion.g>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              LAYER 4 — DROPPING GEM ANIMATION
+          ═══════════════════════════════════════════════════════════════ */}
+          <AnimatePresence>
+            {drops.map(drop => {
+              const [tx, ty] = GEM_SLOTS[drop.slotIdx];
+              return (
+                <React.Fragment key={drop.id}>
+                  {/* Falling gem */}
+                  <motion.g
+                    initial={{ y: -70, opacity: 0, scale: 0 }}
+                    animate={{ y: 0, opacity: 1, scale: [0, 1.3, 0.9, 1] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                  >
+                    <Gem cx={tx} cy={ty - 22} colorIdx={drop.slotIdx} size={12} />
+                  </motion.g>
+
+                  {/* Landing sparkles */}
+                  {drop.sparkles && (
+                    <>
+                      <Sparkle cx={tx - 14} cy={ty - 28} delay={0}    />
+                      <Sparkle cx={tx + 14} cy={ty - 28} delay={0.1}  />
+                      <Sparkle cx={tx}      cy={ty - 42} delay={0.05} />
+                      <Sparkle cx={tx - 8}  cy={ty - 44} delay={0.15} />
+                    </>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </AnimatePresence>
+
+        </svg>
       </motion.div>
+
+      {/* ── Fill progress bar (subtle) ──────────────────────────────────── */}
+      <div className="flex gap-1.5 mt-1">
+        {Array.from({ length: total }).map((_, i) => (
+          <div
+            key={i}
+            className="w-3 h-2 rounded-full transition-all duration-300"
+            style={{
+              background: i < filled
+                ? 'linear-gradient(135deg, #FFE566, #FFAA00)'
+                : 'rgba(0,0,0,0.12)',
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
+
+export default TreasureChest;
