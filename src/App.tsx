@@ -196,10 +196,21 @@ const TREASURE_ITEMS = [
   { component: RubyGem, left: '40%', bottom: '80%', rotate: 0, size: 'w-16 h-16' },
 ];
 
-function TreasureChest({ score, latestItem }: { score: number, latestItem: number | null }) {
+const FLYING_TREASURE_ITEMS = [
+  { component: GoldCoin, size: 'w-16 h-16', rotate: -15, label: '+1 Galben de Aur' },
+  { component: RubyGem, size: 'w-14 h-14', rotate: 12, label: '+1 Rubin Magic' },
+  { component: EmeraldGem, size: 'w-14 h-14', rotate: -10, label: '+1 Smarald' },
+  { component: SapphireGem, size: 'w-14 h-14', rotate: 18, label: '+1 Safir' },
+  { component: RoyalCrown, size: 'w-16 h-16', rotate: 0, label: '+1 Coroană Regală' },
+];
+
+function TreasureChest({ score, latestItem, dropToken }: { score: number, latestItem: number | null, dropToken: number }) {
   const itemsCount = score % 10;
   const totalChests = Math.floor(score / 10);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [incomingTreasure, setIncomingTreasure] = useState<(typeof FLYING_TREASURE_ITEMS)[number] | null>(null);
+  const [dropPosition, setDropPosition] = useState({ x: '50%', y: '-18%', endX: '50%', endY: '42%' });
+  const [showDropFlash, setShowDropFlash] = useState(false);
   const prevScoreRef = useRef(score);
 
   useEffect(() => {
@@ -217,12 +228,42 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
     prevScoreRef.current = score;
   }, [score, itemsCount]);
 
+  useEffect(() => {
+    if (dropToken === 0) return;
+
+    const nextTreasure = FLYING_TREASURE_ITEMS[Math.floor(Math.random() * FLYING_TREASURE_ITEMS.length)];
+    const startX = `${20 + Math.random() * 60}%`;
+    const endX = `${40 + Math.random() * 20}%`;
+
+    setDropPosition({ x: startX, y: '-20%', endX, endY: '42%' });
+    setIncomingTreasure(nextTreasure);
+
+    const flashTimer = setTimeout(() => setShowDropFlash(true), 680);
+    const clearFlashTimer = setTimeout(() => setShowDropFlash(false), 1300);
+    const clearDropTimer = setTimeout(() => setIncomingTreasure(null), 1400);
+
+    return () => {
+      clearTimeout(flashTimer);
+      clearTimeout(clearFlashTimer);
+      clearTimeout(clearDropTimer);
+    };
+  }, [dropToken]);
+
   return (
     <div className="relative w-full max-w-md mx-auto mt-16 h-72 flex items-end justify-center perspective-[2000px]">
       
       {/* Magical Background Glow */}
       <div className="absolute bottom-10 w-96 h-64 bg-purple-500/30 blur-[60px] rounded-full animate-pulse"></div>
       <div className="absolute bottom-0 w-80 h-48 bg-yellow-400/40 blur-[40px] rounded-full"></div>
+      {incomingTreasure && (
+        <motion.div
+          key={`trail-${dropToken}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 0.8 }}
+          className="absolute top-5 left-1/2 -translate-x-1/2 w-2 h-44 bg-gradient-to-b from-yellow-300 via-fuchsia-400 to-transparent blur-sm"
+        />
+      )}
 
       {/* The Chest Container - High Fidelity 3D */}
       <div className="relative w-80 h-64 z-10" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg)' }}>
@@ -377,6 +418,47 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
         </div>
 
       </div>
+
+      {/* Flying reward into chest */}
+      <AnimatePresence>
+        {incomingTreasure && (
+          <>
+            <motion.div
+              key={`flying-reward-${dropToken}`}
+              initial={{ x: dropPosition.x, y: dropPosition.y, scale: 1.6, rotate: -200, opacity: 0 }}
+              animate={{ x: dropPosition.endX, y: dropPosition.endY, scale: 0.7, rotate: incomingTreasure.rotate, opacity: [0, 1, 1, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+              className="absolute z-40 pointer-events-none"
+            >
+              {React.createElement(incomingTreasure.component, { className: incomingTreasure.size })}
+            </motion.div>
+
+            <motion.div
+              key={`drop-label-${dropToken}`}
+              initial={{ opacity: 0, y: 16, scale: 0.8 }}
+              animate={{ opacity: [0, 1, 1, 0], y: [-10, -24, -34, -46], scale: [0.9, 1.1, 1.1, 1.05] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+              className="absolute top-2 left-1/2 -translate-x-1/2 z-40 px-4 py-1 rounded-full bg-gradient-to-r from-yellow-200/95 via-amber-100/95 to-yellow-200/95 border-2 border-yellow-500 text-amber-900 font-black text-sm shadow-xl"
+            >
+              {incomingTreasure.label}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showDropFlash && (
+          <motion.div
+            initial={{ opacity: 0.8, scale: 0.2 }}
+            animate={{ opacity: 0, scale: 2.4 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55 }}
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 w-24 h-24 rounded-full bg-yellow-200 blur-lg pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
       
       {/* Completed Chests Counter Badge */}
       <motion.div 
@@ -435,6 +517,7 @@ export default function App() {
   const [hasStarted, setHasStarted] = useState(false);
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
+  const [treasureDropToken, setTreasureDropToken] = useState(0);
 
   const generateProblem = (level: number) => {
     // Level 1: sum up to 5. Level 2: sum up to 10.
@@ -556,6 +639,7 @@ export default function App() {
       
       // Track the latest item for animation
       setLatestItemIndex((newProfile.score - 1) % 10);
+      setTreasureDropToken(token => token + 1);
 
       // Level up logic (Mastery)
       if (newCorrect >= 5 && newProfile.difficultyLevel === 1) {
@@ -820,7 +904,7 @@ export default function App() {
           </AnimatePresence>
 
           {/* Treasure Chest Reward System */}
-          <TreasureChest score={userProfile.score} latestItem={latestItemIndex} />
+          <TreasureChest score={userProfile.score} latestItem={latestItemIndex} dropToken={treasureDropToken} />
 
           {/* Speed Bump Overlay */}
           <AnimatePresence>
