@@ -61,41 +61,42 @@ const playSound = (type: 'success' | 'error' | 'levelUp' | 'speedBump') => {
   }
 };
 
-type TokenTheme = {
+type CountItemTheme = {
   name: string;
   fillA: string;
   fillB: string;
   glow: string;
   stroke: string;
   accent: string;
-  ornament: 'spark' | 'orb' | 'leaf';
+  motif: 'star' | 'crystal' | 'flower' | 'rocket' | 'heart';
 };
 
-const TOKEN_THEMES: TokenTheme[] = [
-  { name: 'Stelar', fillA: '#fde047', fillB: '#f59e0b', glow: '#fef08a', stroke: '#7c2d12', accent: '#fff7cc', ornament: 'spark' },
-  { name: 'Rubin', fillA: '#fb7185', fillB: '#e11d48', glow: '#fecdd3', stroke: '#881337', accent: '#ffe4e6', ornament: 'orb' },
-  { name: 'Lagună', fillA: '#38bdf8', fillB: '#1d4ed8', glow: '#bae6fd', stroke: '#1e3a8a', accent: '#eff6ff', ornament: 'leaf' },
-  { name: 'Ametist', fillA: '#c084fc', fillB: '#7e22ce', glow: '#e9d5ff', stroke: '#4c1d95', accent: '#faf5ff', ornament: 'spark' },
-  { name: 'Smarald', fillA: '#4ade80', fillB: '#15803d', glow: '#bbf7d0', stroke: '#14532d', accent: '#dcfce7', ornament: 'leaf' },
+const COUNT_ITEM_THEMES: CountItemTheme[] = [
+  { name: 'Aurora', fillA: '#fde047', fillB: '#f59e0b', glow: '#fef08a', stroke: '#7c2d12', accent: '#fff7cc', motif: 'star' },
+  { name: 'Rubin', fillA: '#fb7185', fillB: '#e11d48', glow: '#fecdd3', stroke: '#881337', accent: '#ffe4e6', motif: 'heart' },
+  { name: 'Ocean', fillA: '#67e8f9', fillB: '#2563eb', glow: '#bae6fd', stroke: '#1e3a8a', accent: '#eff6ff', motif: 'crystal' },
+  { name: 'Ametist', fillA: '#c084fc', fillB: '#7e22ce', glow: '#e9d5ff', stroke: '#4c1d95', accent: '#faf5ff', motif: 'flower' },
+  { name: 'Smarald', fillA: '#86efac', fillB: '#16a34a', glow: '#bbf7d0', stroke: '#14532d', accent: '#dcfce7', motif: 'rocket' },
+  { name: 'Coral', fillA: '#fdba74', fillB: '#ea580c', glow: '#fed7aa', stroke: '#7c2d12', accent: '#fff7ed', motif: 'flower' },
 ];
 
-function DetailedToken({ theme, delay }: { theme: TokenTheme; delay: number }) {
-  const gradientId = `${theme.name}-grad`;
-  const glowId = `${theme.name}-glow`;
+function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; delay: number; shapeIndex: number }) {
+  const gradientId = `${theme.name}-${shapeIndex}-grad`;
+  const glowId = `${theme.name}-${shapeIndex}-glow`;
 
   return (
     <motion.div
-      initial={{ scale: 0, rotate: -14, opacity: 0 }}
-      animate={{ scale: 1, rotate: 0, opacity: 1 }}
-      transition={{ delay, type: 'spring', stiffness: 380, damping: 16 }}
+      initial={{ scale: 0, rotate: -14, opacity: 0, y: 8 }}
+      animate={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
+      transition={{ delay, type: 'spring', stiffness: 340, damping: 16 }}
       className="relative"
       title={`Figurină ${theme.name}`}
     >
-      <svg viewBox="0 0 88 88" className="w-11 h-11 drop-shadow-[0_10px_10px_rgba(15,23,42,0.35)]">
+      <svg viewBox="0 0 92 92" className="w-11 h-11 drop-shadow-[0_10px_12px_rgba(15,23,42,0.35)]">
         <defs>
-          <radialGradient id={gradientId} cx="35%" cy="25%" r="70%">
+          <radialGradient id={gradientId} cx="32%" cy="24%" r="72%">
             <stop offset="0%" stopColor={theme.fillA} />
-            <stop offset="55%" stopColor={theme.fillB} />
+            <stop offset="60%" stopColor={theme.fillB} />
             <stop offset="100%" stopColor={theme.stroke} />
           </radialGradient>
           <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
@@ -104,44 +105,61 @@ function DetailedToken({ theme, delay }: { theme: TokenTheme; delay: number }) {
           </radialGradient>
         </defs>
 
-        <circle cx="44" cy="44" r="40" fill={`url(#${glowId})`} opacity="0.6" />
-        <path
-          d="M44 7 L56 29 L81 33 L63 51 L67 78 L44 65 L21 78 L25 51 L7 33 L32 29 Z"
-          fill={`url(#${gradientId})`}
-          stroke={theme.stroke}
-          strokeWidth="3"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M44 14 L52 30 L69 33 L56 46 L59 63 L44 55 L29 63 L32 46 L19 33 L36 30 Z"
-          fill={theme.accent}
-          opacity="0.28"
-        />
-        <ellipse cx="34" cy="30" rx="11" ry="6" fill="#ffffff" opacity="0.45" />
-        <ellipse cx="52" cy="54" rx="13" ry="8" fill="#0f172a" opacity="0.16" />
+        <circle cx="46" cy="46" r="42" fill={`url(#${glowId})`} opacity="0.55" />
 
-        {theme.ornament === 'spark' && (
+        {theme.motif === 'star' && (
           <>
-            <path d="M65 18 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill={theme.accent} opacity="0.8" />
-            <circle cx="68" cy="58" r="2.5" fill={theme.accent} />
+            <path d="M46 8 L57 29 L81 33 L63 51 L68 79 L46 67 L24 79 L29 51 L11 33 L35 29 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
+            <path d="M46 16 L53 30 L68 33 L56 45 L59 61 L46 54 L33 61 L36 45 L24 33 L39 30 Z" fill={theme.accent} opacity="0.3" />
           </>
         )}
 
-        {theme.ornament === 'orb' && (
+        {theme.motif === 'crystal' && (
           <>
-            <circle cx="67" cy="22" r="6" fill={theme.accent} opacity="0.85" />
-            <circle cx="63" cy="21" r="2" fill="#fff" opacity="0.8" />
-            <circle cx="22" cy="61" r="4" fill={theme.glow} opacity="0.7" />
+            <polygon points="46,8 83,30 68,84 24,84 9,30" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
+            <polygon points="46,12 69,30 46,47 23,30" fill={theme.accent} opacity="0.35" />
+            <polygon points="46,47 58,80 34,80" fill="rgba(255,255,255,0.2)" />
           </>
         )}
 
-        {theme.ornament === 'leaf' && (
+        {theme.motif === 'flower' && (
           <>
-            <path d="M64 20 C72 18 76 28 68 34 C60 30 58 22 64 20Z" fill={theme.accent} opacity="0.9" />
-            <path d="M68 34 C66 37 63 39 60 40" stroke={theme.stroke} strokeWidth="1.8" fill="none" opacity="0.65" />
-            <path d="M25 66 C20 63 18 57 22 53 C27 55 29 61 25 66Z" fill={theme.glow} opacity="0.85" />
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse
+                key={a}
+                cx="46"
+                cy="30"
+                rx="13"
+                ry="22"
+                fill={`url(#${gradientId})`}
+                stroke={theme.stroke}
+                strokeWidth="2.2"
+                transform={`rotate(${a} 46 46)`}
+              />
+            ))}
+            <circle cx="46" cy="46" r="13" fill={theme.accent} stroke={theme.stroke} strokeWidth="2.2" />
+            <circle cx="46" cy="46" r="6" fill={theme.fillB} />
           </>
         )}
+
+        {theme.motif === 'rocket' && (
+          <>
+            <path d="M46 10 C59 16 66 30 63 48 C56 53 36 53 29 48 C26 30 33 16 46 10 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" />
+            <ellipse cx="46" cy="33" rx="7" ry="7.5" fill={theme.accent} stroke={theme.stroke} strokeWidth="2" />
+            <path d="M29 45 L19 56 L30 59 Z" fill={theme.fillB} stroke={theme.stroke} strokeWidth="2.2" />
+            <path d="M63 45 L73 56 L62 59 Z" fill={theme.fillB} stroke={theme.stroke} strokeWidth="2.2" />
+            <path d="M39 56 L53 56 L46 83 Z" fill="#fb923c" stroke={theme.stroke} strokeWidth="2.2" />
+          </>
+        )}
+
+        {theme.motif === 'heart' && (
+          <>
+            <path d="M46 81 C24 65 10 50 10 33 C10 20 20 12 31 12 C38 12 44 15 46 20 C48 15 54 12 61 12 C72 12 82 20 82 33 C82 50 68 65 46 81 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
+            <path d="M46 28 C42 21 29 19 24 31 C22 38 25 45 46 66 C67 45 70 38 68 31 C63 19 50 21 46 28 Z" fill={theme.accent} opacity="0.28" />
+          </>
+        )}
+
+        <ellipse cx="34" cy="30" rx="10" ry="6" fill="#ffffff" opacity="0.36" />
       </svg>
     </motion.div>
   );
@@ -194,7 +212,7 @@ export default function App() {
     }
     opts.sort(() => Math.random() - 0.5);
     setOptions(opts);
-    setIconIndex(Math.floor(Math.random() * TOKEN_THEMES.length));
+    setIconIndex(Math.floor(Math.random() * COUNT_ITEM_THEMES.length));
     setShowSuccess(false);
     setWrongAnswer(null);
     setProblemStartTime(Date.now());
@@ -344,7 +362,6 @@ export default function App() {
     await saveDailyStats(updatedStats);
   };
 
-  const activeTokenTheme = TOKEN_THEMES[iconIndex];
 
   if (!dailyStats || !userProfile) return null;
   const chestProgress = getChestProgress(userProfile.score);
@@ -468,7 +485,13 @@ export default function App() {
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
-                  <div key={`n1-${i}`}><DetailedToken theme={activeTokenTheme} delay={i * 0.08} /></div>
+                  <div key={`n1-${i}`}>
+                    <DetailedToken
+                      theme={COUNT_ITEM_THEMES[(iconIndex + i) % COUNT_ITEM_THEMES.length]}
+                      delay={i * 0.07}
+                      shapeIndex={i}
+                    />
+                  </div>
                 ))}
               </div>
               <span className="text-5xl text-sky-500">{num1}</span>
@@ -479,7 +502,13 @@ export default function App() {
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
                 {Array.from({ length: num2 }).map((_, i) => (
-                  <div key={`n2-${i}`}><DetailedToken theme={activeTokenTheme} delay={i * 0.08} /></div>
+                  <div key={`n2-${i}`}>
+                    <DetailedToken
+                      theme={COUNT_ITEM_THEMES[(iconIndex + i + 2) % COUNT_ITEM_THEMES.length]}
+                      delay={i * 0.07}
+                      shapeIndex={i + 20}
+                    />
+                  </div>
                 ))}
               </div>
               <span className="text-5xl text-sky-500">{num2}</span>
