@@ -12,9 +12,26 @@ View your app in AI Studio: https://ai.studio/apps/88a24625-87cd-4b62-aabe-15b36
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Set the `GEMINI_API_KEY` in `.env.local` to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Auto deploy pe GitHub Pages (la fiecare merge/push pe `main`)
+
+Repo-ul include acum workflow-ul `.github/workflows/deploy-pages.yml` care:
+- pornește la orice push pe `main`;
+- face build cu Vite;
+- publică automat folderul `dist` pe GitHub Pages.
+
+### Ce trebuie să faci tu manual (o singură dată)
+
+1. În GitHub, deschide **Settings → Pages**.
+2. La **Source**, selectează **GitHub Actions**.
+3. (Dacă e nevoie) în **Settings → Actions → General**, la **Workflow permissions**, permite ca workflow-urile să poată scrie (`Read and write permissions`).
+4. Fă merge în `main` (sau push direct în `main`) și verifică tab-ul **Actions**.
+5. URL-ul final va fi de forma:
+   `https://<user>.github.io/Basic-Algebra-Game/`
+
+După primul deploy reușit, fiecare merge/push nou în `main` va publica automat versiunea nouă.
