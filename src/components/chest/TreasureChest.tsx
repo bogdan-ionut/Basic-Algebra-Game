@@ -8,47 +8,21 @@ type TreasureChestProps = {
   latestItem: number | null;
 };
 
-type GemColor = {
+type GemPalette = {
   base: string;
   dark: string;
   light: string;
 };
 
-const GEM_COLORS: GemColor[] = [
-  { base: '#ef4444', dark: '#991b1b', light: '#fecaca' },
-  { base: '#3b82f6', dark: '#1e3a8a', light: '#bfdbfe' },
-  { base: '#10b981', dark: '#14532d', light: '#bbf7d0' },
-  { base: '#a855f7', dark: '#581c87', light: '#e9d5ff' },
-  { base: '#f59e0b', dark: '#78350f', light: '#fef3c7' },
+const GEM_COLORS: GemPalette[] = [
+  { base: '#00e5ff', dark: '#0088a0', light: '#b8f9ff' },
+  { base: '#ff00cc', dark: '#93006f', light: '#ffc2f2' },
+  { base: '#ffd700', dark: '#9b7f00', light: '#fff2aa' },
+  { base: '#00ff88', dark: '#008f51', light: '#baffdf' },
+  { base: '#cc44ff', dark: '#6c1c90', light: '#efc7ff' },
 ];
 
-const GemPileToken: React.FC<{ index: number; latestItem: number | null; filled: number }> = ({ index, latestItem, filled }) => {
-  const color = GEM_COLORS[index % GEM_COLORS.length];
-  const x = -52 + (index % 5) * 26 + (Math.floor(index / 5) % 2) * 8;
-  const y = 12 - Math.floor(index / 5) * 15;
-  const isNewest = latestItem === index && filled > 0;
-
-  return (
-    <motion.g
-      initial={isNewest ? { y: -120, opacity: 0, scale: 0.6 } : { y: 0, opacity: 0, scale: 0.95 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
-      transition={
-        isNewest
-          ? { type: 'spring', damping: 12, stiffness: 260, mass: 0.7 }
-          : { duration: 0.28, delay: index * 0.03 }
-      }
-      style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-    >
-      <g transform={`translate(${x} ${y})`}>
-        <polygon points="0,-13 12,-4 8,11 -8,11 -12,-4" fill={color.base} stroke={color.dark} strokeWidth="1.8" />
-        <polygon points="0,-13 12,-4 0,0" fill={color.light} opacity="0.65" />
-        <polygon points="0,0 12,-4 8,11" fill={color.dark} opacity="0.36" />
-        <polygon points="0,0 -12,-4 -8,11" fill={color.light} opacity="0.3" />
-        <ellipse cx="-3.3" cy="-5.1" rx="3.6" ry="2.2" fill="white" opacity="0.48" />
-      </g>
-    </motion.g>
-  );
-};
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 function MiniChestIcon({ highlight }: { highlight: boolean }) {
   return (
@@ -62,189 +36,335 @@ function MiniChestIcon({ highlight }: { highlight: boolean }) {
   );
 }
 
+const GemShape: React.FC<{ x: number; y: number; size: number; colorId: number; sparkle?: boolean }> = ({ x, y, size, colorId, sparkle = false }) => {
+  const color = GEM_COLORS[colorId % GEM_COLORS.length];
+  const h = size;
+  const w = size * 0.8;
+
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <defs>
+        <radialGradient id={`gemGrad-${x}-${y}-${colorId}`} cx="50%" cy="42%" r="70%">
+          <stop offset="0%" stopColor={color.light} />
+          <stop offset="55%" stopColor={color.base} />
+          <stop offset="100%" stopColor={color.dark} />
+        </radialGradient>
+      </defs>
+      <polygon
+        points={`${-w},0 ${-w * 0.35},${-h * 0.6} ${w * 0.35},${-h * 0.6} ${w},0 ${w * 0.35},${h * 0.6} ${-w * 0.35},${h * 0.6}`}
+        fill={`url(#gemGrad-${x}-${y}-${colorId})`}
+        stroke={color.dark}
+        strokeWidth="1"
+      />
+      <polygon points={`${-w * 0.35},${-h * 0.6} 0,0 ${w * 0.35},${-h * 0.6}`} fill="white" opacity="0.18" />
+      <ellipse cx={-w * 0.2} cy={-h * 0.2} rx={w * 0.2} ry={h * 0.12} fill="white" opacity="0.6" />
+      {sparkle && <circle cx={w * 0.95} cy={-h * 0.65} r="1.5" fill="white" opacity="0.7" />}
+    </g>
+  );
+};
+
 export function TreasureChest({ progress, latestItem }: TreasureChestProps) {
+  const prevLatestRef = useRef<number | null>(null);
+  const prevFillRatioRef = useRef(0);
+
+  const [pendingGem, setPendingGem] = useState(false);
   const [burstActive, setBurstActive] = useState(false);
   const [snapShut, setSnapShut] = useState(false);
-  const prevChestCount = useRef(progress.totalChests);
+  const [hideGems, setHideGems] = useState(false);
 
   const filled = (progress as ChestProgress & { filled?: number }).filled ?? progress.itemsCount;
   const total = (progress as ChestProgress & { total?: number }).total ?? 10;
-  const fillRatio = total === 0 ? 0 : filled / total;
-  const lidAngle = useMemo(() => {
-    if (burstActive) return -96;
-    if (fillRatio >= 0.8) return -72;
-    return -12 - fillRatio * 24;
-  }, [burstActive, fillRatio]);
+  const chestCount = (progress as ChestProgress & { chestCount?: number }).chestCount ?? progress.totalChests;
+  const fillRatio = total === 0 ? 0 : clamp(filled / total, 0, 1);
 
   useEffect(() => {
-    if (progress.totalChests > prevChestCount.current) {
-      setBurstActive(true);
-      confetti({
-        particleCount: 180,
-        spread: 125,
-        startVelocity: 52,
-        origin: { y: 0.58 },
-        colors: ['#fde047', '#a855f7', '#60a5fa', '#34d399', '#ffffff'],
-      });
+    if (latestItem !== null && latestItem !== prevLatestRef.current && filled > 0) {
+      setPendingGem(true);
+      const timer = setTimeout(() => setPendingGem(false), 720);
+      prevLatestRef.current = latestItem;
+      return () => clearTimeout(timer);
+    }
+    prevLatestRef.current = latestItem;
+    return undefined;
+  }, [latestItem, filled]);
 
-      const settleTimer = setTimeout(() => {
-        setBurstActive(false);
-        setSnapShut(true);
-      }, 980);
-      const snapTimer = setTimeout(() => setSnapShut(false), 1320);
+  useEffect(() => {
+    const justCompleted = prevFillRatioRef.current < 1 && fillRatio >= 1;
+    prevFillRatioRef.current = fillRatio;
 
-      prevChestCount.current = progress.totalChests;
-      return () => {
-        clearTimeout(settleTimer);
-        clearTimeout(snapTimer);
-      };
+    if (!justCompleted) {
+      if (fillRatio < 1) {
+        setHideGems(false);
+      }
+      return undefined;
     }
 
-    prevChestCount.current = progress.totalChests;
-    return undefined;
-  }, [progress.totalChests]);
+    setBurstActive(true);
+    setSnapShut(false);
+    setHideGems(false);
 
-  const visibleChestHistory = Math.min(progress.totalChests, 6);
+    confetti({
+      particleCount: 170,
+      spread: 122,
+      startVelocity: 48,
+      origin: { x: 0.5, y: 0.42 },
+      colors: ['#ffd700', '#cc44ff', '#00e5ff'],
+    });
+
+    const closeTimer = setTimeout(() => {
+      setSnapShut(true);
+      setHideGems(true);
+    }, 1500);
+
+    const resetTimer = setTimeout(() => {
+      setBurstActive(false);
+      setSnapShut(false);
+      setPendingGem(false);
+    }, 2050);
+
+    return () => {
+      clearTimeout(closeTimer);
+      clearTimeout(resetTimer);
+    };
+  }, [fillRatio]);
+
+  const lidAngle = useMemo(() => {
+    if (snapShut) return 0;
+    if (burstActive) return -80;
+    return -70 * fillRatio;
+  }, [fillRatio, burstActive, snapShut]);
+
+  const pileLevel = hideGems ? 0 : 6 + fillRatio * 34;
+  const visibleGemCount = hideGems ? 0 : Math.min(15, Math.max(0, Math.round(filled + fillRatio * 5) - (pendingGem ? 1 : 0)));
+  const glowOpacity = fillRatio <= 0 ? 0 : 0.25 + fillRatio * 0.75;
+  const historyCount = Math.min(chestCount, 6);
+  const rightFacePath = 'M142 92 L165 108 L165 170 L142 154 Z';
+
+  const gems = Array.from({ length: visibleGemCount }).map((_, index) => {
+    const t = index / Math.max(1, visibleGemCount - 1);
+    const ang = t * Math.PI * 2.2;
+    const radiusX = 42 - (index % 3) * 7;
+    const radiusY = 16 + (index % 4) * 3;
+    const x = 97 + Math.cos(ang) * radiusX + (index % 2 ? 5 : -4);
+    const y = 106 - pileLevel + Math.sin(ang) * radiusY + (index % 3) * 2;
+    const size = 5.8 + (index % 4) * 1.5;
+    return <GemShape key={`pile-gem-${index}`} x={x} y={y} size={size} colorId={index} sparkle />;
+  });
+
+  const overflowGems = fillRatio > 0.8 && !hideGems
+    ? [
+        { x: 56, y: 178, size: 7.5, colorId: 1 },
+        { x: 138, y: 182, size: 7.2, colorId: 2 },
+        { x: 152, y: 173, size: 6.7, colorId: 0 },
+      ]
+    : [];
 
   return (
     <div className="relative w-full max-w-xl mx-auto mt-8 h-[23rem] flex items-end justify-center overflow-visible">
       <motion.svg
-        viewBox="0 0 420 290"
-        className="w-[20rem] md:w-[24rem] drop-shadow-[0_28px_36px_rgba(0,0,0,0.45)]"
-        animate={snapShut ? { scaleX: [1.02, 0.95, 1], y: [0, 7, 0] } : { scaleX: 1, y: 0 }}
-        transition={{ duration: 0.36 }}
+        viewBox="0 0 200 220"
+        className="w-48 h-52 md:w-[12.5rem] md:h-[13.5rem] overflow-visible"
+        animate={snapShut ? { y: [0, 7, -2, 0], scaleY: [1, 0.93, 1] } : { y: 0, scaleY: 1 }}
+        transition={{ duration: 0.45 }}
       >
         <defs>
-          <linearGradient id="woodFront" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#b97433" />
-            <stop offset="50%" stopColor="#8f4f1f" />
-            <stop offset="100%" stopColor="#6f3b17" />
+          <linearGradient id="woodBody" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#6b3518" />
+            <stop offset="100%" stopColor="#3d1f0a" />
           </linearGradient>
-          <linearGradient id="woodTop" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#d5964e" />
-            <stop offset="100%" stopColor="#8a4f1d" />
+          <linearGradient id="woodSide" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#5d2b12" />
+            <stop offset="100%" stopColor="#2f1608" />
           </linearGradient>
-          <linearGradient id="woodDepth" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#603114" />
-            <stop offset="100%" stopColor="#3f1f0c" />
+          <linearGradient id="metalBand" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#f0c040" />
+            <stop offset="100%" stopColor="#c8922a" />
           </linearGradient>
-          <linearGradient id="brass" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffe9a1" />
-            <stop offset="45%" stopColor="#cb9b35" />
-            <stop offset="100%" stopColor="#77521d" />
+          <linearGradient id="lidWood" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#85502a" />
+            <stop offset="100%" stopColor="#4d2711" />
           </linearGradient>
-          <radialGradient id="innerGlow" cx="50%" cy="20%" r="70%">
-            <stop offset="0%" stopColor="#fef08a" stopOpacity={0.3 + fillRatio * 0.55} />
-            <stop offset="55%" stopColor="#c084fc" stopOpacity={0.22 + fillRatio * 0.45} />
-            <stop offset="100%" stopColor="#581c87" stopOpacity="0" />
+          <radialGradient id="insideGlow" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stopColor="#ffd700" stopOpacity={glowOpacity} />
+            <stop offset="55%" stopColor="#cc44ff" stopOpacity={glowOpacity * 0.7} />
+            <stop offset="100%" stopColor="#cc44ff" stopOpacity="0" />
           </radialGradient>
-          <pattern id="woodGrain" width="18" height="18" patternUnits="userSpaceOnUse">
-            <rect width="18" height="18" fill="transparent" />
-            <path d="M-1 4 C4 0, 9 8, 19 4" stroke="#74411b" strokeOpacity="0.42" strokeWidth="1.3" fill="none" />
-            <path d="M-2 11 C5 8, 9 16, 20 12" stroke="#c7833f" strokeOpacity="0.3" strokeWidth="1" fill="none" />
-            <path d="M-2 16 C4 13, 11 19, 22 16" stroke="#5a2f14" strokeOpacity="0.24" strokeWidth="0.9" fill="none" />
-          </pattern>
-          <radialGradient id="shadowFloor" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#000" stopOpacity="0.45" />
+          <radialGradient id="dropShadow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#000" stopOpacity="0.42" />
             <stop offset="100%" stopColor="#000" stopOpacity="0" />
           </radialGradient>
+          <linearGradient id="shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="rgba(255,255,210,0.8)" />
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
         </defs>
 
-        <ellipse cx="210" cy="260" rx="140" ry="24" fill="url(#shadowFloor)" />
+        <ellipse cx="100" cy="194" rx="66" ry="13" fill="url(#dropShadow)" />
 
-        <g>
-          <path d="M112 118 L308 118 L286 224 L134 224 Z" fill="url(#woodDepth)" />
-          <rect x="98" y="104" width="224" height="116" rx="14" fill="url(#woodFront)" stroke="#4b250f" strokeWidth="6" />
-          <rect x="98" y="104" width="224" height="116" rx="14" fill="url(#woodGrain)" opacity="0.7" />
+        <path d="M50 98 L142 98 L142 170 L44 176 Z" fill="url(#woodBody)" stroke="#2e1608" strokeWidth="2.3" />
+        <path d={rightFacePath} fill="url(#woodSide)" stroke="#241106" strokeWidth="2" />
 
-          <rect x="116" y="112" width="188" height="18" rx="7" fill="url(#brass)" stroke="#6f4b13" strokeWidth="3" />
-          <rect x="116" y="172" width="188" height="18" rx="7" fill="url(#brass)" stroke="#6f4b13" strokeWidth="3" />
+        {[112, 126, 140, 154].map((y) => (
+          <line key={`plank-${y}`} x1="49" y1={y} x2="141" y2={y - 2} stroke="#a46839" strokeOpacity="0.38" strokeWidth="1.2" />
+        ))}
+        {Array.from({ length: 11 }).map((_, i) => (
+          <line
+            key={`grain-${i}`}
+            x1={53 + i * 8}
+            y1="102"
+            x2={53 + i * 8 + (i % 2 ? 3 : -2)}
+            y2="173"
+            stroke="#f0c894"
+            strokeOpacity="0.1"
+            strokeWidth="1"
+          />
+        ))}
 
-          {[126, 168, 252, 294].map((x) => (
-            <g key={`rivet-${x}`}>
-              <circle cx={x} cy="122" r="3.8" fill="#f8d271" stroke="#6f4b13" strokeWidth="1.2" />
-              <circle cx={x} cy="182" r="3.8" fill="#f8d271" stroke="#6f4b13" strokeWidth="1.2" />
-            </g>
-          ))}
+        {[74, 113].map((x) => (
+          <g key={`band-${x}`}>
+            <rect x={x} y="99" width="10" height="74" fill="url(#metalBand)" stroke="#8a5e1f" strokeWidth="1.5" />
+            {Array.from({ length: 5 }).map((_, n) => (
+              <circle key={`rivet-${x}-${n}`} cx={x + 5} cy={105 + n * 15} r="1.8" fill="#f8dc7a" stroke="#7f561a" strokeWidth="0.8" />
+            ))}
+          </g>
+        ))}
 
-          <rect x="194" y="137" width="32" height="44" rx="8" fill="url(#brass)" stroke="#5e3d14" strokeWidth="3" />
-          <path d="M210 149 C205 149 201 153 201 158 C201 162 203 164 206 166 L206 172 L214 172 L214 166 C217 164 219 162 219 158 C219 153 215 149 210 149 Z" fill="#3f2b12" />
+        <rect x="92" y="125" width="16" height="22" rx="3" fill="url(#metalBand)" stroke="#815818" strokeWidth="1.2" />
+        <path d="M100 131 C97.5 131 95.7 133 95.7 135.3 C95.7 137.1 96.8 138.5 98.3 139.2 L98.3 142.8 L101.7 142.8 L101.7 139.2 C103.2 138.5 104.3 137.1 104.3 135.3 C104.3 133 102.5 131 100 131 Z" fill="#3f2a10" />
 
-          <rect x="102" y="98" width="14" height="124" rx="6" fill="url(#brass)" stroke="#6f4b13" strokeWidth="3" />
-          <rect x="304" y="98" width="14" height="124" rx="6" fill="url(#brass)" stroke="#6f4b13" strokeWidth="3" />
-        </g>
+        <path d="M50 96 L142 96 L165 112 L72 112 Z" fill="url(#metalBand)" stroke="#7d551d" strokeWidth="2" />
 
-        <g transform="translate(210 122)">
-          <ellipse cx="0" cy="-2" rx="78" ry="36" fill="url(#innerGlow)" />
-          {Array.from({ length: filled }).map((_, index) => (
-            <GemPileToken key={`gem-${progress.totalChests}-${index}`} index={index} latestItem={latestItem} filled={filled} />
-          ))}
-        </g>
+        <ellipse cx="104" cy="111" rx="44" ry="17" fill="#2c160a" opacity="0.92" />
+        <motion.ellipse
+          cx="104"
+          cy="111"
+          rx="45"
+          ry="18"
+          fill="url(#insideGlow)"
+          animate={fillRatio >= 1 && !hideGems ? { opacity: [0.6, 1, 0.6] } : { opacity: glowOpacity }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-        <motion.g
-          animate={{ rotate: lidAngle }}
-          transition={burstActive ? { type: 'spring', stiffness: 190, damping: 12 } : { type: 'spring', stiffness: 130, damping: 16 }}
-          style={{ transformBox: 'fill-box', transformOrigin: '104px 112px' }}
-        >
-          <path d="M88 106 C92 68 124 40 168 32 L244 32 C288 40 320 68 324 106 Z" fill="url(#woodTop)" stroke="#4b250f" strokeWidth="6" />
-          <path d="M88 106 C92 68 124 40 168 32 L244 32 C288 40 320 68 324 106" fill="url(#woodGrain)" opacity="0.65" />
-          <rect x="112" y="82" width="188" height="16" rx="7" fill="url(#brass)" stroke="#6f4b13" strokeWidth="3" />
-          {[126, 168, 252, 294].map((x) => (
-            <circle key={`lid-rivet-${x}`} cx={x} cy="90" r="3.8" fill="#f8d271" stroke="#6f4b13" strokeWidth="1.2" />
-          ))}
-        </motion.g>
+        <g>{gems}</g>
 
         <AnimatePresence>
-          {burstActive && (
-            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {Array.from({ length: 10 }).map((_, idx) => {
-                const angle = (idx / 10) * Math.PI * 2;
-                const x2 = 210 + Math.cos(angle) * 118;
-                const y2 = 116 + Math.sin(angle) * 96;
+          {pendingGem && !hideGems && (
+            <motion.g
+              initial={{ x: 101, y: 36, scale: 0.9 }}
+              animate={{ x: 100, y: 108, scale: [1.3, 0.9, 1] }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            >
+              <GemShape x={0} y={0} size={9} colorId={filled + 1} sparkle />
+              {Array.from({ length: 4 }).map((_, i) => {
+                const angle = (i / 4) * Math.PI * 2;
                 return (
-                  <motion.line
-                    key={`ray-${idx}`}
-                    x1="210"
-                    y1="116"
-                    x2={x2}
-                    y2={y2}
-                    stroke="#fef08a"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ opacity: 0, pathLength: 0 }}
-                    animate={{ opacity: [0, 1, 0], pathLength: [0, 1, 0.6] }}
-                    transition={{ duration: 0.62, delay: idx * 0.03 }}
+                  <motion.path
+                    key={`spawn-spark-${i}`}
+                    d="M0 -4 L1 0 L0 4 L-1 0 Z"
+                    fill="white"
+                    initial={{ x: 0, y: 0, opacity: 0 }}
+                    animate={{ x: Math.cos(angle) * 9, y: Math.sin(angle) * 9, opacity: [0, 1, 0] }}
+                    transition={{ duration: 0.4, delay: 0.24 + i * 0.05 }}
                   />
                 );
               })}
             </motion.g>
           )}
         </AnimatePresence>
+
+        <motion.g
+          animate={{ rotate: lidAngle }}
+          transition={burstActive ? { type: 'spring', stiffness: 230, damping: 10 } : { type: 'spring', stiffness: 140, damping: 16 }}
+          style={{ transformBox: 'fill-box', transformOrigin: '146px 98px' }}
+        >
+          <circle cx="120" cy="98" r="3" fill="#c8922a" stroke="#75521c" strokeWidth="1" />
+          <circle cx="140" cy="102" r="3" fill="#c8922a" stroke="#75521c" strokeWidth="1" />
+          <path d="M52 96 C58 70 82 52 118 50 C145 50 162 64 168 90 L165 112 L72 112 Z" fill="url(#lidWood)" stroke="#2d1608" strokeWidth="2.3" />
+          <path d="M74 112 Q118 123 164 111 L161 119 Q117 130 73 119 Z" fill="#2a1408" opacity="0.82" />
+          <rect x="77" y="82" width="8" height="29" fill="url(#metalBand)" stroke="#7f561a" strokeWidth="1.2" />
+          <rect x="124" y="72" width="8" height="38" fill="url(#metalBand)" stroke="#7f561a" strokeWidth="1.2" />
+        </motion.g>
+
+        <AnimatePresence>
+          {burstActive && !snapShut && (
+            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {Array.from({ length: 8 }).map((_, idx) => {
+                const angle = (idx / 8) * Math.PI * 2;
+                const x2 = 104 + Math.cos(angle) * 68;
+                const y2 = 110 + Math.sin(angle) * 52;
+                return (
+                  <motion.line
+                    key={`ray-${idx}`}
+                    x1="104"
+                    y1="110"
+                    x2={x2}
+                    y2={y2}
+                    stroke="#f6db7a"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeDasharray="6 6"
+                    initial={{ opacity: 0.2, strokeDashoffset: 0 }}
+                    animate={{ opacity: [0.2, 1, 0], strokeDashoffset: [0, 100] }}
+                    transition={{ duration: 0.6, delay: idx * 0.02 }}
+                  />
+                );
+              })}
+            </motion.g>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {burstActive && (
+            <motion.rect
+              initial={{ x: -120, opacity: 0 }}
+              animate={{ x: 260, opacity: [0, 0.65, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.9 }}
+              y="84"
+              width="80"
+              height="80"
+              transform="rotate(-8 100 120)"
+              fill="url(#shimmer)"
+            />
+          )}
+        </AnimatePresence>
+
+        {overflowGems.map((gem, i) => (
+          <motion.g key={`overflow-gem-${i}`} animate={{ y: [0, -2.5, 0], opacity: [0.95, 1, 0.95] }} transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.2 }}>
+            <GemShape x={gem.x} y={gem.y} size={gem.size} colorId={gem.colorId} sparkle />
+            <motion.path
+              d={`M ${gem.x + 9} ${gem.y - 11} L ${gem.x + 10.5} ${gem.y - 7} L ${gem.x + 14} ${gem.y - 6} L ${gem.x + 10.5} ${gem.y - 5} L ${gem.x + 9} ${gem.y - 1} L ${gem.x + 7.5} ${gem.y - 5} L ${gem.x + 4} ${gem.y - 6} L ${gem.x + 7.5} ${gem.y - 7} Z`}
+              fill="white"
+              animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 0.8] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.1 + i * 0.25 }}
+            />
+          </motion.g>
+        ))}
       </motion.svg>
 
       <motion.div
-        animate={burstActive ? { scale: [1, 1.18, 1], rotate: [0, -10, 8, 0] } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.85 }}
+        animate={burstActive ? { scale: [1, 1.2, 1], rotate: [0, -8, 7, 0] } : { scale: 1, rotate: 0 }}
+        transition={{ duration: 0.8 }}
         className="absolute top-0 right-0 md:-right-5 bg-gradient-to-br from-purple-600 via-indigo-700 to-indigo-950 px-5 py-3 rounded-3xl font-black text-white shadow-[0_20px_40px_rgba(76,29,149,0.55)] border-4 border-yellow-400 flex items-center gap-3 z-50"
       >
         <MiniChestIcon highlight={burstActive} />
-        <span className="text-3xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">x {progress.totalChests}</span>
+        <span className="text-3xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">x {chestCount}</span>
       </motion.div>
 
       <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-[70] bg-slate-900/70 backdrop-blur-sm border border-slate-200/20 rounded-2xl px-4 py-2 flex items-end gap-2 shadow-xl">
-        {Array.from({ length: visibleChestHistory }).map((_, i) => (
+        {Array.from({ length: historyCount }).map((_, i) => (
           <motion.div
             key={`mini-history-${i}`}
-            initial={i === visibleChestHistory - 1 ? { y: 10, opacity: 0 } : false}
+            initial={i === historyCount - 1 ? { y: 10, opacity: 0 } : false}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.35, delay: i * 0.04 }}
           >
-            <MiniChestIcon highlight={i === visibleChestHistory - 1 && burstActive} />
+            <MiniChestIcon highlight={i === historyCount - 1 && burstActive} />
           </motion.div>
         ))}
-        {progress.totalChests > visibleChestHistory && (
-          <span className="text-sm font-bold text-white/90 pl-1">+{progress.totalChests - visibleChestHistory}</span>
-        )}
+        {chestCount > historyCount && <span className="text-sm font-bold text-white/90 pl-1">+{chestCount - historyCount}</span>}
       </div>
     </div>
   );
