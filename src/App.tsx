@@ -62,105 +62,83 @@ const playSound = (type: 'success' | 'error' | 'levelUp' | 'speedBump') => {
 };
 
 type CountItemTheme = {
-  name: string;
-  fillA: string;
-  fillB: string;
+  name: 'Ruby' | 'Sapphire' | 'Emerald' | 'Amethyst' | 'Topaz';
+  base: string;
+  dark: string;
+  light: string;
   glow: string;
-  stroke: string;
-  accent: string;
-  motif: 'star' | 'crystal' | 'flower' | 'rocket' | 'heart';
 };
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
-  { name: 'Aurora', fillA: '#fde047', fillB: '#f59e0b', glow: '#fef08a', stroke: '#7c2d12', accent: '#fff7cc', motif: 'star' },
-  { name: 'Rubin', fillA: '#fb7185', fillB: '#e11d48', glow: '#fecdd3', stroke: '#881337', accent: '#ffe4e6', motif: 'heart' },
-  { name: 'Ocean', fillA: '#67e8f9', fillB: '#2563eb', glow: '#bae6fd', stroke: '#1e3a8a', accent: '#eff6ff', motif: 'crystal' },
-  { name: 'Ametist', fillA: '#c084fc', fillB: '#7e22ce', glow: '#e9d5ff', stroke: '#4c1d95', accent: '#faf5ff', motif: 'flower' },
-  { name: 'Smarald', fillA: '#86efac', fillB: '#16a34a', glow: '#bbf7d0', stroke: '#14532d', accent: '#dcfce7', motif: 'rocket' },
-  { name: 'Coral', fillA: '#fdba74', fillB: '#ea580c', glow: '#fed7aa', stroke: '#7c2d12', accent: '#fff7ed', motif: 'flower' },
+  { name: 'Ruby', base: '#ef4444', dark: '#991b1b', light: '#fecaca', glow: '#fca5a5' },
+  { name: 'Sapphire', base: '#3b82f6', dark: '#1e3a8a', light: '#bfdbfe', glow: '#93c5fd' },
+  { name: 'Emerald', base: '#10b981', dark: '#14532d', light: '#a7f3d0', glow: '#6ee7b7' },
+  { name: 'Amethyst', base: '#a855f7', dark: '#581c87', light: '#e9d5ff', glow: '#d8b4fe' },
+  { name: 'Topaz', base: '#f59e0b', dark: '#78350f', light: '#fef3c7', glow: '#fcd34d' },
 ];
 
 function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; delay: number; shapeIndex: number }) {
-  const gradientId = `${theme.name}-${shapeIndex}-grad`;
-  const glowId = `${theme.name}-${shapeIndex}-glow`;
+  const gradId = `gem-${theme.name}-${shapeIndex}-grad`;
+  const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
 
   return (
     <motion.div
-      initial={{ scale: 0, rotate: -14, opacity: 0, y: 8 }}
-      animate={{ scale: 1, rotate: 0, opacity: 1, y: 0 }}
-      transition={{ delay, type: 'spring', stiffness: 340, damping: 16 }}
+      initial={{ scale: 0, rotate: -35, opacity: 0 }}
+      animate={{ scale: [0, 1.2, 1], rotate: [-35, 10, 0], opacity: 1 }}
+      transition={{ delay, duration: 0.6, times: [0, 0.7, 1], ease: 'easeOut' }}
       className="relative"
-      title={`Figurină ${theme.name}`}
+      title={`Gemă ${theme.name}`}
     >
-      <svg viewBox="0 0 92 92" className="w-11 h-11 drop-shadow-[0_10px_12px_rgba(15,23,42,0.35)]">
+      <motion.svg
+        viewBox="0 0 100 100"
+        className="w-10 h-10 drop-shadow-[0_8px_10px_rgba(15,23,42,0.35)]"
+        animate={{ y: [0, -1.5, 0] }}
+        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
+      >
         <defs>
-          <radialGradient id={gradientId} cx="32%" cy="24%" r="72%">
-            <stop offset="0%" stopColor={theme.fillA} />
-            <stop offset="60%" stopColor={theme.fillB} />
-            <stop offset="100%" stopColor={theme.stroke} />
+          <radialGradient id={gradId} cx="30%" cy="25%" r="72%">
+            <stop offset="0%" stopColor={theme.light} />
+            <stop offset="56%" stopColor={theme.base} />
+            <stop offset="100%" stopColor={theme.dark} />
           </radialGradient>
           <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={theme.glow} stopOpacity="0.95" />
+            <stop offset="0%" stopColor={theme.glow} stopOpacity="0.72" />
             <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
           </radialGradient>
         </defs>
 
-        <circle cx="46" cy="46" r="42" fill={`url(#${glowId})`} opacity="0.55" />
+        <circle cx="50" cy="50" r="40" fill={`url(#${glowId})`} opacity="0.55" />
+        <polygon points="50,8 82,28 76,70 50,92 24,70 18,28" fill={`url(#${gradId})`} stroke={theme.dark} strokeWidth="3" strokeLinejoin="round" />
 
-        {theme.motif === 'star' && (
-          <>
-            <path d="M46 8 L57 29 L81 33 L63 51 L68 79 L46 67 L24 79 L29 51 L11 33 L35 29 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
-            <path d="M46 16 L53 30 L68 33 L56 45 L59 61 L46 54 L33 61 L36 45 L24 33 L39 30 Z" fill={theme.accent} opacity="0.3" />
-          </>
-        )}
+        <polygon points="50,8 82,28 50,42 18,28" fill={theme.light} opacity="0.5" />
+        <polygon points="18,28 50,42 24,70" fill={theme.dark} opacity="0.3" />
+        <polygon points="82,28 50,42 76,70" fill={theme.dark} opacity="0.36" />
+        <polygon points="50,42 76,70 50,92" fill={theme.light} opacity="0.22" />
+        <polygon points="50,42 24,70 50,92" fill="white" opacity="0.15" />
 
-        {theme.motif === 'crystal' && (
-          <>
-            <polygon points="46,8 83,30 68,84 24,84 9,30" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
-            <polygon points="46,12 69,30 46,47 23,30" fill={theme.accent} opacity="0.35" />
-            <polygon points="46,47 58,80 34,80" fill="rgba(255,255,255,0.2)" />
-          </>
-        )}
+        <ellipse cx="38" cy="28" rx="11" ry="6" fill="white" opacity="0.52" />
+      </motion.svg>
 
-        {theme.motif === 'flower' && (
-          <>
-            {[0, 72, 144, 216, 288].map((a) => (
-              <ellipse
-                key={a}
-                cx="46"
-                cy="30"
-                rx="13"
-                ry="22"
-                fill={`url(#${gradientId})`}
-                stroke={theme.stroke}
-                strokeWidth="2.2"
-                transform={`rotate(${a} 46 46)`}
-              />
-            ))}
-            <circle cx="46" cy="46" r="13" fill={theme.accent} stroke={theme.stroke} strokeWidth="2.2" />
-            <circle cx="46" cy="46" r="6" fill={theme.fillB} />
-          </>
-        )}
-
-        {theme.motif === 'rocket' && (
-          <>
-            <path d="M46 10 C59 16 66 30 63 48 C56 53 36 53 29 48 C26 30 33 16 46 10 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" />
-            <ellipse cx="46" cy="33" rx="7" ry="7.5" fill={theme.accent} stroke={theme.stroke} strokeWidth="2" />
-            <path d="M29 45 L19 56 L30 59 Z" fill={theme.fillB} stroke={theme.stroke} strokeWidth="2.2" />
-            <path d="M63 45 L73 56 L62 59 Z" fill={theme.fillB} stroke={theme.stroke} strokeWidth="2.2" />
-            <path d="M39 56 L53 56 L46 83 Z" fill="#fb923c" stroke={theme.stroke} strokeWidth="2.2" />
-          </>
-        )}
-
-        {theme.motif === 'heart' && (
-          <>
-            <path d="M46 81 C24 65 10 50 10 33 C10 20 20 12 31 12 C38 12 44 15 46 20 C48 15 54 12 61 12 C72 12 82 20 82 33 C82 50 68 65 46 81 Z" fill={`url(#${gradientId})`} stroke={theme.stroke} strokeWidth="3" strokeLinejoin="round" />
-            <path d="M46 28 C42 21 29 19 24 31 C22 38 25 45 46 66 C67 45 70 38 68 31 C63 19 50 21 46 28 Z" fill={theme.accent} opacity="0.28" />
-          </>
-        )}
-
-        <ellipse cx="34" cy="30" rx="10" ry="6" fill="#ffffff" opacity="0.36" />
-      </svg>
+      <div className="pointer-events-none absolute inset-0">
+        {[
+          { x: '-18%', y: '20%', d: 0 },
+          { x: '78%', y: '10%', d: 0.06 },
+          { x: '82%', y: '72%', d: 0.12 },
+          { x: '4%', y: '78%', d: 0.16 },
+        ].map((star, i) => (
+          <motion.svg
+            key={`${theme.name}-sparkle-${shapeIndex}-${i}`}
+            viewBox="0 0 20 20"
+            className="absolute w-3 h-3"
+            style={{ left: star.x, top: star.y }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: [0, 1.15, 0], opacity: [0, 0.95, 0] }}
+            transition={{ duration: 0.52, delay: delay + star.d }}
+          >
+            <path d="M10 1 L12 8 L19 10 L12 12 L10 19 L8 12 L1 10 L8 8 Z" fill="white" />
+          </motion.svg>
+        ))}
+      </div>
     </motion.div>
   );
 }
