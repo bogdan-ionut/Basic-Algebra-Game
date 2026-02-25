@@ -61,6 +61,14 @@ const GEM_SLOTS: ReadonlyArray<readonly [number, number]> = [
   [ 85,  63] as const, // top-left
 ];
 
+const LOOT_REVEAL_LEVELS = {
+  coins: 0.2,
+  crown: 0.35,
+  queenCrown: 0.5,
+  sword: 0.65,
+  relics: 0.82,
+} as const;
+
 // ─── Gem shape ───────────────────────────────────────────────────────────────
 
 let _gradId = 0;
@@ -153,6 +161,50 @@ function Sparkle({ cx, cy, delay = 0 }: { cx: number; cy: number; delay?: number
   );
 }
 
+function CoinStack({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      {[8, 4, 0].map((offset, i) => (
+        <g key={i} transform={`translate(0 ${offset})`}>
+          <ellipse cx="0" cy="0" rx="11" ry="4" fill="#7A5200" opacity="0.3" />
+          <ellipse cx="0" cy="-1.2" rx="11" ry="4" fill="#FEE78D" />
+          <ellipse cx="0" cy="-1.2" rx="8" ry="2.8" fill="#DAA520" />
+          <circle cx="0" cy="-1.2" r="1.7" fill="#FFF3BE" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+function Crown({ x, y, scale = 1, variant = 'king' }: { x: number; y: number; scale?: number; variant?: 'king' | 'queen' }) {
+  const highlight = variant === 'king' ? '#FFEFA8' : '#FFD5F6';
+  const gem = variant === 'king' ? '#FF3B30' : '#B833FF';
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <path d="M -16 8 L -11 -9 L -3 -1 L 0 -12 L 3 -1 L 11 -9 L 16 8 Z" fill="url(#tc-gold-h)" stroke="#8B5B00" strokeWidth="1.3" />
+      <rect x="-18" y="7" width="36" height="8" rx="3" fill="url(#tc-gold-v)" stroke="#8B5B00" strokeWidth="1.2" />
+      <circle cx="0" cy="4" r="3.6" fill={gem} stroke={highlight} strokeWidth="1" />
+      <circle cx="-9" cy="5" r="2.4" fill="#1DD1FF" stroke={highlight} strokeWidth="0.8" />
+      <circle cx="9" cy="5" r="2.4" fill="#29E07A" stroke={highlight} strokeWidth="0.8" />
+      <ellipse cx="-10.8" cy="-9.5" rx="2.8" ry="1.8" fill={highlight} />
+      <ellipse cx="0" cy="-12.4" rx="2.8" ry="1.8" fill={highlight} />
+      <ellipse cx="10.8" cy="-9.5" rx="2.8" ry="1.8" fill={highlight} />
+    </g>
+  );
+}
+
+function Sword({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(-16) scale(${scale})`}>
+      <rect x="-1.9" y="-30" width="3.8" height="24" rx="1.8" fill="#DDF5FF" stroke="#7EA2B3" strokeWidth="0.9" />
+      <path d="M -1.9 -30 L 0 -40 L 1.9 -30 Z" fill="#BCE4FA" stroke="#7EA2B3" strokeWidth="0.8" />
+      <rect x="-9" y="-7" width="18" height="4" rx="1.7" fill="#C89800" stroke="#7A4F00" strokeWidth="0.9" />
+      <rect x="-2.8" y="-4" width="5.6" height="11" rx="2" fill="#91531E" stroke="#5A2D0F" strokeWidth="0.9" />
+      <circle cx="0" cy="8" r="2" fill="#F6D75A" stroke="#7A4F00" strokeWidth="0.8" />
+    </g>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 let _dropKey = 0;
@@ -168,8 +220,8 @@ export function TreasureChest({ progress, latestItem }: Props) {
 
   // Lid scaleY: 1 = fully closed, ≈0 = fully open
   // We keep a minimum of 0.04 so the gold rim is still visible
-  const lidScaleY = Math.max(0.04, 1 - fillRatio * 1.06);
-  const isOpen    = fillRatio > 0.05;
+  const lidScaleY = Math.max(0.015, 1 - fillRatio * 1.22);
+  const isOpen    = fillRatio > 0.03;
 
   // Inner glow intensity
   const glowAlpha = fillRatio * 0.9;
@@ -381,6 +433,49 @@ export function TreasureChest({ progress, latestItem }: Props) {
               {GEM_SLOTS.slice(0, gemsVisible).map(([gx, gy], i) => (
                 <Gem key={i} cx={gx} cy={gy} colorIdx={i} size={9} />
               ))}
+
+              {/* Detailed loot variety: coins, crowns, swords & relic gems */}
+              {fillRatio >= LOOT_REVEAL_LEVELS.coins && (
+                <>
+                  <CoinStack x={70} y={92} scale={0.72} />
+                  <CoinStack x={127} y={90} scale={0.68} />
+                </>
+              )}
+
+              {fillRatio >= LOOT_REVEAL_LEVELS.crown && (
+                <motion.g
+                  animate={{ y: [0, -1.5, 0] }}
+                  transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <Crown x={80} y={81} scale={0.68} variant="king" />
+                </motion.g>
+              )}
+
+              {fillRatio >= LOOT_REVEAL_LEVELS.queenCrown && (
+                <motion.g
+                  animate={{ y: [0, -1.2, 0] }}
+                  transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut', delay: 0.15 }}
+                >
+                  <Crown x={122} y={80} scale={0.62} variant="queen" />
+                </motion.g>
+              )}
+
+              {fillRatio >= LOOT_REVEAL_LEVELS.sword && (
+                <motion.g
+                  animate={{ rotate: [-2, 1.5, -2] }}
+                  transition={{ duration: 2.3, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ transformOrigin: '109px 88px' }}
+                >
+                  <Sword x={109} y={91} scale={0.62} />
+                </motion.g>
+              )}
+
+              {fillRatio >= LOOT_REVEAL_LEVELS.relics && (
+                <>
+                  <Gem cx={151} cy={85} colorIdx={2} size={8.2} />
+                  <Gem cx={54} cy={84} colorIdx={4} size={7.6} />
+                </>
+              )}
 
               {/* Overflow gems at base when very full */}
               {fillRatio >= 0.8 && (
