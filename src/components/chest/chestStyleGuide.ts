@@ -11,16 +11,31 @@ export type RarityConfig = {
 
 export const CHEST_STYLE_GUIDE = {
   contourWidth: 3,
-  glowType: 'soft-bloom',
+  glowType: 'cinematic-bloom',
   materials: {
-    wood: { base: '#8B4513', shadow: '#3E1F00' },
-    metal: { base: '#D4A017', sheen: '#FEF08A' },
-    gem: { base: '#9333EA', highlight: '#C084FC' },
+    wood: {
+      base: '#8A4B1E',
+      shadow: '#3A1A08',
+      highlight: '#C9864A',
+      deepShadow: '#241104',
+    },
+    metal: {
+      base: '#E6B23C',
+      sheen: '#FFF0B0',
+      shadow: '#7A4A10',
+      highlight: '#FFE39A',
+    },
+    gem: {
+      base: '#7C3AED',
+      highlight: '#E9D5FF',
+      shadow: '#4C1D95',
+    },
   },
   palette: {
-    bgGlowPrimary: '#A855F7',
-    bgGlowSecondary: '#FBBF24',
-    vignette: 'rgba(15, 23, 42, 0.40)',
+    bgGlowPrimary: '#9333EA',
+    bgGlowSecondary: '#22D3EE',
+    bgGlowAccent: '#F59E0B',
+    vignette: 'rgba(3, 7, 18, 0.55)',
   },
 } as const;
 
