@@ -16,10 +16,19 @@ export interface UserProfile {
 }
 
 export const getTodayDateString = () => {
-  const today = new Date();
+  return getDateStringForLocalTimezone(new Date());
+};
+
+export const getDateStringDaysAgo = (daysAgo: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return getDateStringForLocalTimezone(date);
+};
+
+const getDateStringForLocalTimezone = (date: Date) => {
   // Adjust for local timezone to avoid UTC date shifting issues
-  const offset = today.getTimezoneOffset() * 60000;
-  const localDate = new Date(today.getTime() - offset);
+  const offset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() - offset);
   return localDate.toISOString().split('T')[0];
 };
 
