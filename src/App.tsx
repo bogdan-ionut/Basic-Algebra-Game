@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Star, Apple, Heart, Smile, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle } from 'lucide-react';
@@ -196,11 +196,28 @@ const TREASURE_ITEMS = [
   { component: RubyGem, left: '40%', bottom: '80%', rotate: 0, size: 'w-16 h-16' },
 ];
 
+const CHEST_VISUAL_TOKENS = {
+  glowPrimary: '#A855F7',
+  glowSecondary: '#FBBF24',
+  woodDeep: '#3E1F00',
+};
+
 function TreasureChest({ score, latestItem }: { score: number, latestItem: number | null }) {
   const itemsCount = score % 10;
   const totalChests = Math.floor(score / 10);
   const [justCompleted, setJustCompleted] = useState(false);
   const prevScoreRef = useRef(score);
+  const ambientSparkles = useMemo(
+    () => [
+      { left: '12%', bottom: '55%', size: 8, delay: 0 },
+      { left: '25%', bottom: '80%', size: 5, delay: 0.2 },
+      { left: '40%', bottom: '68%', size: 6, delay: 0.7 },
+      { left: '57%', bottom: '82%', size: 4, delay: 1.1 },
+      { left: '74%', bottom: '72%', size: 7, delay: 0.4 },
+      { left: '88%', bottom: '60%', size: 5, delay: 0.9 },
+    ],
+    []
+  );
 
   useEffect(() => {
     if (score > prevScoreRef.current && itemsCount === 0 && score > 0) {
@@ -221,19 +238,47 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
     <div className="relative w-full max-w-md mx-auto mt-16 h-72 flex items-end justify-center perspective-[2000px]">
       
       {/* Magical Background Glow */}
-      <div className="absolute bottom-10 w-96 h-64 bg-purple-500/30 blur-[60px] rounded-full animate-pulse"></div>
-      <div className="absolute bottom-0 w-80 h-48 bg-yellow-400/40 blur-[40px] rounded-full"></div>
+      <motion.div
+        animate={{ opacity: [0.45, 0.75, 0.45], scale: [1, 1.08, 1] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-10 w-96 h-64 blur-[60px] rounded-full"
+        style={{ backgroundColor: `${CHEST_VISUAL_TOKENS.glowPrimary}55` }}
+      />
+      <motion.div
+        animate={{ opacity: [0.35, 0.65, 0.35], scale: [1, 0.95, 1] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-0 w-80 h-48 blur-[40px] rounded-full"
+        style={{ backgroundColor: `${CHEST_VISUAL_TOKENS.glowSecondary}66` }}
+      />
+
+      {/* Ambient Sparkles */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {ambientSparkles.map((sparkle, index) => (
+          <motion.div
+            key={`sparkle-${index}`}
+            className="absolute rounded-full bg-white"
+            style={{ left: sparkle.left, bottom: sparkle.bottom, width: sparkle.size, height: sparkle.size }}
+            animate={{ opacity: [0.1, 0.9, 0.1], y: [0, -10, 0], scale: [0.7, 1.1, 0.7] }}
+            transition={{ duration: 2.6, repeat: Infinity, delay: sparkle.delay, ease: 'easeInOut' }}
+          />
+        ))}
+      </div>
 
       {/* The Chest Container - High Fidelity 3D */}
-      <div className="relative w-80 h-64 z-10" style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg)' }}>
+      <motion.div
+        className="relative w-80 h-64 z-10"
+        style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg)' }}
+        animate={{ y: [0, -4, 0], rotateZ: [0, 0.5, 0, -0.5, 0] }}
+        transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}
+      >
         
         {/* Chest Lid (Animated) */}
         <motion.div 
           animate={{ 
-            rotateX: justCompleted ? 0 : -110,
+            rotateX: justCompleted ? 0 : [-108, -112, -108],
             y: justCompleted ? 0 : -10,
           }}
-          transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
+          transition={justCompleted ? { type: 'spring', bounce: 0.4, duration: 1.2 } : { duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute top-0 w-full h-40 origin-bottom z-0"
           style={{ transformStyle: 'preserve-3d' }}
         >
@@ -317,7 +362,7 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
                       className="absolute inset-0 bg-white rounded-full blur-2xl"
                     />
                   )}
-                  <ItemComponent className={`${item.size}`} />
+                  <ItemComponent className={`${item.size} drop-shadow-[0_8px_8px_rgba(0,0,0,0.55)]`} />
                 </motion.div>
               );
             })}
@@ -328,7 +373,7 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
         <div className="absolute bottom-0 w-full h-32 z-30 drop-shadow-[0_35px_35px_rgba(0,0,0,0.8)]">
           <svg viewBox="0 0 320 120" className="w-full h-full overflow-visible">
             {/* Front Wood Panel */}
-            <path d="M20,0 L300,0 L310,100 C310,110 305,115 295,115 L25,115 C15,115 10,110 10,100 Z" fill="url(#wood-front)" stroke="#3E1F00" strokeWidth="4" />
+            <path d="M20,0 L300,0 L310,100 C310,110 305,115 295,115 L25,115 C15,115 10,110 10,100 Z" fill="url(#wood-front)" stroke={CHEST_VISUAL_TOKENS.woodDeep} strokeWidth="4" />
             
             {/* Wood Planks Lines */}
             <path d="M15,30 Q160,35 305,30" fill="none" stroke="#5C2E00" strokeWidth="4" opacity="0.7" />
@@ -376,7 +421,14 @@ function TreasureChest({ score, latestItem }: { score: number, latestItem: numbe
           </svg>
         </div>
 
-      </div>
+        {/* Metal Shimmer Sweep */}
+        <motion.div
+          className="absolute bottom-2 left-3 right-3 h-28 z-40 pointer-events-none"
+          style={{ background: `linear-gradient(110deg, transparent 35%, ${CHEST_VISUAL_TOKENS.glowSecondary}66 50%, transparent 65%)` }}
+          animate={{ x: ['-120%', '120%'] }}
+          transition={{ duration: 3.8, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
+        />
+      </motion.div>
       
       {/* Completed Chests Counter Badge */}
       <motion.div 
