@@ -206,36 +206,36 @@ function CaptainIdentityCard({
   const stripeCount = Math.min(5, chestCount + 1);
 
   return (
-    <div className={`rounded-3xl border-2 border-sky-200 bg-white/90 shadow-[0_12px_30px_rgba(2,132,199,0.18)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
+    <div className={`rounded-[1.75rem] border-2 border-amber-300/80 bg-gradient-to-b from-[#fff9ea] via-[#f8eed9] to-[#f0e0bf] shadow-[0_10px_26px_rgba(120,76,15,0.28)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
       <div className="flex items-center gap-3">
         <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-          <div className={`rounded-lg bg-amber-200 border border-amber-400 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 ${compact ? 'h-8' : 'h-10'}`}>
+          <div className={`rounded-xl bg-gradient-to-b from-[#ffe8a0] to-[#eec15a] border border-amber-500 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${compact ? 'h-8' : 'h-10'}`}>
             {Array.from({ length: stripeCount }).map((_, index) => (
-              <span key={`left-${index}`} className="w-0.5 bg-amber-600 rounded-full" />
+              <span key={`left-${index}`} className="w-0.5 bg-amber-700 rounded-full" />
             ))}
           </div>
 
           <div className="relative">
             {user.avatarDataUrl ? (
-              <img src={user.avatarDataUrl} alt={user.name} className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-sky-300`} />
+              <img src={user.avatarDataUrl} alt={user.name} className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-amber-300 shadow-[0_4px_10px_rgba(44,31,17,0.25)]`} />
             ) : (
-              <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-sky-100 border-2 border-sky-300 flex items-center justify-center`}>
-                <UserCircle2 className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} text-sky-600`} />
+              <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-amber-50 border-2 border-amber-300 flex items-center justify-center`}>
+                <UserCircle2 className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} text-amber-700`} />
               </div>
             )}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-2 rounded-t-full bg-slate-900" />
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-2 rounded-t-full bg-slate-800" />
           </div>
 
-          <div className={`rounded-lg bg-amber-200 border border-amber-400 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 ${compact ? 'h-8' : 'h-10'}`}>
+          <div className={`rounded-xl bg-gradient-to-b from-[#ffe8a0] to-[#eec15a] border border-amber-500 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${compact ? 'h-8' : 'h-10'}`}>
             {Array.from({ length: stripeCount }).map((_, index) => (
-              <span key={`right-${index}`} className="w-0.5 bg-amber-600 rounded-full" />
+              <span key={`right-${index}`} className="w-0.5 bg-amber-700 rounded-full" />
             ))}
           </div>
         </div>
 
         <div className="min-w-0">
-          <p className={`font-black text-slate-800 truncate ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
-          <p className={`text-slate-500 truncate ${compact ? 'text-[11px]' : 'text-xs'}`}>
+          <p className={`font-black text-amber-950 truncate ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
+          <p className={`text-amber-700/90 truncate ${compact ? 'text-[11px]' : 'text-xs'}`}>
             Căpitan • {chestCount} cufere • rang {epauletteLevel}
           </p>
         </div>
@@ -993,7 +993,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#3aa9e6_0%,#216ca5_42%,#0b3b6a_100%)] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 opacity-25">
+        <div className="absolute inset-[6%] rounded-full border border-sky-100/45" />
+        <div className="absolute inset-[14%] rounded-full border border-sky-100/30" />
+        <div className="absolute inset-[24%] rounded-full border border-sky-100/20" />
+      </div>
       {/* Top Bar with Daily Ring and Parent Access */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20 gap-3">
         <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
@@ -1001,34 +1006,36 @@ export default function App() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleSwitchUser}
-            className="p-3 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
             title="Schimbă user"
           >
             <LogOut className="w-6 h-6" />
           </button>
           <button 
             onClick={() => setIsParentDashboardOpen(true)}
-            className="p-3 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
           >
             <Settings className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-sky-300 relative mt-16 z-10 mb-4">
+      <div className="w-full max-w-2xl bg-gradient-to-b from-[#f8f3e8] via-[#f2ebdd] to-[#efe6d8] rounded-[2rem] shadow-[0_26px_65px_rgba(2,17,47,0.45)] overflow-hidden border-[5px] border-[#d7b67a] relative mt-16 z-10 mb-4">
         
         {/* Header */}
-        <div className="bg-sky-400 p-6 text-center">
-          <h1 className="text-3xl font-bold text-white drop-shadow-md">
+        <div className="bg-gradient-to-b from-[#fefcf7] via-[#f6efe3] to-[#efe2cb] border-b-4 border-[#d9bf90] p-6 text-center relative">
+          <div className="absolute top-1/2 left-5 -translate-y-1/2 w-3 h-3 rotate-45 bg-blue-500 border border-blue-800/50" />
+          <div className="absolute top-1/2 right-5 -translate-y-1/2 w-3 h-3 rotate-45 bg-blue-500 border border-blue-800/50" />
+          <h1 className="text-4xl font-black text-amber-900 drop-shadow-sm tracking-wide">
             {activeUser.name} • {getCurrentChapterLabel()}
           </h1>
         </div>
 
         {/* Game Area */}
-        <div className="p-8 flex flex-col items-center gap-8">
+        <div className="p-6 sm:p-8 flex flex-col items-center gap-7 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9),rgba(245,234,217,0.92))]">
           
           {/* Visual Representation */}
-          <div className="flex items-center justify-center gap-4 text-4xl font-bold text-slate-700 w-full">
+          <div className="flex items-center justify-center gap-4 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-5 shadow-inner">
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
@@ -1041,10 +1048,10 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <span className="text-5xl text-sky-500">{num1}</span>
+              <span className="text-5xl text-[#b45309]">{num1}</span>
             </div>
 
-            <span className="text-5xl text-slate-400 pb-10">+</span>
+            <span className="text-5xl text-blue-500 pb-10 drop-shadow-[0_0_8px_rgba(59,130,246,0.35)]">+</span>
 
             <div className="flex flex-col items-center gap-2 flex-1">
               <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
@@ -1058,11 +1065,11 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <span className="text-5xl text-sky-500">{num2}</span>
+              <span className="text-5xl text-[#b45309]">{num2}</span>
             </div>
           </div>
 
-          <div className="text-6xl font-bold text-slate-700">
+          <div className="text-6xl font-black text-slate-700">
             =
           </div>
 
@@ -1077,15 +1084,15 @@ export default function App() {
                 transition={{ duration: 0.4 }}
                 onClick={() => !showSuccess && !isSpeedBumpActive && handleAnswer(opt)}
                 className={`
-                  w-20 h-20 sm:w-24 sm:h-24 rounded-2xl text-4xl sm:text-5xl font-bold shadow-lg flex items-center justify-center
+                  w-20 h-20 sm:w-24 sm:h-24 rounded-2xl text-4xl sm:text-5xl font-black shadow-[0_8px_18px_rgba(120,76,15,0.35)] flex items-center justify-center
                   transition-colors duration-200
                   ${isSpeedBumpActive ? 'opacity-50 cursor-not-allowed bg-slate-300 text-slate-500 border-b-4 border-slate-400' : 'cursor-pointer'}
                   ${!isSpeedBumpActive && showSuccess && opt === num1 + num2 
-                    ? 'bg-green-400 text-white border-b-4 border-green-600' 
+                    ? 'bg-green-500 text-white border-b-4 border-green-700' 
                     : !isSpeedBumpActive && wrongAnswer === opt
                     ? 'bg-red-400 text-white border-b-4 border-red-600'
                     : !isSpeedBumpActive
-                    ? 'bg-yellow-400 text-white border-b-4 border-yellow-600 hover:bg-yellow-300'
+                    ? 'bg-gradient-to-b from-[#f7d86f] to-[#d6a532] text-amber-50 border-b-4 border-amber-700 hover:from-[#f8e18b] hover:to-[#d9af4c]'
                     : ''
                   }
                 `}
@@ -1117,7 +1124,9 @@ export default function App() {
           </AnimatePresence>
 
           {/* Treasure Chest Reward System */}
-          <TreasureChest progress={chestProgress} latestItem={latestItemIndex} />
+          <div className="w-full rounded-[1.5rem] bg-gradient-to-b from-[#255b85] via-[#1c476a] to-[#163654] p-3 border-2 border-[#d2b47d] shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
+            <TreasureChest progress={chestProgress} latestItem={latestItemIndex} />
+          </div>
 
           {/* Speed Bump Overlay */}
           <AnimatePresence>
