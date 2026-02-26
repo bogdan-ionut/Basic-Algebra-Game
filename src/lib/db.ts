@@ -1,4 +1,4 @@
-import { get, set } from 'idb-keyval';
+import { del, get, keys, set } from 'idb-keyval';
 
 export interface DailyStats {
   date: string;
@@ -90,15 +90,7 @@ export const setLastActiveUserId = async (userId: string) => {
 export const loadDailyStats = async (userId: string): Promise<DailyStats> => {
   const today = getTodayDateString();
   const stats = await get<DailyStats>(getDailyStatsKey(userId, today));
-  return (
-    stats || {
-      date: today,
-      timeSpentSeconds: 0,
-      correctAnswers: 0,
-      totalAttempts: 0,
-      fastGuesses: 0,
-    }
-  );
+  return stats || createDefaultDailyStats(today);
 };
 
 export const saveDailyStats = async (userId: string, stats: DailyStats) => {
@@ -107,16 +99,37 @@ export const saveDailyStats = async (userId: string, stats: DailyStats) => {
 
 export const loadUserProfile = async (userId: string): Promise<UserProfile> => {
   const profile = await get<UserProfile>(getProfileKey(userId));
-  return (
-    profile || {
-      score: 0,
-      streak: 0,
-      lastPlayedDate: '',
-      difficultyLevel: 1,
-    }
-  );
+  return profile || createDefaultUserProfile();
 };
 
 export const saveUserProfile = async (userId: string, profile: UserProfile) => {
   await set(getProfileKey(userId), profile);
+};
+
+export const createDefaultDailyStats = (date = getTodayDateString()): DailyStats => ({
+  date,
+  timeSpentSeconds: 0,
+  correctAnswers: 0,
+  totalAttempts: 0,
+  fastGuesses: 0,
+});
+
+export const createDefaultUserProfile = (): UserProfile => ({
+  score: 0,
+  streak: 0,
+  lastPlayedDate: '',
+  difficultyLevel: 1,
+});
+
+export const resetUserProgress = async (userId: string) => {
+  const allKeys = await keys();
+  const dailyStatsPrefix = `dailyStats_${userId}_`;
+
+  await Promise.all(
+    allKeys
+      .filter((key): key is string => typeof key === 'string' && key.startsWith(dailyStatsPrefix))
+      .map((key) => del(key))
+  );
+
+  await del(getProfileKey(userId));
 };

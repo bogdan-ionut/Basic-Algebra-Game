@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil } from 'lucide-react';
-import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, updateUser, setLastActiveUserId, getLastActiveUserId } from './lib/db';
+import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, updateUser, setLastActiveUserId, getLastActiveUserId, createDefaultDailyStats, createDefaultUserProfile, resetUserProgress } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { DailyRing } from './components/DailyRing';
 import { ParentDashboard } from './components/ParentDashboard';
@@ -320,6 +320,37 @@ export default function App() {
     setShowSuccess(false);
     setWrongAnswer(null);
     setProblemStartTime(Date.now());
+  };
+
+
+  const getCurrentChapterLabel = () => {
+    if (!userProfile) return 'Matematică distractivă';
+    if (userProfile.difficultyLevel <= 1) return 'Capitol: Adunări până la 5';
+    if (userProfile.difficultyLevel === 2) return 'Capitol: Adunări până la 10';
+    return `Capitol: Adunări (nivel ${userProfile.difficultyLevel})`;
+  };
+
+  const handleResetActiveUserProgress = async () => {
+    if (!activeUser) return;
+
+    await resetUserProgress(activeUser.id);
+
+    const resetStats = createDefaultDailyStats();
+    const resetProfile = createDefaultUserProfile();
+
+    setDailyStats(resetStats);
+    setUserProfile(resetProfile);
+    setHasStarted(false);
+    setIsSessionComplete(false);
+    setSessionLimit(600);
+    setConsecutiveCorrect(0);
+    setConsecutiveMistakes(0);
+    setLatestItemIndex(null);
+    setLevelNotification(null);
+    generateProblem(resetProfile.difficultyLevel);
+
+    await saveDailyStats(activeUser.id, resetStats);
+    await saveUserProfile(activeUser.id, resetProfile);
   };
 
   const initializeUserData = async (user: GameUser) => {
@@ -950,7 +981,9 @@ export default function App() {
 
         {isParentDashboardOpen && (
           <ParentDashboard 
-            onClose={() => setIsParentDashboardOpen(false)} 
+            onClose={() => setIsParentDashboardOpen(false)}
+            onResetProgress={handleResetActiveUserProgress}
+            activeUserName={activeUser.name}
             dailyStats={dailyStats} 
             userProfile={userProfile} 
           />
@@ -987,7 +1020,7 @@ export default function App() {
         {/* Header */}
         <div className="bg-sky-400 p-6 text-center">
           <h1 className="text-3xl font-bold text-white drop-shadow-md">
-            Bravo, {activeUser.name}!
+            {activeUser.name} • {getCurrentChapterLabel()}
           </h1>
         </div>
 
@@ -1127,7 +1160,9 @@ export default function App() {
 
       {isParentDashboardOpen && (
         <ParentDashboard 
-          onClose={() => setIsParentDashboardOpen(false)} 
+          onClose={() => setIsParentDashboardOpen(false)}
+          onResetProgress={handleResetActiveUserProgress}
+          activeUserName={activeUser.name}
           dailyStats={dailyStats} 
           userProfile={userProfile} 
         />
