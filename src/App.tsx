@@ -6,8 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { Star, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle } from 'lucide-react';
-import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo } from './lib/db';
+import { Star, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull } from 'lucide-react';
+import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, setLastActiveUserId, getLastActiveUserId } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { DailyRing } from './components/DailyRing';
 import { ParentDashboard } from './components/ParentDashboard';
@@ -219,6 +219,21 @@ export default function App() {
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
 
+  const [users, setUsers] = useState<GameUser[]>([]);
+  const [activeUser, setActiveUser] = useState<GameUser | null>(null);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [newUserForm, setNewUserForm] = useState({
+    name: '',
+    age: '',
+    sex: '',
+    location: '',
+    pin: '',
+    avatarDataUrl: '',
+  });
+
   const generateProblem = (level: number) => {
     // Level 1: sum up to 5. Level 2: sum up to 10.
     const maxSum = level === 1 ? 5 : 10;
@@ -246,37 +261,128 @@ export default function App() {
     setProblemStartTime(Date.now());
   };
 
-  // Load data on mount
-  useEffect(() => {
-    const initDB = async () => {
-      const stats = await loadDailyStats();
-      const profile = await loadUserProfile();
-      
-      // Handle streak logic
-      const today = getTodayDateString();
-      if (profile.lastPlayedDate !== today) {
-        const yesterdayStr = getDateStringDaysAgo(1);
-        
-        if (profile.lastPlayedDate === yesterdayStr) {
-          profile.streak += 1;
-        } else if (profile.lastPlayedDate !== '') {
-          profile.streak = 1; // reset streak if missed a day
-        } else {
-          profile.streak = 1; // first time playing
-        }
-        profile.lastPlayedDate = today;
-        await saveUserProfile(profile);
-      }
+  const initializeUserData = async (user: GameUser) => {
+    const stats = await loadDailyStats(user.id);
+    const profile = await loadUserProfile(user.id);
 
-      if (stats.timeSpentSeconds >= 600) {
-        setSessionLimit(Math.ceil((stats.timeSpentSeconds + 1) / 600) * 600);
-      }
+    const today = getTodayDateString();
+    if (profile.lastPlayedDate !== today) {
+      const yesterdayStr = getDateStringDaysAgo(1);
 
-      setDailyStats(stats);
-      setUserProfile(profile);
-      generateProblem(profile.difficultyLevel);
+      if (profile.lastPlayedDate === yesterdayStr) {
+        profile.streak += 1;
+      } else if (profile.lastPlayedDate !== '') {
+        profile.streak = 1;
+      } else {
+        profile.streak = 1;
+      }
+      profile.lastPlayedDate = today;
+      await saveUserProfile(user.id, profile);
+    }
+
+    if (stats.timeSpentSeconds >= 600) {
+      setSessionLimit(Math.ceil((stats.timeSpentSeconds + 1) / 600) * 600);
+    } else {
+      setSessionLimit(600);
+    }
+
+    setDailyStats(stats);
+    setUserProfile(profile);
+    setConsecutiveMistakes(0);
+    setConsecutiveCorrect(0);
+    setIsSessionComplete(false);
+    setHasStarted(false);
+    generateProblem(profile.difficultyLevel);
+  };
+
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setNewUserForm(prev => ({ ...prev, avatarDataUrl: result }));
     };
-    initDB();
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!newUserForm.name.trim() || !newUserForm.age.trim() || !newUserForm.sex.trim() || !newUserForm.location.trim()) {
+      setAuthError('Completează toate câmpurile.');
+      return;
+    }
+
+    if (!/^\d{4}$/.test(newUserForm.pin)) {
+      setAuthError('PIN-ul trebuie să aibă exact 4 cifre.');
+      return;
+    }
+
+    const created = await createUser({
+      name: newUserForm.name.trim(),
+      age: Number(newUserForm.age),
+      sex: newUserForm.sex.trim(),
+      location: newUserForm.location.trim(),
+      pin: newUserForm.pin,
+      avatarDataUrl: newUserForm.avatarDataUrl || undefined,
+    });
+
+    const updatedUsers = await loadUsers();
+    setUsers(updatedUsers);
+    setActiveUser(created);
+    await setLastActiveUserId(created.id);
+    setIsRegistering(false);
+    setAuthError(null);
+    setNewUserForm({ name: '', age: '', sex: '', location: '', pin: '', avatarDataUrl: '' });
+    await initializeUserData(created);
+  };
+
+  const handleLogin = async () => {
+    const found = users.find(user => user.id === selectedUserId);
+    if (!found) {
+      setAuthError('Selectează un user.');
+      return;
+    }
+
+    if (found.pin !== enteredPin) {
+      setAuthError('PIN greșit.');
+      return;
+    }
+
+    setActiveUser(found);
+    await setLastActiveUserId(found.id);
+    setAuthError(null);
+    setEnteredPin('');
+    await initializeUserData(found);
+  };
+
+  const handleSwitchUser = () => {
+    setActiveUser(null);
+    setDailyStats(null);
+    setUserProfile(null);
+    setHasStarted(false);
+    setEnteredPin('');
+    setSelectedUserId(null);
+    setAuthError(null);
+  };
+
+
+  // Load users on mount
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedUsers = await loadUsers();
+      setUsers(storedUsers);
+
+      const lastActiveId = await getLastActiveUserId();
+      if (!lastActiveId) return;
+
+      const rememberedUser = storedUsers.find(user => user.id === lastActiveId);
+      if (!rememberedUser) return;
+
+      setSelectedUserId(rememberedUser.id);
+    };
+    initAuth();
   }, []);
 
   // Timer logic for timeSpentSeconds
@@ -301,15 +407,17 @@ export default function App() {
         }
 
         const updated = { ...prev, timeSpentSeconds: newTime };
-        saveDailyStats(updated);
+        if (activeUser) {
+          saveDailyStats(activeUser.id, updated);
+        }
         return updated;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [hasStarted, isSessionComplete, sessionLimit]);
+  }, [hasStarted, isSessionComplete, sessionLimit, activeUser]);
 
   const handleAnswer = async (ans: number) => {
-    if (!dailyStats || !userProfile || isSpeedBumpActive) return;
+    if (!dailyStats || !userProfile || !activeUser || isSpeedBumpActive) return;
 
     const timeTaken = Date.now() - problemStartTime;
     const isFastGuess = timeTaken < 1000; // less than 1 second
@@ -348,7 +456,7 @@ export default function App() {
       }
 
       setUserProfile(newProfile);
-      await saveUserProfile(newProfile);
+      await saveUserProfile(activeUser.id, newProfile);
 
       confetti({
         particleCount: 100,
@@ -381,17 +489,144 @@ export default function App() {
       }
       
       setUserProfile(newProfile);
-      await saveUserProfile(newProfile);
+      await saveUserProfile(activeUser.id, newProfile);
     }
 
     setConsecutiveMistakes(newMistakes);
     setConsecutiveCorrect(newCorrect);
     setDailyStats(updatedStats);
-    await saveDailyStats(updatedStats);
+    await saveDailyStats(activeUser.id, updatedStats);
   };
 
 
-  if (!dailyStats || !userProfile) return null;
+  if (!activeUser || !dailyStats || !userProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-200 via-cyan-100 to-amber-50 p-4 md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
+        <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-sky-300/40 blur-2xl" />
+        <div className="absolute -bottom-16 -right-10 w-72 h-72 rounded-full bg-amber-300/30 blur-2xl" />
+        <div className="absolute top-6 left-6 text-sky-700/60">
+          <Waves className="w-10 h-10" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="w-full max-w-5xl bg-white/90 backdrop-blur rounded-[2rem] border-4 border-sky-300 shadow-[0_30px_70px_rgba(14,116,144,0.25)] overflow-hidden relative z-10"
+        >
+          <div className="bg-gradient-to-r from-sky-500 via-cyan-500 to-blue-500 px-6 py-6 md:px-10 md:py-8 text-white">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <Skull className="w-7 h-7" />
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center">Portul Piraților Matematicieni</h1>
+              <Anchor className="w-7 h-7" />
+            </div>
+            <p className="text-center text-sky-50/95 text-base md:text-lg font-medium">
+              Alege un echipaj existent sau creează un nou căpitan pentru aventura cu comori.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            <div className="p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-sky-100">
+              <h2 className="text-xl font-black text-slate-800 mb-4">Echipaj existent</h2>
+
+              {users.length ? (
+                <>
+                  <div className="grid grid-cols-1 gap-3 mb-5 max-h-[320px] overflow-y-auto pr-1">
+                    {users.map(user => (
+                      <button
+                        key={user.id}
+                        onClick={() => {
+                          setSelectedUserId(user.id);
+                          setAuthError(null);
+                          setIsRegistering(false);
+                        }}
+                        className={`p-3.5 rounded-2xl border-2 text-left flex items-center gap-3.5 transition-all shadow-sm ${
+                          selectedUserId === user.id
+                            ? 'border-cyan-400 bg-cyan-50 shadow-[0_8px_20px_rgba(6,182,212,0.2)]'
+                            : 'border-slate-200 bg-white hover:border-cyan-300 hover:-translate-y-0.5'
+                        }`}
+                      >
+                        {user.avatarDataUrl ? (
+                          <img src={user.avatarDataUrl} alt={user.name} className="w-14 h-14 rounded-full object-cover border-2 border-cyan-200" />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-cyan-100 border-2 border-cyan-200 flex items-center justify-center">
+                            <UserCircle2 className="w-8 h-8 text-cyan-600" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-black text-slate-800 truncate">{user.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{user.age} ani • {user.sex} • {user.location}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <label className="block text-sm font-bold text-slate-700 mb-2">PIN de acces (4 cifre)</label>
+                  <input
+                    type="password"
+                    maxLength={4}
+                    value={enteredPin}
+                    onChange={e => setEnteredPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-xl tracking-[0.45em] text-center font-bold text-slate-700 focus:outline-none focus:border-cyan-400"
+                    placeholder="••••"
+                  />
+                  <button
+                    onClick={handleLogin}
+                    className="w-full mt-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-white py-3.5 rounded-xl font-black shadow-lg transition-transform hover:scale-[1.01]"
+                  >
+                    Intră în aventură
+                  </button>
+                </>
+              ) : (
+                <div className="rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50 p-6 text-center">
+                  <p className="font-bold text-sky-700">Nu există încă niciun echipaj salvat.</p>
+                  <p className="text-sky-600 text-sm mt-1">Creează primul căpitan în panoul din dreapta.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 md:p-8 bg-gradient-to-b from-amber-50/80 to-white">
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <h2 className="text-xl font-black text-slate-800">Căpitan nou</h2>
+                <button
+                  onClick={() => {
+                    setIsRegistering(prev => !prev);
+                    setAuthError(null);
+                  }}
+                  className="text-sm font-bold text-cyan-700 hover:text-cyan-600"
+                >
+                  {isRegistering ? 'Ascunde formularul' : 'Arată formularul'}
+                </button>
+              </div>
+
+              {(isRegistering || users.length === 0) && (
+                <form onSubmit={handleCreateUser} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input value={newUserForm.name} onChange={e => setNewUserForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nume" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
+                  <input type="number" min={3} max={99} value={newUserForm.age} onChange={e => setNewUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
+                  <input value={newUserForm.sex} onChange={e => setNewUserForm(prev => ({ ...prev, sex: e.target.value }))} placeholder="Sex" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
+                  <input value={newUserForm.location} onChange={e => setNewUserForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Loc" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
+                  <input type="password" maxLength={4} value={newUserForm.pin} onChange={e => setNewUserForm(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="PIN 4 cifre" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
+                  <label className="border-2 border-dashed border-cyan-200 rounded-xl px-3 py-2.5 text-sm text-cyan-700 bg-cyan-50 cursor-pointer font-semibold">
+                    Poză profil rotundă
+                    <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+                  </label>
+                  <button type="submit" className="sm:col-span-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-3 rounded-xl font-black shadow-lg">Salvează căpitanul</button>
+                </form>
+              )}
+
+              {newUserForm.avatarDataUrl && (
+                <div className="mt-4 flex items-center gap-3 bg-white rounded-xl p-3 border border-sky-100">
+                  <img src={newUserForm.avatarDataUrl} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-cyan-200" />
+                  <p className="text-sm text-slate-600 font-semibold">Previzualizare avatar gata de salvat.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {authError && <p className="text-red-600 font-bold px-6 pb-6">{authError}</p>}
+        </motion.div>
+      </div>
+    );
+  }
   const chestProgress = getChestProgress(userProfile.score);
 
   // Start Screen
@@ -406,7 +641,7 @@ export default function App() {
           <div className="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Rocket className="w-12 h-12 text-sky-500" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, Osea!</h1>
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, {activeUser.name}!</h1>
           <p className="text-slate-600 mb-8">Ești gata pentru 10 minute de aventură matematică?</p>
           <button
             onClick={() => {
@@ -417,6 +652,13 @@ export default function App() {
           >
             <PlayCircle className="w-8 h-8" />
             START
+          </button>
+          <button
+            onClick={handleSwitchUser}
+            className="w-full mt-3 bg-white text-slate-600 border-2 border-slate-200 py-3 rounded-2xl font-bold flex items-center justify-center gap-2"
+          >
+            <LogOut className="w-5 h-5" />
+            Schimbă user
           </button>
         </motion.div>
       </div>
@@ -437,7 +679,7 @@ export default function App() {
           </div>
           <h1 className="text-4xl font-bold text-green-500 mb-4">Misiune Îndeplinită!</h1>
           <p className="text-xl text-slate-600 mb-8">
-            Bravo, Osea! Ai învățat super bine azi. Acum ai timp liber să te joci, să construiești sau să desenezi!
+            Bravo, {activeUser.name}! Ai învățat super bine azi. Acum ai timp liber să te joci, să construiești sau să desenezi!
           </p>
           <div className="bg-slate-50 p-4 rounded-2xl mb-8 flex flex-col items-center">
             <p className="text-slate-500 text-sm uppercase tracking-wider font-bold mb-4">Comoara ta de azi</p>
@@ -461,6 +703,14 @@ export default function App() {
             className="w-full bg-sky-500 hover:bg-sky-400 text-white text-xl font-bold py-4 rounded-2xl shadow-lg transition-transform hover:scale-105 active:scale-95 mb-4"
           >
             Vreau să mă mai joc! 🚀
+          </button>
+
+          <button
+            onClick={handleSwitchUser}
+            className="w-full mb-4 bg-white text-slate-600 border-2 border-slate-200 py-3 rounded-2xl font-bold flex items-center justify-center gap-2"
+          >
+            <LogOut className="w-5 h-5" />
+            Schimbă user
           </button>
 
           <button
@@ -488,12 +738,21 @@ export default function App() {
       {/* Top Bar with Daily Ring and Parent Access */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
         <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
-        <button 
-          onClick={() => setIsParentDashboardOpen(true)}
-          className="p-3 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <Settings className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSwitchUser}
+            className="p-3 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm text-slate-400 hover:text-slate-600 transition-colors"
+            title="Schimbă user"
+          >
+            <LogOut className="w-6 h-6" />
+          </button>
+          <button 
+            onClick={() => setIsParentDashboardOpen(true)}
+            className="p-3 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <Settings className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-sky-300 relative mt-16 z-10 mb-4">
@@ -501,7 +760,7 @@ export default function App() {
         {/* Header */}
         <div className="bg-sky-400 p-6 text-center">
           <h1 className="text-3xl font-bold text-white drop-shadow-md">
-            Bravo, Osea!
+            Bravo, {activeUser.name}!
           </h1>
         </div>
 
