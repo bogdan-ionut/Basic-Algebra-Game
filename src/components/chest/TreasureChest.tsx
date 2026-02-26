@@ -62,11 +62,11 @@ const GEM_SLOTS: ReadonlyArray<readonly [number, number]> = [
 ];
 
 const LOOT_REVEAL_LEVELS = {
-  coins: 0.2,
-  crown: 0.35,
-  queenCrown: 0.5,
-  sword: 0.65,
-  relics: 0.82,
+  coins: 0.1,
+  crown: 0.22,
+  queenCrown: 0.34,
+  sword: 0.48,
+  relics: 0.62,
 } as const;
 
 // ─── Gem shape ───────────────────────────────────────────────────────────────
@@ -420,25 +420,25 @@ export function TreasureChest({ progress, latestItem }: Props) {
                 cx="100"
                 cy="84"
                 rx="52"
-                ry="26"
+                ry="30"
                 fill="url(#tc-glow)"
                 animate={fillRatio >= 0.7
-                  ? { opacity: [0.7, 1, 0.7] }
-                  : { opacity: 0.85 }
+                  ? { opacity: [0.75, 1, 0.75] }
+                  : { opacity: [0.65, 0.9, 0.65] }
                 }
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
               />
 
               {/* Gem pile */}
               {GEM_SLOTS.slice(0, gemsVisible).map(([gx, gy], i) => (
-                <Gem key={i} cx={gx} cy={gy} colorIdx={i} size={9} />
+                <Gem key={i} cx={gx} cy={gy} colorIdx={i} size={10.5} />
               ))}
 
               {/* Detailed loot variety: coins, crowns, swords & relic gems */}
               {fillRatio >= LOOT_REVEAL_LEVELS.coins && (
                 <>
-                  <CoinStack x={70} y={92} scale={0.72} />
-                  <CoinStack x={127} y={90} scale={0.68} />
+                  <CoinStack x={68} y={90} scale={0.84} />
+                  <CoinStack x={130} y={88} scale={0.8} />
                 </>
               )}
 
@@ -447,7 +447,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
                   animate={{ y: [0, -1.5, 0] }}
                   transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <Crown x={80} y={81} scale={0.68} variant="king" />
+                  <Crown x={78} y={78} scale={0.78} variant="king" />
                 </motion.g>
               )}
 
@@ -456,7 +456,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
                   animate={{ y: [0, -1.2, 0] }}
                   transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut', delay: 0.15 }}
                 >
-                  <Crown x={122} y={80} scale={0.62} variant="queen" />
+                  <Crown x={124} y={77} scale={0.74} variant="queen" />
                 </motion.g>
               )}
 
@@ -466,14 +466,14 @@ export function TreasureChest({ progress, latestItem }: Props) {
                   transition={{ duration: 2.3, repeat: Infinity, ease: 'easeInOut' }}
                   style={{ transformOrigin: '109px 88px' }}
                 >
-                  <Sword x={109} y={91} scale={0.62} />
+                  <Sword x={109} y={88} scale={0.72} />
                 </motion.g>
               )}
 
               {fillRatio >= LOOT_REVEAL_LEVELS.relics && (
                 <>
-                  <Gem cx={151} cy={85} colorIdx={2} size={8.2} />
-                  <Gem cx={54} cy={84} colorIdx={4} size={7.6} />
+                  <Gem cx={151} cy={82} colorIdx={2} size={9.2} />
+                  <Gem cx={54} cy={81} colorIdx={4} size={8.8} />
                 </>
               )}
 
