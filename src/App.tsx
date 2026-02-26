@@ -69,6 +69,8 @@ type CountItemTheme = {
   glow: string;
 };
 
+type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
+
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
   { name: 'Ruby', base: '#ef4444', dark: '#991b1b', light: '#fecaca', glow: '#fca5a5' },
   { name: 'Sapphire', base: '#3b82f6', dark: '#1e3a8a', light: '#bfdbfe', glow: '#93c5fd' },
@@ -80,6 +82,64 @@ const COUNT_ITEM_THEMES: CountItemTheme[] = [
 function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; delay: number; shapeIndex: number }) {
   const gradId = `gem-${theme.name}-${shapeIndex}-grad`;
   const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
+  const tokenKinds: CountItemKind[] = ['gem', 'coin', 'crown', 'potion', 'star'];
+  const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
+
+  const renderToken = () => {
+    if (tokenKind === 'coin') {
+      return (
+        <>
+          <circle cx="50" cy="50" r="35" fill="#F59E0B" stroke="#92400E" strokeWidth="4" />
+          <circle cx="50" cy="50" r="28" fill="#FCD34D" stroke="#B45309" strokeWidth="3" />
+          <path d="M50 30 L57 44 L72 50 L57 56 L50 70 L43 56 L28 50 L43 44 Z" fill="#FFF7CC" opacity="0.9" />
+          <ellipse cx="38" cy="36" rx="10" ry="6" fill="white" opacity="0.42" />
+        </>
+      );
+    }
+
+    if (tokenKind === 'crown') {
+      return (
+        <>
+          <path d="M20 68 L26 36 L40 51 L50 28 L60 51 L74 36 L80 68 Z" fill="#F59E0B" stroke="#7C2D12" strokeWidth="3" />
+          <rect x="18" y="66" width="64" height="14" rx="4" fill="#B45309" stroke="#7C2D12" strokeWidth="3" />
+          <circle cx="50" cy="46" r="6" fill={theme.base} stroke={theme.dark} strokeWidth="2.5" />
+        </>
+      );
+    }
+
+    if (tokenKind === 'potion') {
+      return (
+        <>
+          <rect x="40" y="18" width="20" height="14" rx="4" fill="#7C3AED" stroke="#312E81" strokeWidth="2.5" />
+          <path d="M33 34 C33 27 67 27 67 34 V42 C67 47 64 52 62 55 C59 61 58 68 58 76 C58 81 54 84 50 84 C46 84 42 81 42 76 C42 68 41 61 38 55 C36 52 33 47 33 42 Z" fill="#CFFAFE" stroke="#0F172A" strokeWidth="2.8" />
+          <path d="M40 52 C44 57 56 57 60 52 V72 C60 76 56 80 50 80 C44 80 40 76 40 72 Z" fill={theme.base} opacity="0.9" />
+        </>
+      );
+    }
+
+    if (tokenKind === 'star') {
+      return (
+        <>
+          <circle cx="50" cy="50" r="34" fill={theme.light} stroke={theme.dark} strokeWidth="3" opacity="0.45" />
+          <path d="M50 18 L57 40 L80 40 L61 54 L68 76 L50 62 L32 76 L39 54 L20 40 L43 40 Z" fill={theme.base} stroke={theme.dark} strokeWidth="3" />
+          <ellipse cx="42" cy="30" rx="9" ry="5" fill="white" opacity="0.35" />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <circle cx="50" cy="50" r="40" fill={`url(#${glowId})`} opacity="0.55" />
+        <polygon points="50,8 82,28 76,70 50,92 24,70 18,28" fill={`url(#${gradId})`} stroke={theme.dark} strokeWidth="3" strokeLinejoin="round" />
+        <polygon points="50,8 82,28 50,42 18,28" fill={theme.light} opacity="0.5" />
+        <polygon points="18,28 50,42 24,70" fill={theme.dark} opacity="0.3" />
+        <polygon points="82,28 50,42 76,70" fill={theme.dark} opacity="0.36" />
+        <polygon points="50,42 76,70 50,92" fill={theme.light} opacity="0.22" />
+        <polygon points="50,42 24,70 50,92" fill="white" opacity="0.15" />
+        <ellipse cx="38" cy="28" rx="11" ry="6" fill="white" opacity="0.52" />
+      </>
+    );
+  };
 
   return (
     <motion.div
@@ -91,7 +151,7 @@ function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; de
     >
       <motion.svg
         viewBox="0 0 100 100"
-        className="w-10 h-10 drop-shadow-[0_8px_10px_rgba(15,23,42,0.35)]"
+        className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-[0_10px_12px_rgba(15,23,42,0.45)]"
         animate={{ y: [0, -1.5, 0] }}
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
       >
@@ -106,17 +166,7 @@ function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; de
             <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
           </radialGradient>
         </defs>
-
-        <circle cx="50" cy="50" r="40" fill={`url(#${glowId})`} opacity="0.55" />
-        <polygon points="50,8 82,28 76,70 50,92 24,70 18,28" fill={`url(#${gradId})`} stroke={theme.dark} strokeWidth="3" strokeLinejoin="round" />
-
-        <polygon points="50,8 82,28 50,42 18,28" fill={theme.light} opacity="0.5" />
-        <polygon points="18,28 50,42 24,70" fill={theme.dark} opacity="0.3" />
-        <polygon points="82,28 50,42 76,70" fill={theme.dark} opacity="0.36" />
-        <polygon points="50,42 76,70 50,92" fill={theme.light} opacity="0.22" />
-        <polygon points="50,42 24,70 50,92" fill="white" opacity="0.15" />
-
-        <ellipse cx="38" cy="28" rx="11" ry="6" fill="white" opacity="0.52" />
+        {renderToken()}
       </motion.svg>
 
       <div className="pointer-events-none absolute inset-0">
@@ -461,7 +511,7 @@ export default function App() {
           {/* Visual Representation */}
           <div className="flex items-center justify-center gap-4 text-4xl font-bold text-slate-700 w-full">
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
+              <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
                   <div key={`n1-${i}`}>
                     <DetailedToken
@@ -478,7 +528,7 @@ export default function App() {
             <span className="text-5xl text-slate-400 pb-10">+</span>
 
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-1 min-h-[4rem]">
+              <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
                 {Array.from({ length: num2 }).map((_, i) => (
                   <div key={`n2-${i}`}>
                     <DetailedToken
