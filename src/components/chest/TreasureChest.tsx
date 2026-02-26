@@ -339,13 +339,61 @@ export function TreasureChest({ progress, latestItem }: Props) {
               <stop offset="100%" stopColor="#FF9900" stopOpacity="0"    />
             </radialGradient>
 
+            <linearGradient id="tc-floor-top" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1C4E80" />
+              <stop offset="20%" stopColor="#1B6D99" />
+              <stop offset="50%" stopColor="#2A84B6" />
+              <stop offset="80%" stopColor="#1B6D99" />
+              <stop offset="100%" stopColor="#1C4E80" />
+            </linearGradient>
+
+            <linearGradient id="tc-floor-front" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#9AA1AA" />
+              <stop offset="40%" stopColor="#70757F" />
+              <stop offset="100%" stopColor="#42464D" />
+            </linearGradient>
+
+            <linearGradient id="tc-floor-trim" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#795007" />
+              <stop offset="25%" stopColor="#F6DA7A" />
+              <stop offset="55%" stopColor="#C89624" />
+              <stop offset="80%" stopColor="#F6DA7A" />
+              <stop offset="100%" stopColor="#795007" />
+            </linearGradient>
+
+            <radialGradient id="tc-floor-glow" cx="50%" cy="35%" r="70%">
+              <stop offset="0%" stopColor="rgba(255, 239, 154, 0.75)" />
+              <stop offset="60%" stopColor="rgba(255, 214, 94, 0.3)" />
+              <stop offset="100%" stopColor="rgba(255, 214, 94, 0)" />
+            </radialGradient>
+
             <filter id="tc-shadow">
               <feDropShadow dx="0" dy="5" stdDeviation="8" floodColor="rgba(0,0,0,0.45)" />
             </filter>
           </defs>
 
-          {/* ── Floor shadow ─────────────────────────────────────────────── */}
-          <ellipse cx="100" cy="169" rx="75" ry="7" fill="rgba(0,0,0,0.22)" />
+          {/* ── Decorative floor / pedestal ─────────────────────────────── */}
+          <g>
+            <ellipse cx="100" cy="171" rx="80" ry="8.5" fill="rgba(0,0,0,0.24)" />
+
+            {/* Velvet top cushion */}
+            <path
+              d="M 28 161 Q 100 145 172 161 Q 164 166 28 166 Z"
+              fill="url(#tc-floor-top)"
+              stroke="#D1A33F"
+              strokeWidth="1.8"
+            />
+            <path d="M 34 161 Q 100 148 166 161" stroke="rgba(255,240,180,0.5)" strokeWidth="1" fill="none" />
+            <ellipse cx="100" cy="160.8" rx="49" ry="8" fill="url(#tc-floor-glow)" />
+
+            {/* Stone base */}
+            <rect x="26" y="166" width="148" height="12" rx="3" fill="url(#tc-floor-front)" />
+            <path d="M 30 176 H 170" stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
+            <path d="M 41 166 V 178 M 66 166 V 178 M 100 166 V 178 M 134 166 V 178 M 159 166 V 178" stroke="rgba(255,255,255,0.15)" strokeWidth="0.9" />
+
+            {/* Gold trim accent */}
+            <rect x="36" y="166" width="128" height="2.6" rx="1.3" fill="url(#tc-floor-trim)" />
+          </g>
 
           {/* ═══════════════════════════════════════════════════════════════
               LAYER 1 — CHEST BODY (static)
