@@ -1,8 +1,8 @@
 /**
  * TreasureChest.tsx — AAA-style game chest component
  *
- * Key insight: the lid uses scaleY compression (transform-origin at bottom
- * hinge) to simulate "opening backward" — exactly how 2D game sprites look.
+ * Key insight: the lid rotates around the bottom hinge (instead of being
+ * vertically squashed), which keeps its shape clean when the chest is full.
  * Gems pile up in the opening (y ≈ 60-98) and become visible as the lid
  * compresses / opens.
  *
@@ -218,9 +218,9 @@ export function TreasureChest({ progress, latestItem }: Props) {
   const fillRatio   = Math.min(Math.max(filled / total, 0), 1);
   const gemsVisible = Math.round(fillRatio * 10);
 
-  // Lid scaleY: 1 = fully closed, ≈0 = fully open
-  // We keep a minimum of 0.04 so the gold rim is still visible
-  const lidScaleY = Math.max(0.015, 1 - fillRatio * 1.22);
+  // Lid angle: 0deg = closed, negative = opens backward around hinge.
+  // Capped at ~-78deg to keep the artwork readable and avoid clipping.
+  const lidAngle = -Math.min(78, fillRatio * 86);
   const isOpen    = fillRatio > 0.03;
 
   // Inner glow intensity
@@ -490,13 +490,13 @@ export function TreasureChest({ progress, latestItem }: Props) {
           )}
 
           {/* ═══════════════════════════════════════════════════════════════
-              LAYER 3 — LID  (scaleY compresses toward hinge = opens)
+              LAYER 3 — LID  (rotates around hinge = opens)
               transformOrigin at bottom-centre of lid (100, 101).
-              scaleY: 1 = closed  →  ≈0 = fully open / flat
+              rotate: 0 = closed  →  ~-78° = open
           ═══════════════════════════════════════════════════════════════ */}
           <motion.g
             style={{ transformOrigin: '100px 101px' }}
-            animate={{ scaleY: lidScaleY }}
+            animate={{ rotate: lidAngle }}
             transition={{ type: 'spring', stiffness: 130, damping: 15 }}
           >
             {/* Dome shape */}
