@@ -6,8 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull } from 'lucide-react';
-import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, setLastActiveUserId, getLastActiveUserId } from './lib/db';
+import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil } from 'lucide-react';
+import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, updateUser, setLastActiveUserId, getLastActiveUserId } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { DailyRing } from './components/DailyRing';
 import { ParentDashboard } from './components/ParentDashboard';
@@ -280,6 +280,15 @@ export default function App() {
   const [newUserForm, setNewUserForm] = useState({
     name: '',
     age: '',
+    sex: 'Masculin',
+    location: '',
+    pin: '',
+    avatarDataUrl: '',
+  });
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editUserForm, setEditUserForm] = useState({
+    name: '',
+    age: '',
     sex: '',
     location: '',
     pin: '',
@@ -359,10 +368,32 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
+  const handleEditAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setEditUserForm(prev => ({ ...prev, avatarDataUrl: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const validateAge = (ageRaw: string) => {
+    const age = Number(ageRaw);
+    return Number.isInteger(age) && age >= 1 && age <= 99;
+  };
+
   const handleCreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!newUserForm.name.trim() || !newUserForm.age.trim() || !newUserForm.sex.trim() || !newUserForm.location.trim()) {
       setAuthError('Completează toate câmpurile.');
+      return;
+    }
+
+    if (!validateAge(newUserForm.age)) {
+      setAuthError('Vârsta trebuie să fie între 1 și 99 ani.');
       return;
     }
 
@@ -374,7 +405,7 @@ export default function App() {
     const created = await createUser({
       name: newUserForm.name.trim(),
       age: Number(newUserForm.age),
-      sex: newUserForm.sex.trim(),
+      sex: newUserForm.sex.trim() === 'Feminin' ? 'Feminin' : 'Masculin',
       location: newUserForm.location.trim(),
       pin: newUserForm.pin,
       avatarDataUrl: newUserForm.avatarDataUrl || undefined,
@@ -386,8 +417,78 @@ export default function App() {
     await setLastActiveUserId(created.id);
     setIsRegistering(false);
     setAuthError(null);
-    setNewUserForm({ name: '', age: '', sex: '', location: '', pin: '', avatarDataUrl: '' });
+    setNewUserForm({ name: '', age: '', sex: 'Masculin', location: '', pin: '', avatarDataUrl: '' });
     await initializeUserData(created);
+  };
+
+  const startEditingUser = (user: GameUser) => {
+    setEditingUserId(user.id);
+    setEditUserForm({
+      name: user.name,
+      age: String(user.age),
+      sex: user.sex === 'Feminin' ? 'Feminin' : 'Masculin',
+      location: user.location,
+      pin: user.pin,
+      avatarDataUrl: user.avatarDataUrl || '',
+    });
+    setAuthError(null);
+  };
+
+  const cancelEditingUser = () => {
+    setEditingUserId(null);
+    setEditUserForm({ name: '', age: '', sex: '', location: '', pin: '', avatarDataUrl: '' });
+  };
+
+  const handleUpdateUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!editingUserId) return;
+
+    if (!editUserForm.name.trim() || !editUserForm.age.trim() || !editUserForm.sex.trim() || !editUserForm.location.trim()) {
+      setAuthError('Completează toate câmpurile pentru editare.');
+      return;
+    }
+
+    if (!validateAge(editUserForm.age)) {
+      setAuthError('Vârsta trebuie să fie între 1 și 99 ani.');
+      return;
+    }
+
+    if (!/^\d{4}$/.test(editUserForm.pin)) {
+      setAuthError('PIN-ul trebuie să aibă exact 4 cifre.');
+      return;
+    }
+
+    const currentUser = users.find(user => user.id === editingUserId);
+    if (!currentUser) {
+      setAuthError('Profilul nu a fost găsit.');
+      return;
+    }
+
+    const updatedUser: GameUser = {
+      ...currentUser,
+      name: editUserForm.name.trim(),
+      age: Number(editUserForm.age),
+      sex: editUserForm.sex.trim() === 'Feminin' ? 'Feminin' : 'Masculin',
+      location: editUserForm.location.trim(),
+      pin: editUserForm.pin,
+      avatarDataUrl: editUserForm.avatarDataUrl || undefined,
+    };
+
+    await updateUser(updatedUser);
+    const refreshedUsers = await loadUsers();
+    setUsers(refreshedUsers);
+
+    if (activeUser?.id === updatedUser.id) {
+      setActiveUser(updatedUser);
+    }
+
+    if (selectedUserId === updatedUser.id) {
+      setSelectedUserId(updatedUser.id);
+    }
+
+    setAuthError(null);
+    cancelEditingUser();
   };
 
   const handleLogin = async () => {
@@ -612,31 +713,40 @@ export default function App() {
                 <>
                   <div className="grid grid-cols-1 gap-3 mb-5 max-h-[320px] overflow-y-auto pr-1">
                     {users.map(user => (
-                      <button
-                        key={user.id}
-                        onClick={() => {
-                          setSelectedUserId(user.id);
-                          setAuthError(null);
-                          setIsRegistering(false);
-                        }}
-                        className={`group p-3.5 rounded-2xl border text-left flex items-center gap-3.5 transition-all duration-200 ${
-                          selectedUserId === user.id
-                            ? 'border-cyan-400 bg-cyan-50/90 shadow-[0_12px_24px_rgba(6,182,212,0.22)]'
-                            : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40 hover:-translate-y-0.5'
-                        }`}
-                      >
-                        {user.avatarDataUrl ? (
-                          <img src={user.avatarDataUrl} alt={user.name} className="w-14 h-14 rounded-full object-cover border-2 border-cyan-200" />
-                        ) : (
-                          <div className="w-14 h-14 rounded-full bg-cyan-100 border-2 border-cyan-200 flex items-center justify-center">
-                            <UserCircle2 className="w-8 h-8 text-cyan-600" />
+                      <div key={user.id} className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedUserId(user.id);
+                            setAuthError(null);
+                            setIsRegistering(false);
+                          }}
+                          className={`group flex-1 p-3.5 rounded-2xl border text-left flex items-center gap-3.5 transition-all duration-200 ${
+                            selectedUserId === user.id
+                              ? 'border-cyan-400 bg-cyan-50/90 shadow-[0_12px_24px_rgba(6,182,212,0.22)]'
+                              : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40 hover:-translate-y-0.5'
+                          }`}
+                        >
+                          {user.avatarDataUrl ? (
+                            <img src={user.avatarDataUrl} alt={user.name} className="w-14 h-14 rounded-full object-cover border-2 border-cyan-200" />
+                          ) : (
+                            <div className="w-14 h-14 rounded-full bg-cyan-100 border-2 border-cyan-200 flex items-center justify-center">
+                              <UserCircle2 className="w-8 h-8 text-cyan-600" />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-black text-slate-800 truncate">{user.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{user.age} ani • {user.sex} • {user.location}</p>
                           </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="font-black text-slate-800 truncate">{user.name}</p>
-                          <p className="text-xs text-slate-500 truncate">{user.age} ani • {user.sex} • {user.location}</p>
-                        </div>
-                      </button>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => startEditingUser(user)}
+                          className="h-11 w-11 rounded-xl border border-cyan-200 text-cyan-700 bg-white hover:bg-cyan-50 flex items-center justify-center"
+                          title={`Editează profilul lui ${user.name}`}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      </div>
                     ))}
                   </div>
 
@@ -684,8 +794,14 @@ export default function App() {
               {(isRegistering || users.length === 0) && (
                 <form onSubmit={handleCreateUser} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input value={newUserForm.name} onChange={e => setNewUserForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nume" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
-                  <input type="number" min={3} max={99} value={newUserForm.age} onChange={e => setNewUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
-                  <input value={newUserForm.sex} onChange={e => setNewUserForm(prev => ({ ...prev, sex: e.target.value }))} placeholder="Sex" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input type="number" min={1} max={99} value={newUserForm.age} onChange={e => setNewUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <label className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-100 flex items-center gap-2 text-slate-700">
+                    {newUserForm.sex === 'Feminin' ? <Venus className="w-4 h-4 text-pink-500" /> : <Mars className="w-4 h-4 text-sky-500" />}
+                    <select value={newUserForm.sex} onChange={e => setNewUserForm(prev => ({ ...prev, sex: e.target.value }))} className="w-full bg-transparent focus:outline-none">
+                      <option value="Masculin">Masculin</option>
+                      <option value="Feminin">Feminin</option>
+                    </select>
+                  </label>
                   <input value={newUserForm.location} onChange={e => setNewUserForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Loc" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
                   <input type="password" maxLength={4} value={newUserForm.pin} onChange={e => setNewUserForm(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="PIN 4 cifre" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
                   <label className="border-2 border-dashed border-cyan-200 rounded-xl px-3 py-2.5 text-sm text-cyan-700 bg-cyan-50 cursor-pointer font-semibold hover:bg-cyan-100 transition-colors">
@@ -698,9 +814,32 @@ export default function App() {
                 </form>
               )}
 
-              {newUserForm.avatarDataUrl && (
+              {editingUserId && (
+                <form onSubmit={handleUpdateUser} className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border border-cyan-200 bg-cyan-50/50 p-3 rounded-2xl">
+                  <p className="sm:col-span-2 text-sm font-bold text-cyan-800">Editezi profilul selectat</p>
+                  <input value={editUserForm.name} onChange={e => setEditUserForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nume" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input type="number" min={1} max={99} value={editUserForm.age} onChange={e => setEditUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <label className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-100 flex items-center gap-2 text-slate-700">
+                    {editUserForm.sex === 'Feminin' ? <Venus className="w-4 h-4 text-pink-500" /> : <Mars className="w-4 h-4 text-sky-500" />}
+                    <select value={editUserForm.sex} onChange={e => setEditUserForm(prev => ({ ...prev, sex: e.target.value }))} className="w-full bg-transparent focus:outline-none">
+                      <option value="Masculin">Masculin</option>
+                      <option value="Feminin">Feminin</option>
+                    </select>
+                  </label>
+                  <input value={editUserForm.location} onChange={e => setEditUserForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Loc" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input type="password" maxLength={4} value={editUserForm.pin} onChange={e => setEditUserForm(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="PIN 4 cifre" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <label className="border-2 border-dashed border-cyan-200 rounded-xl px-3 py-2.5 text-sm text-cyan-700 bg-cyan-50 cursor-pointer font-semibold hover:bg-cyan-100 transition-colors">
+                    Actualizează poza de profil
+                    <input type="file" accept="image/*" onChange={handleEditAvatarUpload} className="hidden" />
+                  </label>
+                  <button type="submit" className="bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-xl font-black">Salvează editarea</button>
+                  <button type="button" onClick={cancelEditingUser} className="bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl font-black">Renunță</button>
+                </form>
+              )}
+
+              {(newUserForm.avatarDataUrl || editUserForm.avatarDataUrl) && (
                 <div className="mt-4 flex items-center gap-3 bg-white rounded-xl p-3 border border-sky-100 shadow-sm">
-                  <img src={newUserForm.avatarDataUrl} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-cyan-200" />
+                  <img src={editingUserId ? editUserForm.avatarDataUrl : newUserForm.avatarDataUrl} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-cyan-200" />
                   <p className="text-sm text-slate-600 font-semibold">Previzualizare avatar gata de salvat.</p>
                 </div>
               )}
