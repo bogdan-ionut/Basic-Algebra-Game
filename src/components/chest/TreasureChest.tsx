@@ -295,7 +295,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
       >
         <svg
           viewBox="0 0 200 175"
-          className="w-52 h-44"
+          className="w-72 h-56 sm:w-80 sm:h-64"
           style={{ overflow: 'visible' }}
           aria-label="Treasure chest"
         >
@@ -361,6 +361,18 @@ export function TreasureChest({ progress, latestItem }: Props) {
               <stop offset="100%" stopColor="#795007" />
             </linearGradient>
 
+            <linearGradient id="tc-floor-marble" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#A9AFB7" />
+              <stop offset="45%" stopColor="#7D848D" />
+              <stop offset="100%" stopColor="#5A6068" />
+            </linearGradient>
+
+            <linearGradient id="tc-floor-rim-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#30200A" />
+              <stop offset="50%" stopColor="#6C4B13" />
+              <stop offset="100%" stopColor="#30200A" />
+            </linearGradient>
+
             <radialGradient id="tc-floor-glow" cx="50%" cy="35%" r="70%">
               <stop offset="0%" stopColor="rgba(255, 239, 154, 0.75)" />
               <stop offset="60%" stopColor="rgba(255, 214, 94, 0.3)" />
@@ -374,31 +386,44 @@ export function TreasureChest({ progress, latestItem }: Props) {
 
           {/* ── Decorative floor / pedestal ─────────────────────────────── */}
           <g>
-            <ellipse cx="100" cy="171" rx="80" ry="8.5" fill="rgba(0,0,0,0.24)" />
+            <ellipse cx="100" cy="173" rx="106" ry="11" fill="rgba(0,0,0,0.28)" />
+            <ellipse cx="100" cy="168" rx="94" ry="7" fill="rgba(20,53,85,0.28)" />
 
-            {/* Velvet top cushion */}
+            {/* Massive velvet top deck */}
             <path
-              d="M 28 161 Q 100 145 172 161 Q 164 166 28 166 Z"
+              d="M 6 160 Q 100 136 194 160 Q 185 170 15 170 Z"
               fill="url(#tc-floor-top)"
               stroke="#D1A33F"
-              strokeWidth="1.8"
+              strokeWidth="2.2"
             />
-            <path d="M 34 161 Q 100 148 166 161" stroke="rgba(255,240,180,0.5)" strokeWidth="1" fill="none" />
-            <ellipse cx="100" cy="160.8" rx="49" ry="8" fill="url(#tc-floor-glow)" />
+            <path d="M 16 160 Q 100 142 184 160" stroke="rgba(255,240,180,0.58)" strokeWidth="1.1" fill="none" />
+            <path d="M 20 164 Q 100 148 180 164" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="none" />
+            <ellipse cx="100" cy="160.5" rx="66" ry="11.5" fill="url(#tc-floor-glow)" />
 
-            {/* Stone base */}
-            <rect x="26" y="166" width="148" height="12" rx="3" fill="url(#tc-floor-front)" />
-            <path d="M 30 176 H 170" stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
-            <path d="M 41 166 V 178 M 66 166 V 178 M 100 166 V 178 M 134 166 V 178 M 159 166 V 178" stroke="rgba(255,255,255,0.15)" strokeWidth="0.9" />
+            {/* Front stone and brass fascia for more depth */}
+            <rect x="8" y="170" width="184" height="15" rx="4" fill="url(#tc-floor-marble)" />
+            <rect x="12" y="170.4" width="176" height="4" rx="2" fill="url(#tc-floor-trim)" />
+            <rect x="10" y="184" width="180" height="3.8" rx="1.9" fill="url(#tc-floor-rim-dark)" opacity="0.8" />
+            <path d="M 16 183 H 184" stroke="rgba(0,0,0,0.34)" strokeWidth="1" />
 
-            {/* Gold trim accent */}
-            <rect x="36" y="166" width="128" height="2.6" rx="1.3" fill="url(#tc-floor-trim)" />
+            {/* Floor panel seams */}
+            {[24, 44, 64, 84, 104, 124, 144, 164, 184].map((x) => (
+              <line key={`floor-seam-${x}`} x1={x} y1="170" x2={x} y2="185" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+            ))}
+
+            {/* Decorative studs */}
+            {[24, 58, 92, 126, 160, 176].map((x) => (
+              <g key={`floor-stud-${x}`}>
+                <circle cx={x} cy="172.8" r="1.8" fill="#FFEFA8" />
+                <circle cx={x} cy="172.8" r="1.1" fill="#C88A08" />
+              </g>
+            ))}
           </g>
 
           {/* ═══════════════════════════════════════════════════════════════
               LAYER 1 — CHEST BODY (static)
           ═══════════════════════════════════════════════════════════════ */}
-          <g filter="url(#tc-shadow)">
+          <g transform="translate(100 103) scale(1.12) translate(-100 -103)" filter="url(#tc-shadow)">
 
             {/* Main wooden body */}
             <rect x="22" y="97" width="156" height="66" rx="5" fill="url(#tc-wood-body)" />
@@ -545,6 +570,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
           ═══════════════════════════════════════════════════════════════ */}
           <motion.g
             style={{ transformOrigin: '100px 101px' }}
+            transform="translate(100 103) scale(1.12) translate(-100 -103)"
             animate={{ scaleY: lidScaleY, scaleX: lidScaleX }}
             transition={{ type: 'spring', stiffness: 130, damping: 15 }}
           >
@@ -614,7 +640,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
 
 
           {/* Static hinge bridge (always attached to chest body) */}
-          <g>
+          <g transform="translate(100 103) scale(1.12) translate(-100 -103)">
             <rect x="13" y="96" width="174" height="8" rx="3" fill="url(#tc-gold-h)" />
             <line x1="16" y1="98" x2="184" y2="98" stroke="rgba(255,248,160,0.6)" strokeWidth="1" />
             <ellipse cx="65"  cy="101" rx="6" ry="4" fill="#C89800" stroke="#886600" strokeWidth="1" />
