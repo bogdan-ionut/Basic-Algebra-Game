@@ -72,6 +72,13 @@ export const createUser = async (payload: Omit<GameUser, 'id' | 'createdAt'>): P
   return newUser;
 };
 
+export const updateUser = async (updatedUser: GameUser): Promise<GameUser> => {
+  const users = await loadUsers();
+  const nextUsers = users.map(user => (user.id === updatedUser.id ? updatedUser : user));
+  await saveUsers(nextUsers);
+  return updatedUser;
+};
+
 export const getLastActiveUserId = async (): Promise<string | null> => {
   return (await get<string>(LAST_ACTIVE_USER_KEY)) || null;
 };
