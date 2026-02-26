@@ -1,8 +1,8 @@
 /**
  * TreasureChest.tsx — AAA-style game chest component
  *
- * Key insight: the lid rotates around the bottom hinge (instead of being
- * vertically squashed), which keeps its shape clean when the chest is full.
+ * Key insight: the lid uses a controlled hinge squash (scaleY + subtle scaleX)
+ * to fake backward opening without the extreme flattening distortion.
  * Gems pile up in the opening (y ≈ 60-98) and become visible as the lid
  * compresses / opens.
  *
@@ -218,9 +218,10 @@ export function TreasureChest({ progress, latestItem }: Props) {
   const fillRatio   = Math.min(Math.max(filled / total, 0), 1);
   const gemsVisible = Math.round(fillRatio * 10);
 
-  // Lid angle: 0deg = closed, negative = opens backward around hinge.
-  // Capped at ~-78deg to keep the artwork readable and avoid clipping.
-  const lidAngle = -Math.min(78, fillRatio * 86);
+  // Lid open factor: 1 = closed, ~0.28 = open (kept above extreme flattening).
+  // scaleX narrows slightly while open to suggest perspective depth.
+  const lidScaleY = Math.max(0.28, 1 - fillRatio * 0.92);
+  const lidScaleX = 1 - (1 - lidScaleY) * 0.08;
   const isOpen    = fillRatio > 0.03;
 
   // Inner glow intensity
@@ -490,13 +491,13 @@ export function TreasureChest({ progress, latestItem }: Props) {
           )}
 
           {/* ═══════════════════════════════════════════════════════════════
-              LAYER 3 — LID  (rotates around hinge = opens)
+              LAYER 3 — LID  (controlled hinge squash = opens backward)
               transformOrigin at bottom-centre of lid (100, 101).
-              rotate: 0 = closed  →  ~-78° = open
+              scaleY: 1 = closed  →  0.28 = open (no extreme distortion)
           ═══════════════════════════════════════════════════════════════ */}
           <motion.g
             style={{ transformOrigin: '100px 101px' }}
-            animate={{ rotate: lidAngle }}
+            animate={{ scaleY: lidScaleY, scaleX: lidScaleX }}
             transition={{ type: 'spring', stiffness: 130, damping: 15 }}
           >
             {/* Dome shape */}
