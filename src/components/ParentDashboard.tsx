@@ -4,13 +4,16 @@ import { DailyStats, UserProfile } from '../lib/db';
 
 interface ParentDashboardProps {
   onClose: () => void;
+  onResetProgress: () => Promise<void> | void;
+  activeUserName: string;
   dailyStats: DailyStats;
   userProfile: UserProfile;
 }
 
-export function ParentDashboard({ onClose, dailyStats, userProfile }: ParentDashboardProps) {
+export function ParentDashboard({ onClose, onResetProgress, activeUserName, dailyStats, userProfile }: ParentDashboardProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [pin, setPin] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -32,7 +35,7 @@ export function ParentDashboard({ onClose, dailyStats, userProfile }: ParentDash
               <Lock className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold text-slate-800">Acces Părinți</h2>
-            <p className="text-slate-500 text-sm">Introduceți codul PIN (2024) pentru a vedea progresul lui Osea.</p>
+            <p className="text-slate-500 text-sm">Introduceți codul PIN (2024) pentru a vedea progresul lui {activeUserName}.</p>
             <input
               type="password"
               value={pin}
@@ -110,12 +113,35 @@ export function ParentDashboard({ onClose, dailyStats, userProfile }: ParentDash
           <ul className="text-sm text-slate-600 space-y-2">
             {accuracy < 70 && accuracy > 0 && <li>⚠️ Acuratețea este sub 70%. Nivelul ar putea fi prea greu.</li>}
             {accuracy >= 70 && accuracy <= 95 && <li>👍 Acuratețe optimă (70-95%). Nivelul de dificultate este perfect.</li>}
-            {accuracy > 95 && <li>🌟 Acuratețe excelentă! Osea este pregătit pentru provocări noi.</li>}
-            {waste > 20 && <li>⚠️ Waste Meter ridicat. Osea se grăbește și apasă la întâmplare.</li>}
+            {accuracy > 95 && <li>🌟 Acuratețe excelentă! {activeUserName} este pregătit(ă) pentru provocări noi.</li>}
+            {waste > 20 && <li>⚠️ Waste Meter ridicat. {activeUserName} se grăbește și apasă la întâmplare.</li>}
             {dailyStats.timeSpentSeconds < 600 && <li>⏳ Încă nu a atins obiectivul zilnic de 10 minute.</li>}
             {dailyStats.timeSpentSeconds >= 600 && <li>✅ Obiectivul zilnic de 10 minute a fost atins!</li>}
           </ul>
         </div>
+
+        <div className="bg-red-50 p-4 rounded-2xl border border-red-200 mt-4">
+          <h3 className="font-semibold text-red-700 mb-2">Reset progres</h3>
+          <p className="text-sm text-red-600 mb-3">Șterge timpul, scorul și progresul acumulat pentru {activeUserName}, ca să poată începe de la 0.</p>
+          <button
+            onClick={async () => {
+              const confirmed = window.confirm(`Sigur vrei să ștergi tot progresul pentru ${activeUserName}?`);
+              if (!confirmed) return;
+
+              setIsResetting(true);
+              try {
+                await onResetProgress();
+              } finally {
+                setIsResetting(false);
+              }
+            }}
+            disabled={isResetting}
+            className="w-full bg-red-500 hover:bg-red-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl"
+          >
+            {isResetting ? 'Se resetează...' : 'Resetează progresul acestui cont'}
+          </button>
+        </div>
+
       </div>
     </div>
   );
