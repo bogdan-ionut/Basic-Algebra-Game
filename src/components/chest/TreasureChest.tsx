@@ -1,8 +1,8 @@
 /**
  * TreasureChest.tsx — AAA-style game chest component
  *
- * Key insight: the lid uses scaleY compression (transform-origin at bottom
- * hinge) to simulate "opening backward" — exactly how 2D game sprites look.
+ * Key insight: the lid uses a controlled hinge squash (scaleY + subtle scaleX)
+ * to fake backward opening without the extreme flattening distortion.
  * Gems pile up in the opening (y ≈ 60-98) and become visible as the lid
  * compresses / opens.
  *
@@ -218,9 +218,10 @@ export function TreasureChest({ progress, latestItem }: Props) {
   const fillRatio   = Math.min(Math.max(filled / total, 0), 1);
   const gemsVisible = Math.round(fillRatio * 10);
 
-  // Lid scaleY: 1 = fully closed, ≈0 = fully open
-  // We keep a minimum of 0.04 so the gold rim is still visible
-  const lidScaleY = Math.max(0.015, 1 - fillRatio * 1.22);
+  // Lid opening: keep it centered on the hinge to avoid drifting sideways.
+  // Gentle squash keeps shape readable without the old extreme flattening.
+  const lidScaleY = Math.max(0.48, 1 - fillRatio * 0.52);
+  const lidScaleX = 1 - (1 - lidScaleY) * 0.03;
   const isOpen    = fillRatio > 0.03;
 
   // Inner glow intensity
@@ -490,13 +491,13 @@ export function TreasureChest({ progress, latestItem }: Props) {
           )}
 
           {/* ═══════════════════════════════════════════════════════════════
-              LAYER 3 — LID  (scaleY compresses toward hinge = opens)
-              transformOrigin at bottom-centre of lid (100, 101).
-              scaleY: 1 = closed  →  ≈0 = fully open / flat
+              LAYER 3 — LID  (centered hinge squash)
+              Symmetric transform around center hinge avoids left/right drift
+              and keeps the lid visually connected to the chest rim.
           ═══════════════════════════════════════════════════════════════ */}
           <motion.g
             style={{ transformOrigin: '100px 101px' }}
-            animate={{ scaleY: lidScaleY }}
+            animate={{ scaleY: lidScaleY, scaleX: lidScaleX }}
             transition={{ type: 'spring', stiffness: 130, damping: 15 }}
           >
             {/* Dome shape */}
@@ -532,9 +533,6 @@ export function TreasureChest({ progress, latestItem }: Props) {
               fill="none"
             />
 
-            {/* Lid bottom gold rim */}
-            <rect x="13" y="95" width="174" height="10" rx="3" fill="url(#tc-gold-h)" />
-
             {/* Lid vertical gold bands */}
             <path d="M 45,101 Q 46,52 54,42 L 63,42 Q 63,52 63,101 Z" fill="url(#tc-gold-v)" />
             <path d="M 137,101 Q 137,52 145,42 L 154,42 Q 154,52 155,101 Z" fill="url(#tc-gold-v)" />
@@ -564,10 +562,16 @@ export function TreasureChest({ progress, latestItem }: Props) {
               </g>
             ))}
 
-            {/* Hinge pins at bottom of lid */}
+          </motion.g>
+
+
+          {/* Static hinge bridge (always attached to chest body) */}
+          <g>
+            <rect x="13" y="96" width="174" height="8" rx="3" fill="url(#tc-gold-h)" />
+            <line x1="16" y1="98" x2="184" y2="98" stroke="rgba(255,248,160,0.6)" strokeWidth="1" />
             <ellipse cx="65"  cy="101" rx="6" ry="4" fill="#C89800" stroke="#886600" strokeWidth="1" />
             <ellipse cx="135" cy="101" rx="6" ry="4" fill="#C89800" stroke="#886600" strokeWidth="1" />
-          </motion.g>
+          </g>
 
           {/* ═══════════════════════════════════════════════════════════════
               LAYER 4 — DROPPING GEM ANIMATION
