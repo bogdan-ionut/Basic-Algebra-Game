@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { Star, Settings, Snail, ShieldAlert, Rocket, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull } from 'lucide-react';
+import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull } from 'lucide-react';
 import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, setLastActiveUserId, getLastActiveUserId } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { DailyRing } from './components/DailyRing';
@@ -193,6 +193,57 @@ function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; de
   );
 }
 
+function CaptainIdentityCard({
+  user,
+  chestCount,
+  compact = false,
+}: {
+  user: GameUser;
+  chestCount: number;
+  compact?: boolean;
+}) {
+  const epauletteLevel = Math.min(5, Math.max(1, chestCount + 1));
+  const stripeCount = Math.min(5, chestCount + 1);
+
+  return (
+    <div className={`rounded-3xl border-2 border-sky-200 bg-white/90 shadow-[0_12px_30px_rgba(2,132,199,0.18)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
+      <div className="flex items-center gap-3">
+        <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
+          <div className={`rounded-lg bg-amber-200 border border-amber-400 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 ${compact ? 'h-8' : 'h-10'}`}>
+            {Array.from({ length: stripeCount }).map((_, index) => (
+              <span key={`left-${index}`} className="w-0.5 bg-amber-600 rounded-full" />
+            ))}
+          </div>
+
+          <div className="relative">
+            {user.avatarDataUrl ? (
+              <img src={user.avatarDataUrl} alt={user.name} className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-sky-300`} />
+            ) : (
+              <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-sky-100 border-2 border-sky-300 flex items-center justify-center`}>
+                <UserCircle2 className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} text-sky-600`} />
+              </div>
+            )}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-2 rounded-t-full bg-slate-900" />
+          </div>
+
+          <div className={`rounded-lg bg-amber-200 border border-amber-400 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 ${compact ? 'h-8' : 'h-10'}`}>
+            {Array.from({ length: stripeCount }).map((_, index) => (
+              <span key={`right-${index}`} className="w-0.5 bg-amber-600 rounded-full" />
+            ))}
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <p className={`font-black text-slate-800 truncate ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
+          <p className={`text-slate-500 truncate ${compact ? 'text-[11px]' : 'text-xs'}`}>
+            Căpitan • {chestCount} cufere • rang {epauletteLevel}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [num1, setNum1] = useState(1);
   const [num2, setNum2] = useState(1);
@@ -223,6 +274,7 @@ export default function App() {
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserChestCount, setSelectedUserChestCount] = useState(0);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [newUserForm, setNewUserForm] = useState({
@@ -367,6 +419,20 @@ export default function App() {
     setAuthError(null);
   };
 
+  useEffect(() => {
+    const loadSelectedUserProgress = async () => {
+      if (!selectedUserId) {
+        setSelectedUserChestCount(0);
+        return;
+      }
+
+      const profile = await loadUserProfile(selectedUserId);
+      setSelectedUserChestCount(Math.floor(profile.score / 10));
+    };
+
+    loadSelectedUserProgress();
+  }, [selectedUserId]);
+
 
   // Load users on mount
   useEffect(() => {
@@ -500,6 +566,8 @@ export default function App() {
 
 
   if (!activeUser || !dailyStats || !userProfile) {
+    const selectedUser = users.find(user => user.id === selectedUserId);
+
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-200 via-cyan-100 to-amber-50 p-4 md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
         <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-sky-300/40 blur-2xl" />
@@ -522,6 +590,12 @@ export default function App() {
             <p className="text-center text-sky-50/95 text-base md:text-lg font-medium">
               Alege un echipaj existent sau creează un nou căpitan pentru aventura cu comori.
             </p>
+
+            {selectedUser && (
+              <div className="mt-5 flex justify-center">
+                <CaptainIdentityCard user={selectedUser} chestCount={selectedUserChestCount} compact />
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -638,8 +712,8 @@ export default function App() {
           animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border-4 border-sky-300"
         >
-          <div className="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Rocket className="w-12 h-12 text-sky-500" />
+          <div className="flex justify-center mb-6">
+            <CaptainIdentityCard user={activeUser} chestCount={chestProgress.totalChests} />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, {activeUser.name}!</h1>
           <p className="text-slate-600 mb-8">Ești gata pentru 10 minute de aventură matematică?</p>
@@ -736,8 +810,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
       {/* Top Bar with Daily Ring and Parent Access */}
-      <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
+      <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20 gap-3">
         <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
+        <CaptainIdentityCard user={activeUser} chestCount={chestProgress.totalChests} compact />
         <div className="flex items-center gap-2">
           <button
             onClick={handleSwitchUser}
