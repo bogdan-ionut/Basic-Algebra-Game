@@ -569,38 +569,44 @@ export default function App() {
     const selectedUser = users.find(user => user.id === selectedUserId);
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-sky-200 via-cyan-100 to-amber-50 p-4 md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
-        <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-sky-300/40 blur-2xl" />
-        <div className="absolute -bottom-16 -right-10 w-72 h-72 rounded-full bg-amber-300/30 blur-2xl" />
-        <div className="absolute top-6 left-6 text-sky-700/60">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#c8eeff_0%,_#eff9ff_48%,_#fff9ef_100%)] p-4 md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 opacity-70">
+          <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-cyan-300/35 blur-3xl" />
+          <div className="absolute -bottom-24 right-1/4 h-80 w-80 rounded-full bg-amber-200/45 blur-3xl" />
+        </div>
+        <div className="absolute top-6 left-6 text-cyan-800/55">
           <Waves className="w-10 h-10" />
         </div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.97, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="w-full max-w-5xl bg-white/90 backdrop-blur rounded-[2rem] border-4 border-sky-300 shadow-[0_30px_70px_rgba(14,116,144,0.25)] overflow-hidden relative z-10"
+          className="w-full max-w-6xl rounded-[2.25rem] border border-cyan-100/80 bg-white/85 shadow-[0_32px_90px_rgba(8,47,73,0.2)] backdrop-blur-xl overflow-hidden relative z-10"
         >
-          <div className="bg-gradient-to-r from-sky-500 via-cyan-500 to-blue-500 px-6 py-6 md:px-10 md:py-8 text-white">
-            <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="relative bg-gradient-to-r from-sky-600 via-cyan-500 to-blue-600 px-6 py-7 md:px-10 md:py-10 text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.24),_transparent_62%)]" />
+            <div className="relative flex items-center justify-center gap-3 mb-3">
               <Skull className="w-7 h-7" />
               <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center">Portul Piraților Matematicieni</h1>
               <Anchor className="w-7 h-7" />
             </div>
-            <p className="text-center text-sky-50/95 text-base md:text-lg font-medium">
-              Alege un echipaj existent sau creează un nou căpitan pentru aventura cu comori.
+            <p className="relative text-center text-cyan-50/95 text-base md:text-lg font-medium max-w-3xl mx-auto">
+              Selectează un profil existent sau creează un căpitan nou în mai puțin de 30 secunde.
             </p>
 
             {selectedUser && (
-              <div className="mt-5 flex justify-center">
+              <div className="relative mt-6 flex justify-center">
                 <CaptainIdentityCard user={selectedUser} chestCount={selectedUserChestCount} compact />
               </div>
             )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            <div className="p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-sky-100">
-              <h2 className="text-xl font-black text-slate-800 mb-4">Echipaj existent</h2>
+            <section className="p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-slate-200/80 bg-white/90">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-black text-slate-900">Echipaj existent</h2>
+                <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-800 font-bold">Login rapid</span>
+              </div>
 
               {users.length ? (
                 <>
@@ -613,10 +619,10 @@ export default function App() {
                           setAuthError(null);
                           setIsRegistering(false);
                         }}
-                        className={`p-3.5 rounded-2xl border-2 text-left flex items-center gap-3.5 transition-all shadow-sm ${
+                        className={`group p-3.5 rounded-2xl border text-left flex items-center gap-3.5 transition-all duration-200 ${
                           selectedUserId === user.id
-                            ? 'border-cyan-400 bg-cyan-50 shadow-[0_8px_20px_rgba(6,182,212,0.2)]'
-                            : 'border-slate-200 bg-white hover:border-cyan-300 hover:-translate-y-0.5'
+                            ? 'border-cyan-400 bg-cyan-50/90 shadow-[0_12px_24px_rgba(6,182,212,0.22)]'
+                            : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40 hover:-translate-y-0.5'
                         }`}
                       >
                         {user.avatarDataUrl ? (
@@ -640,33 +646,36 @@ export default function App() {
                     maxLength={4}
                     value={enteredPin}
                     onChange={e => setEnteredPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-xl tracking-[0.45em] text-center font-bold text-slate-700 focus:outline-none focus:border-cyan-400"
+                    className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-xl tracking-[0.45em] text-center font-black text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
                     placeholder="••••"
                   />
                   <button
                     onClick={handleLogin}
-                    className="w-full mt-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-white py-3.5 rounded-xl font-black shadow-lg transition-transform hover:scale-[1.01]"
+                    className="w-full mt-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-white py-3.5 rounded-xl font-black shadow-[0_12px_26px_rgba(16,185,129,0.32)] transition-transform hover:scale-[1.01] active:scale-[0.99]"
                   >
                     Intră în aventură
                   </button>
                 </>
               ) : (
-                <div className="rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50 p-6 text-center">
-                  <p className="font-bold text-sky-700">Nu există încă niciun echipaj salvat.</p>
-                  <p className="text-sky-600 text-sm mt-1">Creează primul căpitan în panoul din dreapta.</p>
+                <div className="rounded-2xl border-2 border-dashed border-cyan-200 bg-cyan-50/70 p-6 text-center">
+                  <p className="font-bold text-cyan-800">Nu există încă niciun echipaj salvat.</p>
+                  <p className="text-cyan-700 text-sm mt-1">Creează primul căpitan în panoul din dreapta.</p>
                 </div>
               )}
-            </div>
+            </section>
 
-            <div className="p-6 md:p-8 bg-gradient-to-b from-amber-50/80 to-white">
+            <section className="p-6 md:p-8 bg-gradient-to-b from-slate-50 via-white to-amber-50/60">
               <div className="flex items-center justify-between gap-2 mb-4">
-                <h2 className="text-xl font-black text-slate-800">Căpitan nou</h2>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900">Căpitan nou</h2>
+                  <p className="text-sm text-slate-500">Date clare, formular simplu, setup instant.</p>
+                </div>
                 <button
                   onClick={() => {
                     setIsRegistering(prev => !prev);
                     setAuthError(null);
                   }}
-                  className="text-sm font-bold text-cyan-700 hover:text-cyan-600"
+                  className="text-sm font-bold px-3 py-1.5 rounded-lg bg-white border border-cyan-200 text-cyan-700 hover:text-cyan-600 hover:border-cyan-300"
                 >
                   {isRegistering ? 'Ascunde formularul' : 'Arată formularul'}
                 </button>
@@ -674,29 +683,33 @@ export default function App() {
 
               {(isRegistering || users.length === 0) && (
                 <form onSubmit={handleCreateUser} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input value={newUserForm.name} onChange={e => setNewUserForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nume" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
-                  <input type="number" min={3} max={99} value={newUserForm.age} onChange={e => setNewUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
-                  <input value={newUserForm.sex} onChange={e => setNewUserForm(prev => ({ ...prev, sex: e.target.value }))} placeholder="Sex" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
-                  <input value={newUserForm.location} onChange={e => setNewUserForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Loc" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
-                  <input type="password" maxLength={4} value={newUserForm.pin} onChange={e => setNewUserForm(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="PIN 4 cifre" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-400" />
-                  <label className="border-2 border-dashed border-cyan-200 rounded-xl px-3 py-2.5 text-sm text-cyan-700 bg-cyan-50 cursor-pointer font-semibold">
+                  <input value={newUserForm.name} onChange={e => setNewUserForm(prev => ({ ...prev, name: e.target.value }))} placeholder="Nume" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input type="number" min={3} max={99} value={newUserForm.age} onChange={e => setNewUserForm(prev => ({ ...prev, age: e.target.value }))} placeholder="Vârstă" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input value={newUserForm.sex} onChange={e => setNewUserForm(prev => ({ ...prev, sex: e.target.value }))} placeholder="Sex" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input value={newUserForm.location} onChange={e => setNewUserForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Loc" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <input type="password" maxLength={4} value={newUserForm.pin} onChange={e => setNewUserForm(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))} placeholder="PIN 4 cifre" className="border-2 border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" />
+                  <label className="border-2 border-dashed border-cyan-200 rounded-xl px-3 py-2.5 text-sm text-cyan-700 bg-cyan-50 cursor-pointer font-semibold hover:bg-cyan-100 transition-colors">
                     Poză profil rotundă
                     <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
                   </label>
-                  <button type="submit" className="sm:col-span-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-3 rounded-xl font-black shadow-lg">Salvează căpitanul</button>
+                  <button type="submit" className="sm:col-span-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-3 rounded-xl font-black shadow-[0_12px_26px_rgba(14,165,233,0.3)]">
+                    Salvează căpitanul
+                  </button>
                 </form>
               )}
 
               {newUserForm.avatarDataUrl && (
-                <div className="mt-4 flex items-center gap-3 bg-white rounded-xl p-3 border border-sky-100">
+                <div className="mt-4 flex items-center gap-3 bg-white rounded-xl p-3 border border-sky-100 shadow-sm">
                   <img src={newUserForm.avatarDataUrl} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-cyan-200" />
                   <p className="text-sm text-slate-600 font-semibold">Previzualizare avatar gata de salvat.</p>
                 </div>
               )}
-            </div>
+            </section>
           </div>
 
-          {authError && <p className="text-red-600 font-bold px-6 pb-6">{authError}</p>}
+          {authError && (
+            <p className="text-red-700 font-bold px-6 pb-6 pt-1 text-sm bg-red-50/80 border-t border-red-100">{authError}</p>
+          )}
         </motion.div>
       </div>
     );
