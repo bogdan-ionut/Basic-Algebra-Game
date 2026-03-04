@@ -247,7 +247,7 @@ function CaptainIdentityCard({
 export default function App() {
   const [num1, setNum1] = useState(1);
   const [num2, setNum2] = useState(1);
-  const [options, setOptions] = useState<number[]>([]);
+  const [answerInput, setAnswerInput] = useState('');
   const [iconIndex, setIconIndex] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [wrongAnswer, setWrongAnswer] = useState<number | null>(null);
@@ -305,17 +305,7 @@ export default function App() {
     setNum1(n1);
     setNum2(n2);
 
-    // Generate 3 options including the correct answer
-    const correct = sum;
-    const opts = [correct];
-    while (opts.length < 3) {
-      const wrong = Math.floor(Math.random() * (maxSum + 2)) + 1;
-      if (!opts.includes(wrong) && wrong > 0) {
-        opts.push(wrong);
-      }
-    }
-    opts.sort(() => Math.random() - 0.5);
-    setOptions(opts);
+    setAnswerInput('');
     setIconIndex(Math.floor(Math.random() * COUNT_ITEM_THEMES.length));
     setShowSuccess(false);
     setWrongAnswer(null);
@@ -696,6 +686,24 @@ export default function App() {
     await saveDailyStats(activeUser.id, updatedStats);
   };
 
+  const handleAnswerSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (showSuccess || isSpeedBumpActive) return;
+
+    const trimmedAnswer = answerInput.trim();
+    if (!trimmedAnswer) return;
+
+    const parsedAnswer = Number(trimmedAnswer);
+    if (!Number.isFinite(parsedAnswer)) {
+      setWrongAnswer(-1);
+      setTimeout(() => setWrongAnswer(null), 500);
+      return;
+    }
+
+    await handleAnswer(parsedAnswer);
+    setAnswerInput('');
+  };
+
 
   if (!activeUser || !dailyStats || !userProfile) {
     const selectedUser = users.find(user => user.id === selectedUserId);
@@ -1073,34 +1081,34 @@ export default function App() {
             =
           </div>
 
-          {/* Options */}
-          <div className="flex gap-4 w-full justify-center relative">
-            {options.map((opt, i) => (
-              <motion.button
-                key={`${opt}-${i}`}
-                whileHover={!isSpeedBumpActive ? { scale: 1.1 } : {}}
-                whileTap={!isSpeedBumpActive ? { scale: 0.9 } : {}}
-                animate={wrongAnswer === opt ? { x: [-10, 10, -10, 10, 0] } : {}}
-                transition={{ duration: 0.4 }}
-                onClick={() => !showSuccess && !isSpeedBumpActive && handleAnswer(opt)}
-                className={`
-                  w-20 h-20 sm:w-24 sm:h-24 rounded-2xl text-4xl sm:text-5xl font-black shadow-[0_8px_18px_rgba(120,76,15,0.35)] flex items-center justify-center
-                  transition-colors duration-200
-                  ${isSpeedBumpActive ? 'opacity-50 cursor-not-allowed bg-slate-300 text-slate-500 border-b-4 border-slate-400' : 'cursor-pointer'}
-                  ${!isSpeedBumpActive && showSuccess && opt === num1 + num2 
-                    ? 'bg-green-500 text-white border-b-4 border-green-700' 
-                    : !isSpeedBumpActive && wrongAnswer === opt
-                    ? 'bg-red-400 text-white border-b-4 border-red-600'
-                    : !isSpeedBumpActive
-                    ? 'bg-gradient-to-b from-[#f7d86f] to-[#d6a532] text-amber-50 border-b-4 border-amber-700 hover:from-[#f8e18b] hover:to-[#d9af4c]'
-                    : ''
-                  }
-                `}
-              >
-                {opt}
-              </motion.button>
-            ))}
-          </div>
+          {/* Answer Input */}
+          <motion.form
+            onSubmit={handleAnswerSubmit}
+            animate={wrongAnswer !== null ? { x: [-10, 10, -10, 10, 0] } : {}}
+            transition={{ duration: 0.4 }}
+            className="w-full max-w-[220px]"
+          >
+            <label htmlFor="answer-input" className="sr-only">Scrie răspunsul</label>
+            <input
+              id="answer-input"
+              type="number"
+              inputMode="numeric"
+              autoComplete="off"
+              value={answerInput}
+              onChange={(event) => setAnswerInput(event.target.value)}
+              placeholder=""
+              disabled={isSpeedBumpActive || showSuccess}
+              className={`w-full rounded-xl border-4 px-3 py-2 text-center text-2xl font-black shadow-[0_8px_18px_rgba(120,76,15,0.2)] outline-none transition-colors ${
+                isSpeedBumpActive
+                  ? 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-500'
+                  : wrongAnswer !== null
+                  ? 'border-red-500 bg-red-50 text-red-700'
+                  : showSuccess
+                  ? 'border-green-500 bg-green-50 text-green-700'
+                  : 'border-amber-400 bg-white text-amber-900 focus:border-blue-500'
+              }`}
+            />
+          </motion.form>
 
           {/* Success Message - Moved up so it doesn't block the chest */}
           <AnimatePresence>
