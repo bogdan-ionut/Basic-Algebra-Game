@@ -308,14 +308,20 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
       >
         {isMinecraft ? (
           <div className="relative w-72 h-56 sm:w-80 sm:h-64">
-            <div className="absolute inset-x-5 bottom-4 h-6 rounded-[6px] bg-[#2f4058] border-2 border-[#91a1b6] shadow-[0_10px_16px_rgba(0,0,0,0.4)]" />
-            <div className="absolute inset-x-2 top-8 bottom-10 rounded-md border-[4px] border-[#121a26] bg-[#472a14] shadow-[inset_0_0_0_3px_#8a592e,inset_0_0_0_7px_#2c190d,0_12px_18px_rgba(0,0,0,0.42)]">
-              <div className="absolute inset-x-0 top-0 h-[44%] border-b-[4px] border-[#1b1008] bg-[repeating-linear-gradient(90deg,#8a592e_0px,#8a592e_15px,#6f4524_15px,#6f4524_30px)]" />
-              <div className="absolute inset-x-0 bottom-0 h-[56%] bg-[repeating-linear-gradient(90deg,#744725_0px,#744725_15px,#5d381d_15px,#5d381d_30px)]" />
-              <div className="absolute left-1/2 top-[42%] -translate-x-1/2 w-12 h-14 rounded-[2px] border-[3px] border-[#1f1208] bg-gradient-to-b from-[#e1bc57] to-[#8f6a20] shadow-[0_4px_0_#3a250e]" />
-              <div className="absolute left-1/2 top-[51%] -translate-x-1/2 w-4 h-4 rounded-full border-2 border-[#2f1c0a] bg-[#40250c]" />
+            <div className="absolute inset-x-5 bottom-2 h-7 rounded-[8px] border-2 border-[#7f95b1] bg-gradient-to-b from-[#2a3d56] to-[#17283e] shadow-[0_12px_18px_rgba(0,0,0,0.45)]" />
 
-              <div className="absolute left-0 right-0 top-[38%] grid grid-cols-5 gap-1 px-5">
+            <div className="absolute inset-x-2 top-3 bottom-10 rounded-[4px] border-[4px] border-[#0b111c] bg-[#5f3a1f] shadow-[inset_0_0_0_3px_#9a6736,inset_0_0_0_7px_#3b2412,0_14px_20px_rgba(0,0,0,0.45)]">
+              <div className="absolute inset-x-0 top-0 h-[44%] border-b-[4px] border-[#130b05] bg-[repeating-linear-gradient(90deg,#b07a42_0px,#b07a42_16px,#946436_16px,#946436_32px)]" />
+              <div className="absolute inset-x-0 bottom-0 h-[56%] bg-[repeating-linear-gradient(90deg,#8c5b31_0px,#8c5b31_16px,#734928_16px,#734928_32px)]" />
+              <div className="absolute inset-x-0 top-[44%] h-[4px] bg-[#120a05]" />
+
+              <div className="absolute left-2 top-1 bottom-1 w-[6px] bg-[#1a120c]" />
+              <div className="absolute right-2 top-1 bottom-1 w-[6px] bg-[#1a120c]" />
+
+              <div className="absolute left-1/2 top-[42%] -translate-x-1/2 h-[62px] w-[44px] border-[3px] border-[#201108] bg-gradient-to-b from-[#f0d589] via-[#b98537] to-[#7d541f] shadow-[0_4px_0_#2f1b0a]" />
+              <div className="absolute left-1/2 top-[54%] -translate-x-1/2 h-[16px] w-[16px] border-[3px] border-[#2a1a0c] bg-gradient-to-b from-[#b5b9bf] to-[#6f7784]" />
+
+              <div className="absolute left-0 right-0 top-[37%] grid grid-cols-5 gap-1 px-5">
                 {Array.from({ length: minecraftLootVisible }).map((_, index) => (
                   <div key={`minecraft-loot-${index}`} className="h-9 w-9 rounded-[4px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#1e3a5a,0_6px_10px_rgba(0,0,0,0.35)] p-0.5">
                     <img
@@ -327,7 +333,9 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
                 ))}
               </div>
             </div>
-            <div className="absolute inset-x-2 top-1 h-24 rounded-md border-[4px] border-[#121a26] bg-[repeating-linear-gradient(90deg,#956437_0px,#956437_14px,#7f522e_14px,#7f522e_28px)] shadow-[inset_0_0_0_3px_#c2874c,inset_0_-5px_0_#4b2c14]" />
+
+            <div className="absolute inset-x-2 top-0 h-24 rounded-[4px] border-[4px] border-[#0b111c] bg-[repeating-linear-gradient(90deg,#c18c4d_0px,#c18c4d_16px,#a9753e_16px,#a9753e_32px)] shadow-[inset_0_0_0_3px_#d39f5f,inset_0_-5px_0_#5a351a]" />
+            <div className="absolute inset-x-2 top-[90px] h-[4px] bg-[#0b111c]" />
           </div>
         ) : (
         <svg
