@@ -171,19 +171,19 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
   const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
   const minecraftAsset = MINECRAFT_ASSETS[minecraftKind];
+  const frameColorByFamily: Record<MinecraftAsset['family'], string> = {
+    resource: '#38bdf8',
+    tool: '#f59e0b',
+    utility: '#f97316',
+    food: '#22c55e',
+    animal: '#84cc16',
+    npc: '#a78bfa',
+    hostile: '#ef4444',
+  };
+  const frameColor = frameColorByFamily[minecraftAsset.family];
 
   const renderToken = () => {
     if (stack === 'minecraft') {
-      const frameColorByFamily: Record<MinecraftAsset['family'], string> = {
-        resource: '#38bdf8',
-        tool: '#f59e0b',
-        utility: '#f97316',
-        food: '#22c55e',
-        animal: '#84cc16',
-        npc: '#a78bfa',
-        hostile: '#ef4444',
-      };
-      const frameColor = frameColorByFamily[minecraftAsset.family];
       const panelColorByFamily: Record<MinecraftAsset['family'], string> = {
         resource: '#082f49',
         tool: '#451a03',
@@ -1334,7 +1334,11 @@ export default function App() {
 
           {/* Treasure Chest Reward System */}
           <div className="w-full rounded-[1.5rem] bg-gradient-to-b from-[#255b85] via-[#1c476a] to-[#163654] p-3 border-2 border-[#d2b47d] shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
-            <TreasureChest progress={chestProgress} latestItem={latestItemIndex} />
+            <TreasureChest
+              progress={chestProgress}
+              latestItem={latestItemIndex}
+              visualStyle={visualStack === 'minecraft' ? 'minecraft' : 'treasure'}
+            />
           </div>
 
           {/* Speed Bump Overlay */}
