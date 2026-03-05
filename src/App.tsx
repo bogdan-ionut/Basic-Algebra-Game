@@ -119,11 +119,6 @@ const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
   bread: { label: 'Bread', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/bread.png' },
 };
 
-const VISUAL_STACK_OPTIONS: { id: VisualStack; label: string; hint: string }[] = [
-  { id: 'treasure', label: 'Comori clasice', hint: 'geme, monede și relicve' },
-  { id: 'minecraft', label: 'Minecraft HD', hint: 'resurse, tool-uri, animale, NPC-uri, mobs' },
-];
-
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
   { name: 'Ruby', base: '#ef4444', dark: '#991b1b', light: '#fecaca', glow: '#fca5a5' },
   { name: 'Sapphire', base: '#3b82f6', dark: '#1e3a8a', light: '#bfdbfe', glow: '#93c5fd' },
@@ -173,18 +168,18 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
         <>
           <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#minecraftGlowGrad)" opacity="0.95" />
           <rect x="6" y="6" width="88" height="88" rx="18" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="3.5" />
-          <rect x="12" y="12" width="76" height="76" rx="14" fill={panelColorByFamily[minecraftAsset.family]} stroke={frameColor} strokeWidth="3.5" />
-          <rect x="15" y="15" width="70" height="22" rx="8" fill="white" opacity="0.1" />
-          <rect x="15" y="63" width="70" height="22" rx="8" fill="#020617" opacity="0.28" />
+          <rect x="10" y="10" width="80" height="80" rx="16" fill={panelColorByFamily[minecraftAsset.family]} stroke={frameColor} strokeWidth="3.5" />
+          <rect x="14" y="14" width="72" height="24" rx="8" fill="white" opacity="0.16" />
+          <rect x="14" y="62" width="72" height="24" rx="8" fill="#020617" opacity="0.32" />
           <image
             href={minecraftAsset.url}
-            x="20"
-            y="20"
-            width="60"
-            height="60"
+            x="15"
+            y="15"
+            width="70"
+            height="70"
             style={{
               imageRendering: 'pixelated',
-              filter: 'drop-shadow(0px 16px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0px 5px 6px rgba(0, 0, 0, 0.45))'
+              filter: 'contrast(1.1) saturate(1.2) drop-shadow(0px 18px 14px rgba(0, 0, 0, 0.66)) drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.5))'
             }}
           />
           <text x="50" y="78" textAnchor="middle" fill={frameColor} fontSize="7" fontWeight="700" style={{ letterSpacing: '0.5px' }}>
@@ -259,7 +254,7 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
     >
       <motion.svg
         viewBox="0 0 100 100"
-        className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-[0_10px_12px_rgba(15,23,42,0.45)]"
+        className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_12px_16px_rgba(15,23,42,0.55)]"
         animate={{ y: [0, -1.5, 0] }}
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
       >
@@ -295,7 +290,7 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
           ].map((pixel, i) => (
             <motion.span
               key={`${minecraftKind}-pixel-${shapeIndex}-${i}`}
-              className="absolute h-1.5 w-1.5"
+              className="absolute h-2 w-2"
               style={{ left: pixel.x, top: pixel.y, backgroundColor: pixel.c, boxShadow: '0 0 0 1px rgba(15,23,42,0.45)' }}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: [0, 1, 0], opacity: [0, 0.9, 0] }}
@@ -405,7 +400,7 @@ export default function App() {
   const [hasStarted, setHasStarted] = useState(false);
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
-  const [visualStack, setVisualStack] = useState<VisualStack>('treasure');
+  const [visualStack] = useState<VisualStack>('minecraft');
 
   const [users, setUsers] = useState<GameUser[]>([]);
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
@@ -1057,19 +1052,6 @@ export default function App() {
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, {activeUser.name}!</h1>
           <p className="text-slate-600 mb-8">Ești gata pentru 10 minute de aventură matematică?</p>
-          <div className="mb-6 text-left bg-slate-50 border border-slate-200 rounded-2xl p-3">
-            <label htmlFor="visual-stack-start" className="block text-sm font-bold text-slate-700 mb-1">Obiecte de numărat</label>
-            <select
-              id="visual-stack-start"
-              value={visualStack}
-              onChange={(event) => setVisualStack(event.target.value as VisualStack)}
-              className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-700 focus:outline-none focus:border-sky-400"
-            >
-              {VISUAL_STACK_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>{option.label} — {option.hint}</option>
-              ))}
-            </select>
-          </div>
           <button
             onClick={() => {
               setHasStarted(true);
@@ -1203,24 +1185,10 @@ export default function App() {
 
         {/* Game Area */}
         <div className="p-6 sm:p-8 flex flex-col items-center gap-7 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9),rgba(245,234,217,0.92))]">
-          <div className="w-full max-w-md bg-white/75 border-2 border-amber-200 rounded-2xl px-4 py-3">
-            <label htmlFor="visual-stack-in-game" className="block text-sm font-bold text-amber-900 mb-1">Tematică obiecte</label>
-            <select
-              id="visual-stack-in-game"
-              value={visualStack}
-              onChange={(event) => setVisualStack(event.target.value as VisualStack)}
-              className="w-full rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900 focus:outline-none focus:border-amber-500"
-            >
-              {VISUAL_STACK_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>{option.label} — {option.hint}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Visual Representation */}
-          <div className="flex items-center justify-center gap-4 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-5 shadow-inner">
+          <div className="flex items-center justify-center gap-8 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-7 shadow-inner shadow-slate-900/20">
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
+              <div className="flex flex-wrap justify-center gap-2 min-h-[7rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
                   <div key={`n1-${i}`}>
                     <DetailedToken
@@ -1238,7 +1206,7 @@ export default function App() {
             <span className="text-5xl text-blue-500 pb-10 drop-shadow-[0_0_8px_rgba(59,130,246,0.35)]">+</span>
 
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-1.5 min-h-[5rem]">
+              <div className="flex flex-wrap justify-center gap-2 min-h-[7rem]">
                 {Array.from({ length: num2 }).map((_, i) => (
                   <div key={`n2-${i}`}>
                     <DetailedToken
