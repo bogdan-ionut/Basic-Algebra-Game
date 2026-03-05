@@ -19,10 +19,10 @@ const playSound = (type: 'success' | 'error' | 'levelUp' | 'speedBump') => {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
+
     if (type === 'success') {
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
@@ -72,11 +72,31 @@ type CountItemTheme = {
 type VisualStack = 'treasure' | 'minecraft';
 
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
-type MinecraftItemKind = 'diamond' | 'emerald' | 'gold_ingot' | 'redstone' | 'grass_block';
+type MinecraftItemKind = 'diamond' | 'emerald' | 'gold_ingot' | 'redstone' | 'grass_block' | 'apple' | 'iron_sword' | 'diamond_pickaxe' | 'cake' | 'pig' | 'cow' | 'chicken' | 'sheep' | 'villager' | 'zombie' | 'enderman' | 'creeper';
+
+const MINECRAFT_URLS: Record<MinecraftItemKind, string> = {
+  diamond: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png',
+  emerald: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png',
+  gold_ingot: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png',
+  redstone: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png',
+  grass_block: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/block/grass_block_side.png',
+  apple: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png',
+  iron_sword: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_sword.png',
+  diamond_pickaxe: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png',
+  cake: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cake.png',
+  pig: 'https://mc-heads.net/avatar/MHF_Pig/100.png',
+  cow: 'https://mc-heads.net/avatar/MHF_Cow/100.png',
+  chicken: 'https://mc-heads.net/avatar/MHF_Chicken/100.png',
+  sheep: 'https://mc-heads.net/avatar/MHF_Sheep/100.png',
+  villager: 'https://mc-heads.net/avatar/MHF_Villager/100.png',
+  zombie: 'https://mc-heads.net/avatar/MHF_Zombie/100.png',
+  enderman: 'https://mc-heads.net/avatar/MHF_Enderman/100.png',
+  creeper: 'https://mc-heads.net/avatar/MHF_Creeper/100.png',
+};
 
 const VISUAL_STACK_OPTIONS: { id: VisualStack; label: string; hint: string }[] = [
   { id: 'treasure', label: 'Comori clasice', hint: 'geme, monede și relicve' },
-  { id: 'minecraft', label: 'Minecraft', hint: 'diamante, smaralde și block-uri' },
+  { id: 'minecraft', label: 'Minecraft', hint: 'resurse, animale, NPC-uri' },
 ];
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
@@ -91,59 +111,32 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
   const gradId = `gem-${theme.name}-${shapeIndex}-grad`;
   const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
   const tokenKinds: CountItemKind[] = ['gem', 'coin', 'crown', 'potion', 'star'];
-  const minecraftKinds: MinecraftItemKind[] = ['diamond', 'emerald', 'gold_ingot', 'redstone', 'grass_block'];
+  const minecraftKinds: MinecraftItemKind[] = [
+    'diamond', 'pig', 'diamond_pickaxe', 'emerald', 'cow',
+    'gold_ingot', 'chicken', 'apple', 'redstone', 'sheep',
+    'cake', 'grass_block', 'villager', 'iron_sword',
+    'zombie', 'enderman', 'creeper'
+  ];
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
   const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
 
   const renderToken = () => {
     if (stack === 'minecraft') {
-      if (minecraftKind === 'diamond') {
-        return (
-          <>
-            <rect x="16" y="16" width="68" height="68" rx="8" fill="#8de8ff" stroke="#0f766e" strokeWidth="4" />
-            <path d="M20 30 L36 20 L52 30 L36 40 Z" fill="#cffafe" />
-            <path d="M52 30 L68 20 L80 32 L64 42 Z" fill="#67e8f9" />
-            <path d="M36 40 L52 30 L64 42 L48 52 Z" fill="#22d3ee" />
-          </>
-        );
-      }
-
-      if (minecraftKind === 'emerald') {
-        return (
-          <>
-            <rect x="16" y="16" width="68" height="68" rx="8" fill="#34d399" stroke="#166534" strokeWidth="4" />
-            <rect x="24" y="24" width="52" height="52" fill="#6ee7b7" opacity="0.35" />
-            <path d="M20 60 L34 46 L48 56 L62 44 L80 60" stroke="#14532d" strokeWidth="5" fill="none" />
-          </>
-        );
-      }
-
-      if (minecraftKind === 'gold_ingot') {
-        return (
-          <>
-            <rect x="14" y="32" width="72" height="38" rx="9" fill="#facc15" stroke="#a16207" strokeWidth="4" />
-            <rect x="22" y="40" width="56" height="18" rx="5" fill="#fde047" />
-            <path d="M14 42 L22 32 H78 L86 42" fill="#fef08a" opacity="0.7" />
-          </>
-        );
-      }
-
-      if (minecraftKind === 'redstone') {
-        return (
-          <>
-            <rect x="16" y="16" width="68" height="68" rx="8" fill="#7f1d1d" stroke="#450a0a" strokeWidth="4" />
-            <path d="M30 54 L38 42 L50 58 L62 38 L72 50" stroke="#fca5a5" strokeWidth="6" strokeLinecap="round" fill="none" />
-            <circle cx="38" cy="42" r="4" fill="#fee2e2" />
-            <circle cx="62" cy="38" r="4" fill="#fee2e2" />
-          </>
-        );
-      }
+      const imageUrl = MINECRAFT_URLS[minecraftKind];
 
       return (
         <>
-          <rect x="14" y="14" width="72" height="72" fill="#65a30d" stroke="#365314" strokeWidth="4" />
-          <rect x="14" y="50" width="72" height="36" fill="#7c3f00" stroke="#422006" strokeWidth="4" />
-          <path d="M14 50 L28 42 L42 50 L56 42 L70 50 L86 42" stroke="#84cc16" strokeWidth="4" fill="none" />
+          <image
+            href={imageUrl}
+            x="10"
+            y="10"
+            width="80"
+            height="80"
+            style={{
+              imageRendering: 'pixelated',
+              filter: 'drop-shadow(0px 14px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0px 4px 5px rgba(0, 0, 0, 0.4))'
+            }}
+          />
         </>
       );
     }
@@ -644,7 +637,7 @@ export default function App() {
       setDailyStats(prev => {
         if (!prev) return prev;
         const newTime = prev.timeSpentSeconds + 1;
-        
+
         // Pomodoro Session Limit Check
         if (newTime >= sessionLimit && !isSessionComplete) {
           setIsSessionComplete(true);
@@ -675,7 +668,7 @@ export default function App() {
 
     let updatedStats = { ...dailyStats };
     updatedStats.totalAttempts += 1;
-    
+
     if (isFastGuess) {
       updatedStats.fastGuesses += 1;
       setIsSpeedBumpActive(true);
@@ -693,7 +686,7 @@ export default function App() {
       newProfile.score += 1;
       newMistakes = 0;
       newCorrect += 1;
-      
+
       // Track the latest item for animation
       setLatestItemIndex((newProfile.score - 1) % 10);
 
@@ -732,13 +725,13 @@ export default function App() {
         newMistakes = 0;
         setLevelNotification('down');
         setTimeout(() => setLevelNotification(null), 3000);
-        
+
         // Immediately generate an easier problem
         setTimeout(() => {
           generateProblem(1);
         }, 1000);
       }
-      
+
       setUserProfile(newProfile);
       await saveUserProfile(activeUser.id, newProfile);
     }
@@ -822,11 +815,10 @@ export default function App() {
                             setAuthError(null);
                             setIsRegistering(false);
                           }}
-                          className={`group flex-1 p-3.5 rounded-2xl border text-left flex items-center gap-3.5 transition-all duration-200 ${
-                            selectedUserId === user.id
-                              ? 'border-cyan-400 bg-cyan-50/90 shadow-[0_12px_24px_rgba(6,182,212,0.22)]'
-                              : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40 hover:-translate-y-0.5'
-                          }`}
+                          className={`group flex-1 p-3.5 rounded-2xl border text-left flex items-center gap-3.5 transition-all duration-200 ${selectedUserId === user.id
+                            ? 'border-cyan-400 bg-cyan-50/90 shadow-[0_12px_24px_rgba(6,182,212,0.22)]'
+                            : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40 hover:-translate-y-0.5'
+                            }`}
                         >
                           {user.avatarDataUrl ? (
                             <img src={user.avatarDataUrl} alt={user.name} className="w-14 h-14 rounded-full object-cover border-2 border-cyan-200" />
@@ -961,7 +953,7 @@ export default function App() {
   if (!hasStarted) {
     return (
       <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans">
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border-4 border-sky-300"
@@ -1010,7 +1002,7 @@ export default function App() {
   if (isSessionComplete) {
     return (
       <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans">
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center border-4 border-green-400"
@@ -1064,12 +1056,12 @@ export default function App() {
         </motion.div>
 
         {isParentDashboardOpen && (
-          <ParentDashboard 
+          <ParentDashboard
             onClose={() => setIsParentDashboardOpen(false)}
             onResetProgress={handleResetActiveUserProgress}
             activeUserName={activeUser.name}
-            dailyStats={dailyStats} 
-            userProfile={userProfile} 
+            dailyStats={dailyStats}
+            userProfile={userProfile}
           />
         )}
       </div>
@@ -1095,7 +1087,7 @@ export default function App() {
           >
             <LogOut className="w-6 h-6" />
           </button>
-          <button 
+          <button
             onClick={() => setIsParentDashboardOpen(true)}
             className="p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
           >
@@ -1105,7 +1097,7 @@ export default function App() {
       </div>
 
       <div className="w-full max-w-2xl bg-gradient-to-b from-[#f8f3e8] via-[#f2ebdd] to-[#efe6d8] rounded-[2rem] shadow-[0_26px_65px_rgba(2,17,47,0.45)] overflow-hidden border-[5px] border-[#d7b67a] relative mt-16 z-10 mb-4">
-        
+
         {/* Header */}
         <div className="bg-gradient-to-b from-[#fefcf7] via-[#f6efe3] to-[#efe2cb] border-b-4 border-[#d9bf90] p-6 text-center relative">
           <div className="absolute top-1/2 left-5 -translate-y-1/2 w-3 h-3 rotate-45 bg-blue-500 border border-blue-800/50" />
@@ -1130,7 +1122,7 @@ export default function App() {
               ))}
             </select>
           </div>
-          
+
           {/* Visual Representation */}
           <div className="flex items-center justify-center gap-4 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-5 shadow-inner">
             <div className="flex flex-col items-center gap-2 flex-1">
@@ -1189,15 +1181,14 @@ export default function App() {
               onChange={(event) => setAnswerInput(event.target.value)}
               placeholder=""
               disabled={isSpeedBumpActive || showSuccess}
-              className={`w-full rounded-xl border-4 px-3 py-2 text-center text-2xl font-black shadow-[0_8px_18px_rgba(120,76,15,0.2)] outline-none transition-colors ${
-                isSpeedBumpActive
-                  ? 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-500'
-                  : wrongAnswer !== null
+              className={`w-full rounded-xl border-4 px-3 py-2 text-center text-2xl font-black shadow-[0_8px_18px_rgba(120,76,15,0.2)] outline-none transition-colors ${isSpeedBumpActive
+                ? 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-500'
+                : wrongAnswer !== null
                   ? 'border-red-500 bg-red-50 text-red-700'
                   : showSuccess
-                  ? 'border-green-500 bg-green-50 text-green-700'
-                  : 'border-amber-400 bg-white text-amber-900 focus:border-blue-500'
-              }`}
+                    ? 'border-green-500 bg-green-50 text-green-700'
+                    : 'border-amber-400 bg-white text-amber-900 focus:border-blue-500'
+                }`}
             />
           </motion.form>
 
@@ -1252,9 +1243,8 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className={`absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 whitespace-nowrap ${
-                  levelNotification === 'up' ? 'bg-green-500 text-white' : 'bg-sky-500 text-white'
-                }`}
+                className={`absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 whitespace-nowrap ${levelNotification === 'up' ? 'bg-green-500 text-white' : 'bg-sky-500 text-white'
+                  }`}
               >
                 <ShieldAlert className="w-6 h-6" />
                 <span className="font-bold">
@@ -1267,12 +1257,12 @@ export default function App() {
       </div>
 
       {isParentDashboardOpen && (
-        <ParentDashboard 
+        <ParentDashboard
           onClose={() => setIsParentDashboardOpen(false)}
           onResetProgress={handleResetActiveUserProgress}
           activeUserName={activeUser.name}
-          dailyStats={dailyStats} 
-          userProfile={userProfile} 
+          dailyStats={dailyStats}
+          userProfile={userProfile}
         />
       )}
     </div>
