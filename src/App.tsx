@@ -460,9 +460,9 @@ export default function App() {
 
   const getCurrentChapterLabel = () => {
     if (!userProfile) return 'Matematică distractivă';
-    if (userProfile.difficultyLevel <= 1) return 'Capitol: Adunări până la 5';
-    if (userProfile.difficultyLevel === 2) return 'Capitol: Adunări până la 10';
-    return `Capitol: Adunări (nivel ${userProfile.difficultyLevel})`;
+    if (userProfile.difficultyLevel <= 1) return 'Adunări până la 5';
+    if (userProfile.difficultyLevel === 2) return 'Adunări până la 10';
+    return `Adunări (nivel ${userProfile.difficultyLevel})`;
   };
 
   const handleResetActiveUserProgress = async () => {
@@ -1264,12 +1264,23 @@ export default function App() {
                 className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center z-40 pointer-events-none"
               >
                 <motion.div
-                  animate={{ rotate: [0, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-white/90 backdrop-blur-md px-8 py-4 rounded-3xl shadow-2xl border-4 border-green-400 flex flex-col items-center"
+                  animate={{ y: [0, -8, 0], scale: [1, 1.06, 1] }}
+                  transition={{ duration: 0.48, ease: 'easeInOut' }}
+                  className="relative bg-gradient-to-b from-[#234d2f] to-[#14331f] px-8 py-4 rounded-md shadow-[0_14px_24px_rgba(0,0,0,0.5)] border-4 border-[#0b1f13] flex flex-col items-center"
                 >
-                  <Star className="w-16 h-16 text-yellow-400 fill-yellow-400 mb-2 drop-shadow-lg" />
-                  <h2 className="text-4xl font-black text-green-500 drop-shadow-sm">Corect!</h2>
+                  <div className="absolute inset-1 border-2 border-[#5b8a66] rounded-[2px]" />
+                  <div className="absolute -top-2 left-3 h-2 w-2 bg-[#8fd694]" />
+                  <div className="absolute -top-2 right-3 h-2 w-2 bg-[#58a862]" />
+                  <div className="relative flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-[2px] bg-[#0f172a] border-2 border-[#334155] p-1 shadow-[inset_0_0_0_2px_#1e293b]">
+                      <img
+                        src="https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png"
+                        alt="Emerald reward"
+                        className="h-full w-full object-contain [image-rendering:pixelated]"
+                      />
+                    </div>
+                    <h2 className="text-3xl font-black text-[#86efac] tracking-wide">CORECT!</h2>
+                  </div>
                 </motion.div>
               </motion.div>
             )}
