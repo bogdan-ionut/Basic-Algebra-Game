@@ -273,7 +273,7 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
     prevFillRef.current = fillRatio;
   }, [fillRatio]);
 
-  const minecraftLootVisible = Math.max(2, Math.round(fillRatio * 10));
+  const minecraftLootVisible = filled;
   const isMinecraft = visualStyle === 'minecraft';
 
   return (
