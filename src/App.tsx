@@ -74,24 +74,30 @@ type VisualStack = 'treasure' | 'minecraft';
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
 type MinecraftItemKind = 'diamond' | 'emerald' | 'gold_ingot' | 'redstone' | 'grass_block' | 'apple' | 'iron_sword' | 'diamond_pickaxe' | 'cake' | 'pig' | 'cow' | 'chicken' | 'sheep' | 'villager' | 'zombie' | 'enderman' | 'creeper';
 
-const MINECRAFT_URLS: Record<MinecraftItemKind, string> = {
-  diamond: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png',
-  emerald: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png',
-  gold_ingot: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png',
-  redstone: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png',
-  grass_block: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/block/grass_block_side.png',
-  apple: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png',
-  iron_sword: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_sword.png',
-  diamond_pickaxe: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png',
-  cake: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cake.png',
-  pig: 'https://mc-heads.net/avatar/MHF_Pig/100.png',
-  cow: 'https://mc-heads.net/avatar/MHF_Cow/100.png',
-  chicken: 'https://mc-heads.net/avatar/MHF_Chicken/100.png',
-  sheep: 'https://mc-heads.net/avatar/MHF_Sheep/100.png',
-  villager: 'https://mc-heads.net/avatar/MHF_Villager/100.png',
-  zombie: 'https://mc-heads.net/avatar/MHF_Zombie/100.png',
-  enderman: 'https://mc-heads.net/avatar/MHF_Enderman/100.png',
-  creeper: 'https://mc-heads.net/avatar/MHF_Creeper/100.png',
+type MinecraftAsset = {
+  label: string;
+  family: 'resource' | 'tool' | 'food' | 'mob';
+  url: string;
+};
+
+const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
+  diamond: { label: 'Diamond', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png' },
+  emerald: { label: 'Emerald', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png' },
+  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
+  redstone: { label: 'Redstone', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png' },
+  grass_block: { label: 'Grass Block', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/block/grass_block_side.png' },
+  apple: { label: 'Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png' },
+  iron_sword: { label: 'Iron Sword', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_sword.png' },
+  diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png' },
+  cake: { label: 'Cake', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cake.png' },
+  pig: { label: 'Pig', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Pig/100.png' },
+  cow: { label: 'Cow', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Cow/100.png' },
+  chicken: { label: 'Chicken', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Chicken/100.png' },
+  sheep: { label: 'Sheep', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Sheep/100.png' },
+  villager: { label: 'Villager', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Villager/100.png' },
+  zombie: { label: 'Zombie', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Zombie/100.png' },
+  enderman: { label: 'Enderman', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Enderman/100.png' },
+  creeper: { label: 'Creeper', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Creeper/100.png' },
 };
 
 const VISUAL_STACK_OPTIONS: { id: VisualStack; label: string; hint: string }[] = [
@@ -119,19 +125,29 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
   ];
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
   const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
+  const minecraftAsset = MINECRAFT_ASSETS[minecraftKind];
 
   const renderToken = () => {
     if (stack === 'minecraft') {
-      const imageUrl = MINECRAFT_URLS[minecraftKind];
+      const frameColorByFamily: Record<MinecraftAsset['family'], string> = {
+        resource: '#38bdf8',
+        tool: '#f59e0b',
+        food: '#22c55e',
+        mob: '#a855f7',
+      };
+      const frameColor = frameColorByFamily[minecraftAsset.family];
 
       return (
         <>
+          <rect x="4" y="4" width="92" height="92" rx="20" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="4" />
+          <rect x="10" y="10" width="80" height="80" rx="16" fill="#050d1f" stroke={frameColor} strokeWidth="3.5" />
+          <rect x="12" y="12" width="76" height="24" rx="10" fill="white" opacity="0.08" />
           <image
-            href={imageUrl}
-            x="10"
-            y="10"
-            width="80"
-            height="80"
+            href={minecraftAsset.url}
+            x="18"
+            y="18"
+            width="64"
+            height="64"
             style={{
               imageRendering: 'pixelated',
               filter: 'drop-shadow(0px 14px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0px 4px 5px rgba(0, 0, 0, 0.4))'
@@ -202,7 +218,7 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
       animate={{ scale: [0, 1.2, 1], rotate: [-35, 10, 0], opacity: 1 }}
       transition={{ delay, duration: 0.6, times: [0, 0.7, 1], ease: 'easeOut' }}
       className="relative"
-      title={stack === 'minecraft' ? 'Item Minecraft' : `Gemă ${theme.name}`}
+      title={stack === 'minecraft' ? `Minecraft • ${minecraftAsset.label}` : `Gemă ${theme.name}`}
     >
       <motion.svg
         viewBox="0 0 100 100"
@@ -220,30 +236,54 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
             <stop offset="0%" stopColor={theme.glow} stopOpacity="0.72" />
             <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
           </radialGradient>
+          <linearGradient id="minecraftCardGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
         </defs>
         {renderToken()}
       </motion.svg>
 
-      <div className="pointer-events-none absolute inset-0">
-        {[
-          { x: '-18%', y: '20%', d: 0 },
-          { x: '78%', y: '10%', d: 0.06 },
-          { x: '82%', y: '72%', d: 0.12 },
-          { x: '4%', y: '78%', d: 0.16 },
-        ].map((star, i) => (
-          <motion.svg
-            key={`${theme.name}-sparkle-${shapeIndex}-${i}`}
-            viewBox="0 0 20 20"
-            className="absolute w-3 h-3"
-            style={{ left: star.x, top: star.y }}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: [0, 1.15, 0], opacity: [0, 0.95, 0] }}
-            transition={{ duration: 0.52, delay: delay + star.d }}
-          >
-            <path d="M10 1 L12 8 L19 10 L12 12 L10 19 L8 12 L1 10 L8 8 Z" fill="white" />
-          </motion.svg>
-        ))}
-      </div>
+      {stack === 'minecraft' ? (
+        <div className="pointer-events-none absolute inset-0">
+          {[
+            { x: '-12%', y: '16%', d: 0, c: '#34d399' },
+            { x: '82%', y: '22%', d: 0.07, c: '#facc15' },
+            { x: '76%', y: '80%', d: 0.11, c: '#60a5fa' },
+            { x: '3%', y: '75%', d: 0.15, c: '#a78bfa' },
+          ].map((pixel, i) => (
+            <motion.span
+              key={`${minecraftKind}-pixel-${shapeIndex}-${i}`}
+              className="absolute h-1.5 w-1.5"
+              style={{ left: pixel.x, top: pixel.y, backgroundColor: pixel.c, boxShadow: '0 0 0 1px rgba(15,23,42,0.45)' }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: [0, 1, 0], opacity: [0, 0.9, 0] }}
+              transition={{ duration: 0.48, delay: delay + pixel.d }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="pointer-events-none absolute inset-0">
+          {[
+            { x: '-18%', y: '20%', d: 0 },
+            { x: '78%', y: '10%', d: 0.06 },
+            { x: '82%', y: '72%', d: 0.12 },
+            { x: '4%', y: '78%', d: 0.16 },
+          ].map((star, i) => (
+            <motion.svg
+              key={`${theme.name}-sparkle-${shapeIndex}-${i}`}
+              viewBox="0 0 20 20"
+              className="absolute w-3 h-3"
+              style={{ left: star.x, top: star.y }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: [0, 1.15, 0], opacity: [0, 0.95, 0] }}
+              transition={{ duration: 0.52, delay: delay + star.d }}
+            >
+              <path d="M10 1 L12 8 L19 10 L12 12 L10 19 L8 12 L1 10 L8 8 Z" fill="white" />
+            </motion.svg>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }
