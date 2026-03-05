@@ -394,9 +394,22 @@ export default function App() {
   const generateProblem = (level: number) => {
     // Level 1: sum up to 5. Level 2: sum up to 10.
     const maxSum = level === 1 ? 5 : 10;
-    const sum = Math.floor(Math.random() * (maxSum - 1)) + 2; // 2 to maxSum
-    const n1 = Math.floor(Math.random() * (sum - 1)) + 1; // 1 to sum - 1
-    const n2 = sum - n1;
+    const createCandidate = () => {
+      const sum = Math.floor(Math.random() * (maxSum - 1)) + 2; // 2 to maxSum
+      const n1 = Math.floor(Math.random() * (sum - 1)) + 1; // 1 to sum - 1
+      const n2 = sum - n1;
+      return { n1, n2 };
+    };
+
+    // Avoid repeating the exact same exercise twice in a row.
+    let candidate = createCandidate();
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const isSameProblem = candidate.n1 === num1 && candidate.n2 === num2;
+      if (!isSameProblem) break;
+      candidate = createCandidate();
+    }
+
+    const { n1, n2 } = candidate;
 
     setNum1(n1);
     setNum2(n2);
