@@ -69,7 +69,15 @@ type CountItemTheme = {
   glow: string;
 };
 
+type VisualStack = 'treasure' | 'minecraft';
+
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
+type MinecraftItemKind = 'diamond' | 'emerald' | 'gold_ingot' | 'redstone' | 'grass_block';
+
+const VISUAL_STACK_OPTIONS: { id: VisualStack; label: string; hint: string }[] = [
+  { id: 'treasure', label: 'Comori clasice', hint: 'geme, monede și relicve' },
+  { id: 'minecraft', label: 'Minecraft', hint: 'diamante, smaralde și block-uri' },
+];
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
   { name: 'Ruby', base: '#ef4444', dark: '#991b1b', light: '#fecaca', glow: '#fca5a5' },
@@ -79,13 +87,67 @@ const COUNT_ITEM_THEMES: CountItemTheme[] = [
   { name: 'Topaz', base: '#f59e0b', dark: '#78350f', light: '#fef3c7', glow: '#fcd34d' },
 ];
 
-function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; delay: number; shapeIndex: number }) {
+function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTheme; delay: number; shapeIndex: number; stack: VisualStack }) {
   const gradId = `gem-${theme.name}-${shapeIndex}-grad`;
   const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
   const tokenKinds: CountItemKind[] = ['gem', 'coin', 'crown', 'potion', 'star'];
+  const minecraftKinds: MinecraftItemKind[] = ['diamond', 'emerald', 'gold_ingot', 'redstone', 'grass_block'];
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
+  const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
 
   const renderToken = () => {
+    if (stack === 'minecraft') {
+      if (minecraftKind === 'diamond') {
+        return (
+          <>
+            <rect x="16" y="16" width="68" height="68" rx="8" fill="#8de8ff" stroke="#0f766e" strokeWidth="4" />
+            <path d="M20 30 L36 20 L52 30 L36 40 Z" fill="#cffafe" />
+            <path d="M52 30 L68 20 L80 32 L64 42 Z" fill="#67e8f9" />
+            <path d="M36 40 L52 30 L64 42 L48 52 Z" fill="#22d3ee" />
+          </>
+        );
+      }
+
+      if (minecraftKind === 'emerald') {
+        return (
+          <>
+            <rect x="16" y="16" width="68" height="68" rx="8" fill="#34d399" stroke="#166534" strokeWidth="4" />
+            <rect x="24" y="24" width="52" height="52" fill="#6ee7b7" opacity="0.35" />
+            <path d="M20 60 L34 46 L48 56 L62 44 L80 60" stroke="#14532d" strokeWidth="5" fill="none" />
+          </>
+        );
+      }
+
+      if (minecraftKind === 'gold_ingot') {
+        return (
+          <>
+            <rect x="14" y="32" width="72" height="38" rx="9" fill="#facc15" stroke="#a16207" strokeWidth="4" />
+            <rect x="22" y="40" width="56" height="18" rx="5" fill="#fde047" />
+            <path d="M14 42 L22 32 H78 L86 42" fill="#fef08a" opacity="0.7" />
+          </>
+        );
+      }
+
+      if (minecraftKind === 'redstone') {
+        return (
+          <>
+            <rect x="16" y="16" width="68" height="68" rx="8" fill="#7f1d1d" stroke="#450a0a" strokeWidth="4" />
+            <path d="M30 54 L38 42 L50 58 L62 38 L72 50" stroke="#fca5a5" strokeWidth="6" strokeLinecap="round" fill="none" />
+            <circle cx="38" cy="42" r="4" fill="#fee2e2" />
+            <circle cx="62" cy="38" r="4" fill="#fee2e2" />
+          </>
+        );
+      }
+
+      return (
+        <>
+          <rect x="14" y="14" width="72" height="72" fill="#65a30d" stroke="#365314" strokeWidth="4" />
+          <rect x="14" y="50" width="72" height="36" fill="#7c3f00" stroke="#422006" strokeWidth="4" />
+          <path d="M14 50 L28 42 L42 50 L56 42 L70 50 L86 42" stroke="#84cc16" strokeWidth="4" fill="none" />
+        </>
+      );
+    }
+
     if (tokenKind === 'coin') {
       return (
         <>
@@ -147,7 +209,7 @@ function DetailedToken({ theme, delay, shapeIndex }: { theme: CountItemTheme; de
       animate={{ scale: [0, 1.2, 1], rotate: [-35, 10, 0], opacity: 1 }}
       transition={{ delay, duration: 0.6, times: [0, 0.7, 1], ease: 'easeOut' }}
       className="relative"
-      title={`Gemă ${theme.name}`}
+      title={stack === 'minecraft' ? 'Item Minecraft' : `Gemă ${theme.name}`}
     >
       <motion.svg
         viewBox="0 0 100 100"
@@ -269,6 +331,7 @@ export default function App() {
   const [hasStarted, setHasStarted] = useState(false);
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
+  const [visualStack, setVisualStack] = useState<VisualStack>('treasure');
 
   const [users, setUsers] = useState<GameUser[]>([]);
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
@@ -908,6 +971,19 @@ export default function App() {
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, {activeUser.name}!</h1>
           <p className="text-slate-600 mb-8">Ești gata pentru 10 minute de aventură matematică?</p>
+          <div className="mb-6 text-left bg-slate-50 border border-slate-200 rounded-2xl p-3">
+            <label htmlFor="visual-stack-start" className="block text-sm font-bold text-slate-700 mb-1">Obiecte de numărat</label>
+            <select
+              id="visual-stack-start"
+              value={visualStack}
+              onChange={(event) => setVisualStack(event.target.value as VisualStack)}
+              className="w-full border-2 border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-700 focus:outline-none focus:border-sky-400"
+            >
+              {VISUAL_STACK_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>{option.label} — {option.hint}</option>
+              ))}
+            </select>
+          </div>
           <button
             onClick={() => {
               setHasStarted(true);
@@ -1041,6 +1117,19 @@ export default function App() {
 
         {/* Game Area */}
         <div className="p-6 sm:p-8 flex flex-col items-center gap-7 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9),rgba(245,234,217,0.92))]">
+          <div className="w-full max-w-md bg-white/75 border-2 border-amber-200 rounded-2xl px-4 py-3">
+            <label htmlFor="visual-stack-in-game" className="block text-sm font-bold text-amber-900 mb-1">Tematică obiecte</label>
+            <select
+              id="visual-stack-in-game"
+              value={visualStack}
+              onChange={(event) => setVisualStack(event.target.value as VisualStack)}
+              className="w-full rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900 focus:outline-none focus:border-amber-500"
+            >
+              {VISUAL_STACK_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>{option.label} — {option.hint}</option>
+              ))}
+            </select>
+          </div>
           
           {/* Visual Representation */}
           <div className="flex items-center justify-center gap-4 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-5 shadow-inner">
@@ -1052,6 +1141,7 @@ export default function App() {
                       theme={COUNT_ITEM_THEMES[(iconIndex + i) % COUNT_ITEM_THEMES.length]}
                       delay={i * 0.07}
                       shapeIndex={i}
+                      stack={visualStack}
                     />
                   </div>
                 ))}
@@ -1069,6 +1159,7 @@ export default function App() {
                       theme={COUNT_ITEM_THEMES[(iconIndex + i + 2) % COUNT_ITEM_THEMES.length]}
                       delay={i * 0.07}
                       shapeIndex={i + 20}
+                      stack={visualStack}
                     />
                   </div>
                 ))}
