@@ -32,7 +32,17 @@ export interface ChestProgress {
 interface Props {
   progress: ChestProgress;
   latestItem: number | null;
+  visualStyle?: 'treasure' | 'minecraft';
 }
+
+const MINECRAFT_LOOT = [
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_ingot.png',
+];
 
 // ─── Gem palette ─────────────────────────────────────────────────────────────
 
@@ -209,7 +219,7 @@ function Sword({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
 
 let _dropKey = 0;
 
-export function TreasureChest({ progress, latestItem }: Props) {
+export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }: Props) {
   // Support both API shapes
   const filled     = progress.filled     ?? (progress as any).itemsCount  ?? 0;
   const total      = progress.total      ?? 10;
@@ -263,6 +273,9 @@ export function TreasureChest({ progress, latestItem }: Props) {
     prevFillRef.current = fillRatio;
   }, [fillRatio]);
 
+  const minecraftLootVisible = Math.max(2, Math.round(fillRatio * 10));
+  const isMinecraft = visualStyle === 'minecraft';
+
   return (
     <div className="relative flex flex-col items-center">
 
@@ -293,6 +306,30 @@ export function TreasureChest({ progress, latestItem }: Props) {
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
       >
+        {isMinecraft ? (
+          <div className="relative w-72 h-56 sm:w-80 sm:h-64">
+            <div className="absolute inset-x-5 bottom-4 h-6 rounded-[6px] bg-[#2f4058] border-2 border-[#91a1b6] shadow-[0_10px_16px_rgba(0,0,0,0.4)]" />
+            <div className="absolute inset-x-2 top-8 bottom-10 rounded-md border-[4px] border-[#121a26] bg-[#472a14] shadow-[inset_0_0_0_3px_#8a592e,inset_0_0_0_7px_#2c190d,0_12px_18px_rgba(0,0,0,0.42)]">
+              <div className="absolute inset-x-0 top-0 h-[44%] border-b-[4px] border-[#1b1008] bg-[repeating-linear-gradient(90deg,#8a592e_0px,#8a592e_15px,#6f4524_15px,#6f4524_30px)]" />
+              <div className="absolute inset-x-0 bottom-0 h-[56%] bg-[repeating-linear-gradient(90deg,#744725_0px,#744725_15px,#5d381d_15px,#5d381d_30px)]" />
+              <div className="absolute left-1/2 top-[42%] -translate-x-1/2 w-12 h-14 rounded-[2px] border-[3px] border-[#1f1208] bg-gradient-to-b from-[#e1bc57] to-[#8f6a20] shadow-[0_4px_0_#3a250e]" />
+              <div className="absolute left-1/2 top-[51%] -translate-x-1/2 w-4 h-4 rounded-full border-2 border-[#2f1c0a] bg-[#40250c]" />
+
+              <div className="absolute left-0 right-0 top-[38%] grid grid-cols-5 gap-1 px-5">
+                {Array.from({ length: minecraftLootVisible }).map((_, index) => (
+                  <div key={`minecraft-loot-${index}`} className="h-9 w-9 rounded-[4px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#1e3a5a,0_6px_10px_rgba(0,0,0,0.35)] p-0.5">
+                    <img
+                      src={MINECRAFT_LOOT[index % MINECRAFT_LOOT.length]}
+                      alt="Minecraft loot"
+                      className="h-full w-full object-contain [image-rendering:pixelated]"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="absolute inset-x-2 top-1 h-24 rounded-md border-[4px] border-[#121a26] bg-[repeating-linear-gradient(90deg,#956437_0px,#956437_14px,#7f522e_14px,#7f522e_28px)] shadow-[inset_0_0_0_3px_#c2874c,inset_0_-5px_0_#4b2c14]" />
+          </div>
+        ) : (
         <svg
           viewBox="0 0 200 175"
           className="w-72 h-56 sm:w-80 sm:h-64"
@@ -680,6 +717,7 @@ export function TreasureChest({ progress, latestItem }: Props) {
           </AnimatePresence>
 
         </svg>
+        )}
       </motion.div>
 
       {/* ── Fill progress bar (subtle) ──────────────────────────────────── */}
