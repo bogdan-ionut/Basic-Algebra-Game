@@ -35,3 +35,10 @@ Repo-ul include acum workflow-ul `.github/workflows/deploy-pages.yml` care:
    `https://<user>.github.io/Basic-Algebra-Game/`
 
 După primul deploy reușit, fiecare merge/push nou în `main` va publica automat versiunea nouă.
+
+## Minecraft high-fidelity assets
+
+Am adăugat un ghid actualizat cu surse free și pașii de integrare:
+- `docs/minecraft-free-packs.md`
+- `docs/ASSET_LICENSES.md`
+
