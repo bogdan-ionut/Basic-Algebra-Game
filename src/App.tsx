@@ -72,37 +72,80 @@ type CountItemTheme = {
 type VisualStack = 'treasure' | 'minecraft';
 
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
-type MinecraftItemKind = 'diamond' | 'emerald' | 'gold_ingot' | 'redstone' | 'grass_block' | 'apple' | 'iron_sword' | 'diamond_pickaxe' | 'cake' | 'pig' | 'cow' | 'chicken' | 'sheep' | 'villager' | 'zombie' | 'enderman' | 'creeper';
+type MinecraftItemKind =
+  | 'diamond'
+  | 'emerald'
+  | 'amethyst_shard'
+  | 'lapis_lazuli'
+  | 'redstone'
+  | 'gold_ingot'
+  | 'diamond_pickaxe'
+  | 'diamond_sword'
+  | 'bow'
+  | 'totem_of_undying'
+  | 'crafting_table'
+  | 'chest'
+  | 'lantern'
+  | 'honey_bottle'
+  | 'golden_apple'
+  | 'cake'
+  | 'pig_spawn_egg'
+  | 'cow_spawn_egg'
+  | 'chicken_spawn_egg'
+  | 'sheep_spawn_egg'
+  | 'wolf_spawn_egg'
+  | 'fox_spawn_egg'
+  | 'villager_spawn_egg'
+  | 'wandering_trader_spawn_egg'
+  | 'iron_golem_spawn_egg'
+  | 'zombie_spawn_egg'
+  | 'skeleton_spawn_egg'
+  | 'enderman_spawn_egg'
+  | 'creeper_spawn_egg'
+  | 'warden_spawn_egg';
 
 type MinecraftAsset = {
   label: string;
-  family: 'resource' | 'tool' | 'food' | 'mob';
+  family: 'resource' | 'tool' | 'utility' | 'food' | 'animal' | 'npc' | 'hostile';
   url: string;
 };
 
 const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
   diamond: { label: 'Diamond', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png' },
   emerald: { label: 'Emerald', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png' },
-  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
+  amethyst_shard: { label: 'Amethyst Shard', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/amethyst_shard.png' },
+  lapis_lazuli: { label: 'Lapis Lazuli', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/lapis_lazuli.png' },
   redstone: { label: 'Redstone', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png' },
-  grass_block: { label: 'Grass Block', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/block/grass_block_side.png' },
-  apple: { label: 'Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png' },
-  iron_sword: { label: 'Iron Sword', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_sword.png' },
+  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
   diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png' },
+  diamond_sword: { label: 'Diamond Sword', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_sword.png' },
+  bow: { label: 'Bow', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/bow.png' },
+  totem_of_undying: { label: 'Totem of Undying', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/totem_of_undying.png' },
+  crafting_table: { label: 'Crafting Table', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/block/crafting_table_front.png' },
+  chest: { label: 'Chest', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/chest.png' },
+  lantern: { label: 'Lantern', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/lantern.png' },
+  honey_bottle: { label: 'Honey Bottle', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/honey_bottle.png' },
+  golden_apple: { label: 'Golden Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png' },
   cake: { label: 'Cake', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cake.png' },
-  pig: { label: 'Pig', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Pig/100.png' },
-  cow: { label: 'Cow', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Cow/100.png' },
-  chicken: { label: 'Chicken', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Chicken/100.png' },
-  sheep: { label: 'Sheep', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Sheep/100.png' },
-  villager: { label: 'Villager', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Villager/100.png' },
-  zombie: { label: 'Zombie', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Zombie/100.png' },
-  enderman: { label: 'Enderman', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Enderman/100.png' },
-  creeper: { label: 'Creeper', family: 'mob', url: 'https://mc-heads.net/avatar/MHF_Creeper/100.png' },
+  pig_spawn_egg: { label: 'Pig', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/pig_spawn_egg.png' },
+  cow_spawn_egg: { label: 'Cow', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png' },
+  chicken_spawn_egg: { label: 'Chicken', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/chicken_spawn_egg.png' },
+  sheep_spawn_egg: { label: 'Sheep', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/sheep_spawn_egg.png' },
+  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png' },
+  fox_spawn_egg: { label: 'Fox', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/fox_spawn_egg.png' },
+  villager_spawn_egg: { label: 'Villager', family: 'npc', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png' },
+  wandering_trader_spawn_egg: { label: 'Wandering Trader', family: 'npc', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wandering_trader_spawn_egg.png' },
+  iron_golem_spawn_egg: { label: 'Iron Golem', family: 'npc', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_golem_spawn_egg.png' },
+  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png' },
+  skeleton_spawn_egg: { label: 'Skeleton', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/skeleton_spawn_egg.png' },
+  enderman_spawn_egg: { label: 'Enderman', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/enderman_spawn_egg.png' },
+  creeper_spawn_egg: { label: 'Creeper', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/creeper_spawn_egg.png' },
+  warden_spawn_egg: { label: 'Warden', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/warden_spawn_egg.png' },
 };
 
 const VISUAL_STACK_OPTIONS: { id: VisualStack; label: string; hint: string }[] = [
   { id: 'treasure', label: 'Comori clasice', hint: 'geme, monede și relicve' },
-  { id: 'minecraft', label: 'Minecraft', hint: 'resurse, animale, NPC-uri' },
+  { id: 'minecraft', label: 'Minecraft HD', hint: 'resurse, tool-uri, animale, NPC-uri, mobs' },
 ];
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
@@ -118,10 +161,12 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
   const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
   const tokenKinds: CountItemKind[] = ['gem', 'coin', 'crown', 'potion', 'star'];
   const minecraftKinds: MinecraftItemKind[] = [
-    'diamond', 'pig', 'diamond_pickaxe', 'emerald', 'cow',
-    'gold_ingot', 'chicken', 'apple', 'redstone', 'sheep',
-    'cake', 'grass_block', 'villager', 'iron_sword',
-    'zombie', 'enderman', 'creeper'
+    'diamond', 'emerald', 'amethyst_shard', 'lapis_lazuli', 'redstone', 'gold_ingot',
+    'diamond_pickaxe', 'diamond_sword', 'bow', 'totem_of_undying', 'crafting_table', 'chest', 'lantern',
+    'honey_bottle', 'golden_apple', 'cake',
+    'pig_spawn_egg', 'cow_spawn_egg', 'chicken_spawn_egg', 'sheep_spawn_egg', 'wolf_spawn_egg', 'fox_spawn_egg',
+    'villager_spawn_egg', 'wandering_trader_spawn_egg', 'iron_golem_spawn_egg',
+    'zombie_spawn_egg', 'skeleton_spawn_egg', 'enderman_spawn_egg', 'creeper_spawn_egg', 'warden_spawn_egg'
   ];
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
   const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
@@ -132,27 +177,44 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
       const frameColorByFamily: Record<MinecraftAsset['family'], string> = {
         resource: '#38bdf8',
         tool: '#f59e0b',
+        utility: '#f97316',
         food: '#22c55e',
-        mob: '#a855f7',
+        animal: '#84cc16',
+        npc: '#a78bfa',
+        hostile: '#ef4444',
       };
       const frameColor = frameColorByFamily[minecraftAsset.family];
+      const panelColorByFamily: Record<MinecraftAsset['family'], string> = {
+        resource: '#082f49',
+        tool: '#451a03',
+        utility: '#431407',
+        food: '#052e16',
+        animal: '#1a2e05',
+        npc: '#2e1065',
+        hostile: '#450a0a',
+      };
 
       return (
         <>
-          <rect x="4" y="4" width="92" height="92" rx="20" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="4" />
-          <rect x="10" y="10" width="80" height="80" rx="16" fill="#050d1f" stroke={frameColor} strokeWidth="3.5" />
-          <rect x="12" y="12" width="76" height="24" rx="10" fill="white" opacity="0.08" />
+          <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#minecraftGlowGrad)" opacity="0.95" />
+          <rect x="6" y="6" width="88" height="88" rx="18" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="3.5" />
+          <rect x="12" y="12" width="76" height="76" rx="14" fill={panelColorByFamily[minecraftAsset.family]} stroke={frameColor} strokeWidth="3.5" />
+          <rect x="15" y="15" width="70" height="22" rx="8" fill="white" opacity="0.1" />
+          <rect x="15" y="63" width="70" height="22" rx="8" fill="#020617" opacity="0.28" />
           <image
             href={minecraftAsset.url}
-            x="18"
-            y="18"
-            width="64"
-            height="64"
+            x="20"
+            y="20"
+            width="60"
+            height="60"
             style={{
               imageRendering: 'pixelated',
-              filter: 'drop-shadow(0px 14px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0px 4px 5px rgba(0, 0, 0, 0.4))'
+              filter: 'drop-shadow(0px 16px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0px 5px 6px rgba(0, 0, 0, 0.45))'
             }}
           />
+          <text x="50" y="78" textAnchor="middle" fill={frameColor} fontSize="7" fontWeight="700" style={{ letterSpacing: '0.5px' }}>
+            {minecraftAsset.label.toUpperCase().slice(0, 10)}
+          </text>
         </>
       );
     }
@@ -240,6 +302,10 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
             <stop offset="0%" stopColor="#1e293b" />
             <stop offset="100%" stopColor="#0f172a" />
           </linearGradient>
+          <radialGradient id="minecraftGlowGrad" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stopColor={frameColor} stopOpacity="0.7" />
+            <stop offset="100%" stopColor={frameColor} stopOpacity="0" />
+          </radialGradient>
         </defs>
         {renderToken()}
       </motion.svg>
