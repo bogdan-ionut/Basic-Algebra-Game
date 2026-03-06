@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil } from 'lucide-react';
@@ -426,6 +426,21 @@ export default function App() {
     pin: '',
     avatarDataUrl: '',
   });
+  const timeoutIdsRef = useRef<number[]>([]);
+
+  const clearScheduledTimeouts = () => {
+    timeoutIdsRef.current.forEach(timeoutId => window.clearTimeout(timeoutId));
+    timeoutIdsRef.current = [];
+  };
+
+  const scheduleTimeout = (callback: () => void, delayMs: number) => {
+    const timeoutId = window.setTimeout(() => {
+      timeoutIdsRef.current = timeoutIdsRef.current.filter(id => id !== timeoutId);
+      callback();
+    }, delayMs);
+
+    timeoutIdsRef.current.push(timeoutId);
+  };
 
   const generateProblem = (level: number) => {
     // Level 1: sum up to 5. Level 2: sum up to 10.
@@ -468,6 +483,8 @@ export default function App() {
   const handleResetActiveUserProgress = async () => {
     if (!activeUser) return;
 
+    clearScheduledTimeouts();
+
     await resetUserProgress(activeUser.id);
 
     const resetStats = createDefaultDailyStats();
@@ -482,6 +499,9 @@ export default function App() {
     setConsecutiveMistakes(0);
     setLatestItemIndex(null);
     setLevelNotification(null);
+    setIsSpeedBumpActive(false);
+    setShowSuccess(false);
+    setWrongAnswer(null);
     generateProblem(resetProfile.difficultyLevel);
 
     await saveDailyStats(activeUser.id, resetStats);
@@ -677,14 +697,24 @@ export default function App() {
   };
 
   const handleSwitchUser = () => {
+    clearScheduledTimeouts();
     setActiveUser(null);
     setDailyStats(null);
     setUserProfile(null);
     setHasStarted(false);
+    setIsSpeedBumpActive(false);
+    setShowSuccess(false);
+    setWrongAnswer(null);
     setEnteredPin('');
     setSelectedUserId(null);
     setAuthError(null);
   };
+
+  useEffect(() => {
+    return () => {
+      clearScheduledTimeouts();
+    };
+  }, []);
 
   useEffect(() => {
     const loadSelectedUserProgress = async () => {
@@ -762,7 +792,7 @@ export default function App() {
       updatedStats.fastGuesses += 1;
       setIsSpeedBumpActive(true);
       playSound('speedBump');
-      setTimeout(() => setIsSpeedBumpActive(false), 3000);
+      scheduleTimeout(() => setIsSpeedBumpActive(false), 3000);
     }
 
     let newProfile = { ...userProfile };
@@ -785,7 +815,7 @@ export default function App() {
         newCorrect = 0;
         setLevelNotification('up');
         playSound('levelUp');
-        setTimeout(() => setLevelNotification(null), 3000);
+        scheduleTimeout(() => setLevelNotification(null), 3000);
       }
 
       setUserProfile(newProfile);
@@ -798,7 +828,7 @@ export default function App() {
         colors: ['#FFD700', '#FF6347', '#FF69B4', '#87CEEB']
       });
       setShowSuccess(true);
-      setTimeout(() => {
+      scheduleTimeout(() => {
         generateProblem(newProfile.difficultyLevel);
       }, 2000);
     } else {
@@ -806,17 +836,17 @@ export default function App() {
       newMistakes += 1;
       newCorrect = 0;
       setWrongAnswer(ans);
-      setTimeout(() => setWrongAnswer(null), 500);
+      scheduleTimeout(() => setWrongAnswer(null), 500);
 
       // Struggle detector: level down
       if (newMistakes >= 2 && newProfile.difficultyLevel > 1) {
         newProfile.difficultyLevel = 1;
         newMistakes = 0;
         setLevelNotification('down');
-        setTimeout(() => setLevelNotification(null), 3000);
+        scheduleTimeout(() => setLevelNotification(null), 3000);
 
         // Immediately generate an easier problem
-        setTimeout(() => {
+        scheduleTimeout(() => {
           generateProblem(1);
         }, 1000);
       }
@@ -841,7 +871,7 @@ export default function App() {
     const parsedAnswer = Number(trimmedAnswer);
     if (!Number.isFinite(parsedAnswer)) {
       setWrongAnswer(-1);
-      setTimeout(() => setWrongAnswer(null), 500);
+      scheduleTimeout(() => setWrongAnswer(null), 500);
       return;
     }
 
@@ -1136,6 +1166,7 @@ export default function App() {
             onClose={() => setIsParentDashboardOpen(false)}
             onResetProgress={handleResetActiveUserProgress}
             activeUserName={activeUser.name}
+            parentPin={activeUser.pin}
             dailyStats={dailyStats}
             userProfile={userProfile}
           />
@@ -1338,6 +1369,7 @@ export default function App() {
           onClose={() => setIsParentDashboardOpen(false)}
           onResetProgress={handleResetActiveUserProgress}
           activeUserName={activeUser.name}
+          parentPin={activeUser.pin}
           dailyStats={dailyStats}
           userProfile={userProfile}
         />

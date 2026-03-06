@@ -7,12 +7,14 @@ interface DailyRingProps {
 }
 
 export function DailyRing({ currentSeconds, targetSeconds }: DailyRingProps) {
-  const progress = Math.min(currentSeconds / targetSeconds, 1);
+  const safeTargetSeconds = Math.max(targetSeconds, 1);
+  const safeCurrentSeconds = Math.max(currentSeconds, 0);
+  const progress = Math.min(safeCurrentSeconds / safeTargetSeconds, 1);
   const radius = 24;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - progress * circumference;
   
-  const minutes = Math.floor(currentSeconds / 60);
+  const minutes = Math.floor(safeCurrentSeconds / 60);
 
   return (
     <div className="relative flex items-center justify-center w-16 h-16 bg-white/50 rounded-full shadow-sm border-2 border-white/60 backdrop-blur-sm">
