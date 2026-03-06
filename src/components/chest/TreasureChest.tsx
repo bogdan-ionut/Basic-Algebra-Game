@@ -44,6 +44,15 @@ const MINECRAFT_LOOT = [
   `${MINECRAFT_TEXTURE_BASE_URL}/redstone.png`,
   `${MINECRAFT_TEXTURE_BASE_URL}/golden_apple.png`,
   `${MINECRAFT_TEXTURE_BASE_URL}/iron_ingot.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/amethyst_shard.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/lapis_lazuli.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/totem_of_undying.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/honey_bottle.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/bread.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/apple.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/diamond_pickaxe.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/diamond_sword.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/bow.png`,
   `${MINECRAFT_TEXTURE_BASE_URL}/cow_spawn_egg.png`,
   `${MINECRAFT_TEXTURE_BASE_URL}/wolf_spawn_egg.png`,
   `${MINECRAFT_TEXTURE_BASE_URL}/villager_spawn_egg.png`,
@@ -288,22 +297,12 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
       {/* ── Chest counter badge ────────────────────────────────────────────── */}
       {chestCount > 0 && (
         <motion.div
-          className="absolute -top-3 right-2 z-20 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-xl"
-          style={{
-            background: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
-            border: '2.5px solid #FACC15',
-          }}
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -top-4 right-1 z-20 flex items-center gap-2 rounded-md border-[3px] border-[#123019] bg-gradient-to-b from-[#4ca056] to-[#2f6a37] px-3 py-1.5 shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
+          animate={{ y: [0, -1.5, 0] }}
+          transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
         >
-          {/* Tiny chest icon */}
-          <svg viewBox="0 0 20 16" className="w-5 h-4">
-            <rect x="1" y="6" width="18" height="9" rx="2" fill="#c8721a" />
-            <rect x="0" y="5" width="20" height="4" rx="2" fill="#f09030" />
-            <rect x="8" y="8" width="4" height="4" rx="1" fill="#7a3a0a" />
-            <circle cx="10" cy="9" r="1.5" fill="#FACC15" />
-          </svg>
-          <span className="text-white font-black text-sm tracking-wide">x {chestCount}</span>
+          <div className="h-6 w-6 rounded-sm border-2 border-[#122518] bg-gradient-to-b from-[#7ff28e] to-[#38a14a] shadow-[inset_0_0_0_2px_#4ad060]" />
+          <span className="text-[#ecffd9] font-black text-sm tracking-wide">Nivel Minecraft {chestCount}</span>
         </motion.div>
       )}
 
@@ -314,34 +313,47 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
       >
         {isMinecraft ? (
           <div className="relative w-72 h-56 sm:w-80 sm:h-64">
-            <div className="absolute inset-x-5 bottom-2 h-7 rounded-[8px] border-2 border-[#7f95b1] bg-gradient-to-b from-[#2a3d56] to-[#17283e] shadow-[0_12px_18px_rgba(0,0,0,0.45)]" />
+            <div className="absolute inset-x-8 bottom-3 h-6 rounded-sm border-2 border-[#223247] bg-gradient-to-b from-[#344f6d] to-[#14263b] shadow-[0_10px_18px_rgba(0,0,0,0.5)]" />
 
-            <div className="absolute inset-x-2 top-3 bottom-10 rounded-[4px] border-[4px] border-[#0b111c] bg-[#5f3a1f] shadow-[inset_0_0_0_3px_#9a6736,inset_0_0_0_7px_#3b2412,0_14px_20px_rgba(0,0,0,0.45)]">
-              <div className="absolute inset-x-0 top-0 h-[44%] border-b-[4px] border-[#130b05] bg-[repeating-linear-gradient(90deg,#b07a42_0px,#b07a42_16px,#946436_16px,#946436_32px)]" />
-              <div className="absolute inset-x-0 bottom-0 h-[56%] bg-[repeating-linear-gradient(90deg,#8c5b31_0px,#8c5b31_16px,#734928_16px,#734928_32px)]" />
-              <div className="absolute inset-x-0 top-[44%] h-[4px] bg-[#120a05]" />
+            <div className="absolute inset-x-3 top-3 bottom-10 rounded-[2px] border-[4px] border-[#0a0f15] bg-[#3a2716] shadow-[0_14px_20px_rgba(0,0,0,0.5),inset_0_0_0_3px_#7a522b,inset_0_0_0_7px_#26170c]">
+              <div className="absolute inset-x-0 top-0 h-[43%] bg-[repeating-linear-gradient(90deg,#ba8752_0px,#ba8752_14px,#99683d_14px,#99683d_28px)] border-b-[4px] border-[#130b05]" />
+              <div className="absolute inset-x-0 bottom-0 h-[57%] bg-[repeating-linear-gradient(90deg,#936033_0px,#936033_14px,#7a4d29_14px,#7a4d29_28px)]" />
+              <div className="absolute left-2 top-1 bottom-1 w-[6px] bg-[#160f09]" />
+              <div className="absolute right-2 top-1 bottom-1 w-[6px] bg-[#160f09]" />
+              <div className="absolute inset-x-0 top-[43%] h-[4px] bg-[#080604]" />
 
-              <div className="absolute left-2 top-1 bottom-1 w-[6px] bg-[#1a120c]" />
-              <div className="absolute right-2 top-1 bottom-1 w-[6px] bg-[#1a120c]" />
+              <div className="absolute left-1/2 top-[41%] h-[62px] w-[42px] -translate-x-1/2 border-[3px] border-[#1d1007] bg-gradient-to-b from-[#f1d48d] via-[#b9863d] to-[#734c1e] shadow-[0_4px_0_#2e1b0b]" />
+              <div className="absolute left-1/2 top-[55%] h-[15px] w-[15px] -translate-x-1/2 border-[3px] border-[#2a1a0c] bg-gradient-to-b from-[#b7bcc2] to-[#66707f]" />
 
-              <div className="absolute left-1/2 top-[42%] -translate-x-1/2 h-[62px] w-[44px] border-[3px] border-[#201108] bg-gradient-to-b from-[#f0d589] via-[#b98537] to-[#7d541f] shadow-[0_4px_0_#2f1b0a]" />
-              <div className="absolute left-1/2 top-[54%] -translate-x-1/2 h-[16px] w-[16px] border-[3px] border-[#2a1a0c] bg-gradient-to-b from-[#b5b9bf] to-[#6f7784]" />
+              <div className="absolute left-1/2 top-[30%] -translate-x-1/2 text-[11px] font-black tracking-wider text-[#9bf8a4] drop-shadow-[0_1px_0_#000]">
+                LOOT {filled}/{total}
+              </div>
 
-              <div className="absolute left-0 right-0 top-[37%] grid grid-cols-5 gap-1 px-5">
+              <div className="absolute left-0 right-0 top-[35%] grid grid-cols-6 gap-1 px-4">
                 {Array.from({ length: minecraftLootVisible }).map((_, index) => (
-                  <div key={`minecraft-loot-${index}`} className="h-10 w-10 rounded-[5px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#22476f,0_8px_14px_rgba(0,0,0,0.4)] p-[3px]">
+                  <div key={`minecraft-loot-${index}`} className="h-9 w-9 rounded-[3px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#22476f,0_7px_12px_rgba(0,0,0,0.42)] p-[2px]">
                     <img
                       src={MINECRAFT_LOOT[index % MINECRAFT_LOOT.length]}
                       alt="Minecraft loot"
-                      className="h-full w-full object-contain [image-rendering:crisp-edges] [filter:contrast(1.15)_saturate(1.35)_brightness(1.08)_drop-shadow(0_2px_2px_rgba(0,0,0,0.5))]"
+                      className="h-full w-full object-contain [image-rendering:pixelated] [filter:contrast(1.15)_saturate(1.35)_brightness(1.08)_drop-shadow(0_2px_2px_rgba(0,0,0,0.5))]"
                     />
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="absolute inset-x-2 top-0 h-24 rounded-[4px] border-[4px] border-[#0b111c] bg-[repeating-linear-gradient(90deg,#c18c4d_0px,#c18c4d_16px,#a9753e_16px,#a9753e_32px)] shadow-[inset_0_0_0_3px_#d39f5f,inset_0_-5px_0_#5a351a]" />
-            <div className="absolute inset-x-2 top-[90px] h-[4px] bg-[#0b111c]" />
+            <div className="absolute inset-x-3 top-0 h-24 rounded-[2px] border-[4px] border-[#090d13] bg-[repeating-linear-gradient(90deg,#ce9557_0px,#ce9557_14px,#b77f46_14px,#b77f46_28px)] shadow-[inset_0_0_0_3px_#e0ab68,inset_0_-6px_0_#553316]" />
+            <div className="absolute inset-x-3 top-[90px] h-[4px] bg-[#090d13]" />
+
+            {fillRatio >= 1 && (
+              <motion.div
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-sm border-2 border-[#123019] bg-gradient-to-b from-[#5fd56d] to-[#2f6a37] px-3 py-1 text-xs font-black text-[#edffe5]"
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                +1 Nivel de Insulă!
+              </motion.div>
+            )}
           </div>
         ) : (
         <svg

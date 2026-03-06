@@ -62,3 +62,39 @@
 - Avoid hand-drawn placeholders for Minecraft mode once pack assets are ready.
 - Use nearest-neighbor rendering to preserve pixel-art crispness.
 - Keep item silhouettes instantly recognizable for young learners.
+
+## Manual download list (new assets for richer Minecraft look)
+
+> Because binary assets are not committed automatically, download these manually and place them at the exact paths below.
+
+### A) UI/Chest visuals (high impact)
+
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/block/barrel_side.png`
+  - Put at: `public/assets/minecraft-faithful/barrel_side.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/block/barrel_top.png`
+  - Put at: `public/assets/minecraft-faithful/barrel_top.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/block/barrel_bottom.png`
+  - Put at: `public/assets/minecraft-faithful/barrel_bottom.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/block/emerald_block.png`
+  - Put at: `public/assets/minecraft-faithful/emerald_block.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/block/sea_lantern.png`
+  - Put at: `public/assets/minecraft-faithful/sea_lantern.png`
+
+### B) More items/NPC/animals for collectible variety
+
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/netherite_ingot.png`
+  - Put at: `public/assets/minecraft-faithful/netherite_ingot.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/crossbow_standby.png`
+  - Put at: `public/assets/minecraft-faithful/crossbow_standby.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/trident.png`
+  - Put at: `public/assets/minecraft-faithful/trident.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/axolotl_bucket.png`
+  - Put at: `public/assets/minecraft-faithful/axolotl_bucket.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/fox_spawn_egg.png`
+  - Put at: `public/assets/minecraft-faithful/fox_spawn_egg.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/panda_spawn_egg.png`
+  - Put at: `public/assets/minecraft-faithful/panda_spawn_egg.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/allay_spawn_egg.png`
+  - Put at: `public/assets/minecraft-faithful/allay_spawn_egg.png`
+- URL: `https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item/warden_spawn_egg.png`
+  - Put at: `public/assets/minecraft-faithful/warden_spawn_egg.png`
