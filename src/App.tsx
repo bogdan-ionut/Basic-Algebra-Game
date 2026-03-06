@@ -90,7 +90,11 @@ type MinecraftItemKind =
   | 'honey_bottle'
   | 'golden_apple'
   | 'apple'
-  | 'bread';
+  | 'bread'
+  | 'cow_spawn_egg'
+  | 'wolf_spawn_egg'
+  | 'villager_spawn_egg'
+  | 'zombie_spawn_egg';
 
 type MinecraftAsset = {
   label: string;
@@ -117,6 +121,10 @@ const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
   golden_apple: { label: 'Golden Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png' },
   apple: { label: 'Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png' },
   bread: { label: 'Bread', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/bread.png' },
+  cow_spawn_egg: { label: 'Cow', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png' },
+  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png' },
+  villager_spawn_egg: { label: 'Villager', family: 'npc', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png' },
+  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png' },
 };
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
@@ -136,7 +144,8 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
     'iron_ingot', 'coal',
     'diamond_pickaxe', 'diamond_sword', 'iron_axe', 'bow',
     'totem_of_undying', 'lantern', 'honey_bottle',
-    'golden_apple', 'apple', 'bread'
+    'golden_apple', 'apple', 'bread',
+    'cow_spawn_egg', 'wolf_spawn_egg', 'villager_spawn_egg', 'zombie_spawn_egg'
   ];
   const tokenKind = tokenKinds[shapeIndex % tokenKinds.length];
   const minecraftKind = minecraftKinds[shapeIndex % minecraftKinds.length];
@@ -166,25 +175,24 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
 
       return (
         <>
-          <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#minecraftGlowGrad)" opacity="0.95" />
+          <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#minecraftGlowGrad)" opacity="0.95" />
           <rect x="6" y="6" width="88" height="88" rx="18" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="3.5" />
           <rect x="10" y="10" width="80" height="80" rx="16" fill={panelColorByFamily[minecraftAsset.family]} stroke={frameColor} strokeWidth="3.5" />
-          <rect x="14" y="14" width="72" height="24" rx="8" fill="white" opacity="0.16" />
-          <rect x="14" y="62" width="72" height="24" rx="8" fill="#020617" opacity="0.32" />
+          <rect x="12" y="12" width="76" height="76" rx="14" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" />
+          <rect x="14" y="14" width="72" height="22" rx="8" fill="white" opacity="0.16" />
+          <rect x="14" y="58" width="72" height="28" rx="8" fill="#020617" opacity="0.28" />
           <image
             href={minecraftAsset.url}
-            x="15"
-            y="15"
-            width="70"
-            height="70"
+            x="10"
+            y="10"
+            width="80"
+            height="80"
+            preserveAspectRatio="xMidYMid meet"
             style={{
-              imageRendering: 'pixelated',
-              filter: 'contrast(1.1) saturate(1.2) drop-shadow(0px 18px 14px rgba(0, 0, 0, 0.66)) drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.5))'
+              imageRendering: 'crisp-edges',
+              filter: 'contrast(1.18) saturate(1.35) brightness(1.08) drop-shadow(0px 16px 12px rgba(0, 0, 0, 0.64)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.45))'
             }}
           />
-          <text x="50" y="78" textAnchor="middle" fill={frameColor} fontSize="7" fontWeight="700" style={{ letterSpacing: '0.5px' }}>
-            {minecraftAsset.label.toUpperCase().slice(0, 10)}
-          </text>
         </>
       );
     }
