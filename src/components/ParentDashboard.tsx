@@ -6,20 +6,29 @@ interface ParentDashboardProps {
   onClose: () => void;
   onResetProgress: () => Promise<void> | void;
   activeUserName: string;
+  parentPin: string;
   dailyStats: DailyStats;
   userProfile: UserProfile;
 }
 
-export function ParentDashboard({ onClose, onResetProgress, activeUserName, dailyStats, userProfile }: ParentDashboardProps) {
+export function ParentDashboard({ onClose, onResetProgress, activeUserName, parentPin, dailyStats, userProfile }: ParentDashboardProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [pin, setPin] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
 
   const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+    const val = e.target.value.replace(/\D/g, '').slice(0, 4);
     setPin(val);
-    if (val === '2024') { // Simple PIN for now
+    setPinError(null);
+
+    if (val === parentPin) {
       setIsUnlocked(true);
+      return;
+    }
+
+    if (val.length === 4) {
+      setPinError('PIN incorect. Încearcă din nou.');
     }
   };
 
@@ -35,15 +44,17 @@ export function ParentDashboard({ onClose, onResetProgress, activeUserName, dail
               <Lock className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold text-slate-800">Acces Părinți</h2>
-            <p className="text-slate-500 text-sm">Introduceți codul PIN (2024) pentru a vedea progresul lui {activeUserName}.</p>
+            <p className="text-slate-500 text-sm">Introduceți codul PIN al contului pentru a vedea progresul lui {activeUserName}.</p>
             <input
               type="password"
+              inputMode="numeric"
               value={pin}
               onChange={handlePinChange}
               className="w-full text-center text-2xl tracking-widest p-4 rounded-xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none transition-colors"
               placeholder="****"
               maxLength={4}
             />
+            {pinError && <p className="text-sm font-semibold text-red-500">{pinError}</p>}
           </div>
         </div>
       </div>
