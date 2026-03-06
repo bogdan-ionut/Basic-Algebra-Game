@@ -17,6 +17,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
+import { MinecraftChestModel } from './MinecraftChestModel';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -321,6 +322,7 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
               <div className="absolute inset-x-8 bottom-1 h-8 rounded-[6px] border-2 border-[#0e1a26] bg-[linear-gradient(to_bottom,#14395e,#08192d)] shadow-[0_15px_22px_rgba(0,0,0,0.56)]" />
 
               <div className="absolute inset-x-4 top-7 bottom-8 rounded-[8px] border-4 border-[#08090a] bg-[#5f3d1e] shadow-[0_0_0_3px_#2a1a0d,inset_0_0_0_3px_#a67445,inset_0_-12px_0_#2f1b0d,0_16px_24px_rgba(0,0,0,0.45)]">
+                <MinecraftChestModel filled={filled} total={total} />
                 <div className="absolute inset-0 rounded-[4px] bg-[repeating-linear-gradient(90deg,#8f5f30_0px,#8f5f30_12px,#7a4e27_12px,#7a4e27_24px)]" />
                 <div className="absolute inset-0 rounded-[4px] bg-[linear-gradient(to_bottom,rgba(255,238,197,0.2)_0%,rgba(0,0,0,0.18)_38%,rgba(0,0,0,0.52)_100%)]" />
                 <div className="absolute inset-y-0 left-[10px] w-[7px] bg-[#170d05]" />
