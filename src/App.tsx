@@ -103,28 +103,28 @@ type MinecraftAsset = {
 };
 
 const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
-  diamond: { label: 'Diamond', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png' },
-  emerald: { label: 'Emerald', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png' },
-  amethyst_shard: { label: 'Amethyst Shard', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/amethyst_shard.png' },
-  lapis_lazuli: { label: 'Lapis Lazuli', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/lapis_lazuli.png' },
-  redstone: { label: 'Redstone', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png' },
-  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
-  iron_ingot: { label: 'Iron Ingot', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_ingot.png' },
-  coal: { label: 'Coal', family: 'resource', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/coal.png' },
-  diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png' },
-  diamond_sword: { label: 'Diamond Sword', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond_sword.png' },
-  iron_axe: { label: 'Iron Axe', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_axe.png' },
-  bow: { label: 'Bow', family: 'tool', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/bow.png' },
-  totem_of_undying: { label: 'Totem of Undying', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/totem_of_undying.png' },
-  lantern: { label: 'Lantern', family: 'utility', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/lantern.png' },
-  honey_bottle: { label: 'Honey Bottle', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/honey_bottle.png' },
-  golden_apple: { label: 'Golden Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png' },
-  apple: { label: 'Apple', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/apple.png' },
-  bread: { label: 'Bread', family: 'food', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/bread.png' },
-  cow_spawn_egg: { label: 'Cow', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png' },
-  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png' },
-  villager_spawn_egg: { label: 'Villager', family: 'npc', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png' },
-  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png' },
+  diamond: { label: 'Diamond', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond.png' },
+  emerald: { label: 'Emerald', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/emerald.png' },
+  amethyst_shard: { label: 'Amethyst Shard', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/amethyst_shard.png' },
+  lapis_lazuli: { label: 'Lapis Lazuli', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/lapis_lazuli.png' },
+  redstone: { label: 'Redstone', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/redstone.png' },
+  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
+  iron_ingot: { label: 'Iron Ingot', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/iron_ingot.png' },
+  coal: { label: 'Coal', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/coal.png' },
+  diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png' },
+  diamond_sword: { label: 'Diamond Sword', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond_sword.png' },
+  iron_axe: { label: 'Iron Axe', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/iron_axe.png' },
+  bow: { label: 'Bow', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/bow.png' },
+  totem_of_undying: { label: 'Totem of Undying', family: 'utility', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/totem_of_undying.png' },
+  lantern: { label: 'Lantern', family: 'utility', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/lantern.png' },
+  honey_bottle: { label: 'Honey Bottle', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/honey_bottle.png' },
+  golden_apple: { label: 'Golden Apple', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/golden_apple.png' },
+  apple: { label: 'Apple', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/apple.png' },
+  bread: { label: 'Bread', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/bread.png' },
+  cow_spawn_egg: { label: 'Cow', family: 'animal', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png' },
+  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png' },
+  villager_spawn_egg: { label: 'Villager', family: 'npc', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png' },
+  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png' },
 };
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
@@ -136,6 +136,7 @@ const COUNT_ITEM_THEMES: CountItemTheme[] = [
 ];
 
 function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTheme; delay: number; shapeIndex: number; stack: VisualStack }) {
+  const [isImageBroken, setIsImageBroken] = useState(false);
   const gradId = `gem-${theme.name}-${shapeIndex}-grad`;
   const glowId = `gem-${theme.name}-${shapeIndex}-glow`;
   const tokenKinds: CountItemKind[] = ['gem', 'coin', 'crown', 'potion', 'star'];
@@ -160,43 +161,21 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
     hostile: '#ef4444',
   };
   const frameColor = frameColorByFamily[minecraftAsset.family];
+  const fallbackByFamily: Record<MinecraftAsset['family'], string> = {
+    resource: '⛏️',
+    tool: '🛠️',
+    utility: '🧰',
+    food: '🍎',
+    animal: '🐾',
+    npc: '🧑',
+    hostile: '💀',
+  };
+
+  useEffect(() => {
+    setIsImageBroken(false);
+  }, [minecraftAsset.url]);
 
   const renderToken = () => {
-    if (stack === 'minecraft') {
-      const panelColorByFamily: Record<MinecraftAsset['family'], string> = {
-        resource: '#082f49',
-        tool: '#451a03',
-        utility: '#431407',
-        food: '#052e16',
-        animal: '#1a2e05',
-        npc: '#2e1065',
-        hostile: '#450a0a',
-      };
-
-      return (
-        <>
-          <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#minecraftGlowGrad)" opacity="0.95" />
-          <rect x="6" y="6" width="88" height="88" rx="18" fill="url(#minecraftCardGrad)" stroke="#0f172a" strokeWidth="3.5" />
-          <rect x="10" y="10" width="80" height="80" rx="16" fill={panelColorByFamily[minecraftAsset.family]} stroke={frameColor} strokeWidth="3.5" />
-          <rect x="12" y="12" width="76" height="76" rx="14" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" />
-          <rect x="14" y="14" width="72" height="22" rx="8" fill="white" opacity="0.16" />
-          <rect x="14" y="58" width="72" height="28" rx="8" fill="#020617" opacity="0.28" />
-          <image
-            href={minecraftAsset.url}
-            x="10"
-            y="10"
-            width="80"
-            height="80"
-            preserveAspectRatio="xMidYMid meet"
-            style={{
-              imageRendering: 'crisp-edges',
-              filter: 'contrast(1.18) saturate(1.35) brightness(1.08) drop-shadow(0px 16px 12px rgba(0, 0, 0, 0.64)) drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.45))'
-            }}
-          />
-        </>
-      );
-    }
-
     if (tokenKind === 'coin') {
       return (
         <>
@@ -260,33 +239,49 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
       className="relative"
       title={stack === 'minecraft' ? `Minecraft • ${minecraftAsset.label}` : `Gemă ${theme.name}`}
     >
-      <motion.svg
-        viewBox="0 0 100 100"
-        className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_12px_16px_rgba(15,23,42,0.55)]"
-        animate={{ y: [0, -1.5, 0] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
-      >
-        <defs>
-          <radialGradient id={gradId} cx="30%" cy="25%" r="72%">
-            <stop offset="0%" stopColor={theme.light} />
-            <stop offset="56%" stopColor={theme.base} />
-            <stop offset="100%" stopColor={theme.dark} />
-          </radialGradient>
-          <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={theme.glow} stopOpacity="0.72" />
-            <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="minecraftCardGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1e293b" />
-            <stop offset="100%" stopColor="#0f172a" />
-          </linearGradient>
-          <radialGradient id="minecraftGlowGrad" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor={frameColor} stopOpacity="0.7" />
-            <stop offset="100%" stopColor={frameColor} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        {renderToken()}
-      </motion.svg>
+      {stack === 'minecraft' ? (
+        <motion.div
+          className="relative flex w-16 h-16 sm:w-20 sm:h-20 items-center justify-center rounded-[1.35rem] border-[3px] bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 shadow-[0_12px_16px_rgba(15,23,42,0.45)]"
+          style={{ borderColor: frameColor }}
+          animate={{ y: [0, -1.5, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
+        >
+          <div className="absolute inset-1 rounded-[1rem] border border-white/20 bg-black/25" />
+          {!isImageBroken ? (
+            <img
+              src={minecraftAsset.url}
+              alt={minecraftAsset.label}
+              className="relative z-10 h-11 w-11 sm:h-14 sm:w-14 [image-rendering:pixelated] drop-shadow-[0_8px_10px_rgba(0,0,0,0.5)]"
+              onError={() => setIsImageBroken(true)}
+            />
+          ) : (
+            <div className="relative z-10 text-2xl sm:text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
+              {fallbackByFamily[minecraftAsset.family]}
+            </div>
+          )}
+          <div className="absolute left-3 top-2 h-2 w-10 rounded-full bg-white/20 blur-[1px]" />
+        </motion.div>
+      ) : (
+        <motion.svg
+          viewBox="0 0 100 100"
+          className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_12px_16px_rgba(15,23,42,0.55)]"
+          animate={{ y: [0, -1.5, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
+        >
+          <defs>
+            <radialGradient id={gradId} cx="30%" cy="25%" r="72%">
+              <stop offset="0%" stopColor={theme.light} />
+              <stop offset="56%" stopColor={theme.base} />
+              <stop offset="100%" stopColor={theme.dark} />
+            </radialGradient>
+            <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={theme.glow} stopOpacity="0.72" />
+              <stop offset="100%" stopColor={theme.glow} stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {renderToken()}
+        </motion.svg>
+      )}
 
       {stack === 'minecraft' ? (
         <div className="pointer-events-none absolute inset-0">
@@ -1313,7 +1308,7 @@ export default function App() {
                   <div className="relative flex items-center gap-3">
                     <div className="h-12 w-12 rounded-[2px] bg-[#0f172a] border-2 border-[#334155] p-1 shadow-[inset_0_0_0_2px_#1e293b]">
                       <img
-                        src="https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png"
+                        src="https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/emerald.png"
                         alt="Emerald reward"
                         className="h-full w-full object-contain [image-rendering:pixelated]"
                       />
