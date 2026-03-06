@@ -4,7 +4,7 @@ Pune aici PNG-urile pentru itemele Minecraft.
 
 Path exact: `public/assets/minecraft-faithful/`
 
-Aplicația citește imaginile din `/assets/minecraft-faithful/<fisier>.png`.
+Aplicația citește imaginile din `${BASE_URL}assets/minecraft-faithful/<fisier>.png` (în dev BASE_URL este `/`, iar pe GitHub Pages include numele repo-ului).
 
 ## Nume de fișiere așteptate
 

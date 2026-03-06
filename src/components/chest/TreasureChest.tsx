@@ -35,17 +35,19 @@ interface Props {
   visualStyle?: 'treasure' | 'minecraft';
 }
 
+const MINECRAFT_TEXTURE_BASE_URL = `${import.meta.env.BASE_URL}assets/minecraft-faithful`;
+
 const MINECRAFT_LOOT = [
-  '/assets/minecraft-faithful/diamond.png',
-  '/assets/minecraft-faithful/emerald.png',
-  '/assets/minecraft-faithful/gold_ingot.png',
-  '/assets/minecraft-faithful/redstone.png',
-  '/assets/minecraft-faithful/golden_apple.png',
-  '/assets/minecraft-faithful/iron_ingot.png',
-  '/assets/minecraft-faithful/cow_spawn_egg.png',
-  '/assets/minecraft-faithful/wolf_spawn_egg.png',
-  '/assets/minecraft-faithful/villager_spawn_egg.png',
-  '/assets/minecraft-faithful/zombie_spawn_egg.png',
+  `${MINECRAFT_TEXTURE_BASE_URL}/diamond.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/emerald.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/gold_ingot.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/redstone.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/golden_apple.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/iron_ingot.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/cow_spawn_egg.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/wolf_spawn_egg.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/villager_spawn_egg.png`,
+  `${MINECRAFT_TEXTURE_BASE_URL}/zombie_spawn_egg.png`,
 ];
 
 // ─── Gem palette ─────────────────────────────────────────────────────────────
