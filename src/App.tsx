@@ -71,6 +71,21 @@ type CountItemTheme = {
 
 type VisualStack = 'treasure' | 'minecraft';
 
+const PRACTICE_OPTIONS = [5, 10, 100] as const;
+type PracticeMax = (typeof PRACTICE_OPTIONS)[number];
+
+const difficultyLevelToMax = (difficultyLevel: number): PracticeMax => {
+  if (difficultyLevel <= 1) return 5;
+  if (difficultyLevel === 2) return 10;
+  return 100;
+};
+
+const maxToDifficultyLevel = (practiceMax: PracticeMax): number => {
+  if (practiceMax <= 5) return 1;
+  if (practiceMax <= 10) return 2;
+  return 3;
+};
+
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
 type MinecraftItemKind =
   | 'diamond'
@@ -342,36 +357,35 @@ function CaptainIdentityCard({
   const stripeCount = Math.min(5, chestCount + 1);
 
   return (
-    <div className={`rounded-[1.75rem] border-2 border-amber-300/80 bg-gradient-to-b from-[#fff9ea] via-[#f8eed9] to-[#f0e0bf] shadow-[0_10px_26px_rgba(120,76,15,0.28)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
-      <div className="flex items-center gap-3">
-        <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-          <div className={`rounded-xl bg-gradient-to-b from-[#ffe8a0] to-[#eec15a] border border-amber-500 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${compact ? 'h-8' : 'h-10'}`}>
-            {Array.from({ length: stripeCount }).map((_, index) => (
-              <span key={`left-${index}`} className="w-0.5 bg-amber-700 rounded-full" />
-            ))}
-          </div>
+    <div className={`relative rounded-md border-4 border-[#1a130b] bg-gradient-to-b from-[#5b4125] via-[#3f2e1a] to-[#2a1d11] text-[#fce7b2] shadow-[0_14px_24px_rgba(0,0,0,0.45)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
+      <div className="absolute inset-[3px] border border-[#8d6a40] rounded-[2px] opacity-90" />
+      <div className="relative flex items-center gap-3">
+        <div className={`grid ${compact ? 'gap-1' : 'gap-1.5'}`}>
+          {Array.from({ length: stripeCount }).map((_, index) => (
+            <span key={`left-${index}`} className={`block rounded-sm border border-[#26190d] bg-gradient-to-b from-[#f6d572] to-[#ba8d2a] ${compact ? 'h-1.5 w-6' : 'h-2 w-7'}`} />
+          ))}
+        </div>
 
-          <div className="relative">
-            {user.avatarDataUrl ? (
-              <img src={user.avatarDataUrl} alt={user.name} className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full object-cover border-2 border-amber-300 shadow-[0_4px_10px_rgba(44,31,17,0.25)]`} />
-            ) : (
-              <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-full bg-amber-50 border-2 border-amber-300 flex items-center justify-center`}>
-                <UserCircle2 className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} text-amber-700`} />
-              </div>
-            )}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-2 rounded-t-full bg-slate-800" />
-          </div>
+        <div className="relative rounded-sm border-4 border-[#1d1309] bg-[#2d2113] p-0.5">
+          {user.avatarDataUrl ? (
+            <img src={user.avatarDataUrl} alt={user.name} className={`${compact ? 'w-11 h-11' : 'w-14 h-14'} rounded-[2px] object-cover [image-rendering:pixelated]`} />
+          ) : (
+            <div className={`${compact ? 'w-11 h-11' : 'w-14 h-14'} rounded-[2px] bg-[#3c2c18] border border-[#8d6a40] flex items-center justify-center`}>
+              <UserCircle2 className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} text-[#f8d580]`} />
+            </div>
+          )}
+          <div className="absolute -top-2 left-1/2 h-2 w-8 -translate-x-1/2 rounded-sm border border-[#1d1309] bg-[#355f2c]" />
+        </div>
 
-          <div className={`rounded-xl bg-gradient-to-b from-[#ffe8a0] to-[#eec15a] border border-amber-500 px-1.5 py-1 min-w-[1.7rem] flex justify-center gap-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${compact ? 'h-8' : 'h-10'}`}>
-            {Array.from({ length: stripeCount }).map((_, index) => (
-              <span key={`right-${index}`} className="w-0.5 bg-amber-700 rounded-full" />
-            ))}
-          </div>
+        <div className={`grid ${compact ? 'gap-1' : 'gap-1.5'}`}>
+          {Array.from({ length: stripeCount }).map((_, index) => (
+            <span key={`right-${index}`} className={`block rounded-sm border border-[#26190d] bg-gradient-to-b from-[#f6d572] to-[#ba8d2a] ${compact ? 'h-1.5 w-6' : 'h-2 w-7'}`} />
+          ))}
         </div>
 
         <div className="min-w-0">
-          <p className={`font-black text-amber-950 truncate ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
-          <p className={`text-amber-700/90 truncate ${compact ? 'text-[11px]' : 'text-xs'}`}>
+          <p className={`font-black truncate text-[#fff2ce] drop-shadow-[1px_1px_0_#2b1f10] ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
+          <p className={`truncate text-[#f6d588] ${compact ? 'text-[11px]' : 'text-xs'}`}>
             Căpitan • {chestCount} cufere • rang {epauletteLevel}
           </p>
         </div>
@@ -406,6 +420,7 @@ export default function App() {
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
   const [visualStack] = useState<VisualStack>('minecraft');
+  const [practiceMax, setPracticeMax] = useState<PracticeMax>(5);
 
   const [users, setUsers] = useState<GameUser[]>([]);
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
@@ -447,9 +462,7 @@ export default function App() {
     timeoutIdsRef.current.push(timeoutId);
   };
 
-  const generateProblem = (level: number) => {
-    // Level 1: sum up to 5. Level 2: sum up to 10.
-    const maxSum = level === 1 ? 5 : 10;
+  const generateProblem = (maxSum: number) => {
     const createCandidate = () => {
       const sum = Math.floor(Math.random() * (maxSum - 1)) + 2; // 2 to maxSum
       const n1 = Math.floor(Math.random() * (sum - 1)) + 1; // 1 to sum - 1
@@ -480,9 +493,7 @@ export default function App() {
 
   const getCurrentChapterLabel = () => {
     if (!userProfile) return 'Matematică distractivă';
-    if (userProfile.difficultyLevel <= 1) return 'Adunări până la 5';
-    if (userProfile.difficultyLevel === 2) return 'Adunări până la 10';
-    return `Adunări (nivel ${userProfile.difficultyLevel})`;
+    return `Adunări până la ${practiceMax}`;
   };
 
   const handleResetActiveUserProgress = async () => {
@@ -507,7 +518,8 @@ export default function App() {
     setIsSpeedBumpActive(false);
     setShowSuccess(false);
     setWrongAnswer(null);
-    generateProblem(resetProfile.difficultyLevel);
+    setPracticeMax(difficultyLevelToMax(resetProfile.difficultyLevel));
+    generateProblem(difficultyLevelToMax(resetProfile.difficultyLevel));
 
     await saveDailyStats(activeUser.id, resetStats);
     await saveUserProfile(activeUser.id, resetProfile);
@@ -538,13 +550,16 @@ export default function App() {
       setSessionLimit(600);
     }
 
+    const currentPracticeMax = difficultyLevelToMax(profile.difficultyLevel);
+
     setDailyStats(stats);
     setUserProfile(profile);
+    setPracticeMax(currentPracticeMax);
     setConsecutiveMistakes(0);
     setConsecutiveCorrect(0);
     setIsSessionComplete(false);
     setHasStarted(false);
-    generateProblem(profile.difficultyLevel);
+    generateProblem(currentPracticeMax);
   };
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -815,12 +830,13 @@ export default function App() {
       setLatestItemIndex((newProfile.score - 1) % 10);
 
       // Level up logic (Mastery)
-      if (newCorrect >= 5 && newProfile.difficultyLevel === 1) {
-        newProfile.difficultyLevel = 2;
+      if (newCorrect >= 5 && newProfile.difficultyLevel < 3) {
+        newProfile.difficultyLevel += 1;
         newCorrect = 0;
         setLevelNotification('up');
         playSound('levelUp');
         scheduleTimeout(() => setLevelNotification(null), 3000);
+        setPracticeMax(difficultyLevelToMax(newProfile.difficultyLevel));
       }
 
       setUserProfile(newProfile);
@@ -834,7 +850,7 @@ export default function App() {
       });
       setShowSuccess(true);
       scheduleTimeout(() => {
-        generateProblem(newProfile.difficultyLevel);
+        generateProblem(difficultyLevelToMax(newProfile.difficultyLevel));
       }, 2000);
     } else {
       playSound('error');
@@ -845,14 +861,15 @@ export default function App() {
 
       // Struggle detector: level down
       if (newMistakes >= 2 && newProfile.difficultyLevel > 1) {
-        newProfile.difficultyLevel = 1;
+        newProfile.difficultyLevel -= 1;
         newMistakes = 0;
         setLevelNotification('down');
         scheduleTimeout(() => setLevelNotification(null), 3000);
+        setPracticeMax(difficultyLevelToMax(newProfile.difficultyLevel));
 
         // Immediately generate an easier problem
         scheduleTimeout(() => {
-          generateProblem(1);
+          generateProblem(difficultyLevelToMax(newProfile.difficultyLevel));
         }, 1000);
       }
 
@@ -882,6 +899,26 @@ export default function App() {
 
     await handleAnswer(parsedAnswer);
     setAnswerInput('');
+  };
+
+  const handlePracticeModeChange = async (nextPracticeMax: PracticeMax) => {
+    if (!activeUser || !userProfile) return;
+
+    const nextDifficultyLevel = maxToDifficultyLevel(nextPracticeMax);
+    const updatedProfile = {
+      ...userProfile,
+      difficultyLevel: nextDifficultyLevel,
+    };
+
+    setPracticeMax(nextPracticeMax);
+    setUserProfile(updatedProfile);
+    setConsecutiveCorrect(0);
+    setConsecutiveMistakes(0);
+    setLevelNotification('up');
+    scheduleTimeout(() => setLevelNotification(null), 1800);
+
+    await saveUserProfile(activeUser.id, updatedProfile);
+    generateProblem(nextPracticeMax);
   };
 
 
@@ -1211,12 +1248,34 @@ export default function App() {
       <div className="w-full max-w-2xl bg-gradient-to-b from-[#f8f3e8] via-[#f2ebdd] to-[#efe6d8] rounded-[2rem] shadow-[0_26px_65px_rgba(2,17,47,0.45)] overflow-hidden border-[5px] border-[#d7b67a] relative mt-16 z-10 mb-4">
 
         {/* Header */}
-        <div className="bg-gradient-to-b from-[#fefcf7] via-[#f6efe3] to-[#efe2cb] border-b-4 border-[#d9bf90] p-6 text-center relative">
-          <div className="absolute top-1/2 left-5 -translate-y-1/2 w-3 h-3 rotate-45 bg-blue-500 border border-blue-800/50" />
-          <div className="absolute top-1/2 right-5 -translate-y-1/2 w-3 h-3 rotate-45 bg-blue-500 border border-blue-800/50" />
-          <h1 className="text-4xl font-black text-amber-900 drop-shadow-sm tracking-wide">
+        <div className="bg-gradient-to-b from-[#72502f] via-[#5a4026] to-[#43301d] border-b-4 border-[#24180f] p-6 text-center relative">
+          <div className="absolute top-1/2 left-5 -translate-y-1/2 w-3 h-3 bg-[#8ccf64] border-2 border-[#203015]" />
+          <div className="absolute top-1/2 right-5 -translate-y-1/2 w-3 h-3 bg-[#8ccf64] border-2 border-[#203015]" />
+          <h1 className="text-4xl font-black text-[#ffeab8] drop-shadow-[2px_2px_0_#2a1c0d] tracking-wide">
             {activeUser.name} • {getCurrentChapterLabel()}
           </h1>
+        </div>
+
+        <div className="border-b-4 border-[#d9bf90] bg-gradient-to-b from-[#d6c3a0] to-[#b59669] px-4 py-3">
+          <div className="mx-auto flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
+            <span className="font-black uppercase tracking-wide text-[#2f2110] text-xs sm:text-sm">Mod de joc:</span>
+            {PRACTICE_OPTIONS.map(option => {
+              const isActive = option === practiceMax;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => handlePracticeModeChange(option)}
+                  className={`relative rounded-sm border-4 px-3 py-1.5 text-xs sm:text-sm font-black transition-all ${isActive
+                    ? 'border-[#25180b] bg-gradient-to-b from-[#7ec850] to-[#436d2a] text-[#f4ffe6] shadow-[0_4px_0_#203315]'
+                    : 'border-[#53371b] bg-gradient-to-b from-[#d0aa6d] to-[#9a713f] text-[#2f2110] shadow-[0_4px_0_#664826] hover:brightness-105'
+                    }`}
+                >
+                  Adunări ≤ {option}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Game Area */}
