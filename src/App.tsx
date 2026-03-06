@@ -102,7 +102,7 @@ type MinecraftAsset = {
   url: string;
 };
 
-const MINECRAFT_TEXTURE_BASE_URL = '/assets/minecraft-faithful';
+const MINECRAFT_TEXTURE_BASE_URL = `${import.meta.env.BASE_URL}assets/minecraft-faithful`;
 
 const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
   diamond: { label: 'Diamond', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/diamond.png` },
