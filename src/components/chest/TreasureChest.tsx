@@ -36,16 +36,16 @@ interface Props {
 }
 
 const MINECRAFT_LOOT = [
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/diamond.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/emerald.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/gold_ingot.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_ingot.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png',
-  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png',
+  '/assets/minecraft-faithful/diamond.png',
+  '/assets/minecraft-faithful/emerald.png',
+  '/assets/minecraft-faithful/gold_ingot.png',
+  '/assets/minecraft-faithful/redstone.png',
+  '/assets/minecraft-faithful/golden_apple.png',
+  '/assets/minecraft-faithful/iron_ingot.png',
+  '/assets/minecraft-faithful/cow_spawn_egg.png',
+  '/assets/minecraft-faithful/wolf_spawn_egg.png',
+  '/assets/minecraft-faithful/villager_spawn_egg.png',
+  '/assets/minecraft-faithful/zombie_spawn_egg.png',
 ];
 
 // ─── Gem palette ─────────────────────────────────────────────────────────────

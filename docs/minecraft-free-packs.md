@@ -4,9 +4,9 @@
 
 ## Current status in this repo
 
-✅ Implemented: the game now uses **Faithful 32x item textures from official upstream URLs** (resources, tools, food, NPC/animal/hostile spawn eggs, utility items).
+✅ Implemented: the game now uses **Faithful-style item textures from the local folder** `public/assets/minecraft-faithful/` (resources, tools, food, NPC/animal/hostile spawn eggs, utility items).
 
-✅ Why this approach: avoids committing binary texture files in this repo (important for platforms/workflows that reject binary diffs) while still massively improving visual quality.
+✅ Why this approach: lets maintainers upload PNG files manually in-repo and use them directly at runtime (`/assets/minecraft-faithful/...`) without changing code every time assets are updated.
 
 ## Quick recommendations (best first)
 
@@ -51,10 +51,10 @@
 ## Integration plan for this repo
 
 1. ✅ Pick one base pack (**Faithful selected**).
-2. ✅ Wire upstream item URLs into the `minecraft` visual stack renderer.
+2. ✅ Wire local item URLs (`/assets/minecraft-faithful/<name>.png`) into the `minecraft` visual stack renderer.
 3. ✅ Keep all Minecraft item keys mapped (resources/tools/utility/food/NPC-animal-hostile entries).
 4. ✅ Keep attribution and license source documented in `docs/ASSET_LICENSES.md`.
-5. 🔜 Optional later: add a safe asset mirroring pipeline (e.g., CDN or object storage) if upstream URL reliability becomes a concern.
+5. 🔜 Optional later: add automated validation for required filenames in `public/assets/minecraft-faithful/`.
 
 ## Suggested quality bar ("HIGH FIDELITY")
 

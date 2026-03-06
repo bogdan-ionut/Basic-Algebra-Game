@@ -102,8 +102,7 @@ type MinecraftAsset = {
   url: string;
 };
 
-const MINECRAFT_TEXTURE_BASE_URL =
-  'https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item';
+const MINECRAFT_TEXTURE_BASE_URL = '/assets/minecraft-faithful';
 
 const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
   diamond: { label: 'Diamond', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/diamond.png` },
