@@ -42,6 +42,10 @@ const MINECRAFT_LOOT = [
   'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/redstone.png',
   'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/golden_apple.png',
   'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/iron_ingot.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png',
+  'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png',
 ];
 
 // ─── Gem palette ─────────────────────────────────────────────────────────────
@@ -323,11 +327,11 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
 
               <div className="absolute left-0 right-0 top-[37%] grid grid-cols-5 gap-1 px-5">
                 {Array.from({ length: minecraftLootVisible }).map((_, index) => (
-                  <div key={`minecraft-loot-${index}`} className="h-9 w-9 rounded-[4px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#1e3a5a,0_6px_10px_rgba(0,0,0,0.35)] p-0.5">
+                  <div key={`minecraft-loot-${index}`} className="h-10 w-10 rounded-[5px] border-2 border-[#101822] bg-[#091526] shadow-[0_0_0_2px_#22476f,0_8px_14px_rgba(0,0,0,0.4)] p-[3px]">
                     <img
                       src={MINECRAFT_LOOT[index % MINECRAFT_LOOT.length]}
                       alt="Minecraft loot"
-                      className="h-full w-full object-contain [image-rendering:pixelated]"
+                      className="h-full w-full object-contain [image-rendering:crisp-edges] [filter:contrast(1.15)_saturate(1.35)_brightness(1.08)_drop-shadow(0_2px_2px_rgba(0,0,0,0.5))]"
                     />
                   </div>
                 ))}
