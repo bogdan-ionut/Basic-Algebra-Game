@@ -44,3 +44,13 @@ Detalii și licențiere:
 - `docs/minecraft-free-packs.md`
 - `docs/ASSET_LICENSES.md`
 
+### Optional: Minecraft 3D chest model
+
+Poți folosi un model 3D de cufăr (GLB/GLTF) în ecranul de joc:
+
+1. Pune fișierul la `public/assets/minecraft-faithful/models/chest.glb`
+   **sau** setează variabila `VITE_MINECRAFT_CHEST_MODEL_URL` în `.env.local` cu URL direct către model.
+2. Aplicația îl va încărca automat în componenta cufăr Minecraft (`<model-viewer>`).
+
+Dacă modelul nu există, restul UI rămâne funcțional (overlay-ul 2D rămâne vizibil).
+
