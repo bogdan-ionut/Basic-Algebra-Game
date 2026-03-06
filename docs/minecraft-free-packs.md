@@ -2,13 +2,19 @@
 
 > Goal: help the project switch from placeholder vector icons to much more faithful Minecraft-looking items.
 
+## Current status in this repo
+
+✅ Implemented: the game now uses **Faithful 32x item textures from official upstream URLs** (resources, tools, food, NPC/animal/hostile spawn eggs, utility items).
+
+✅ Why this approach: avoids committing binary texture files in this repo (important for platforms/workflows that reject binary diffs) while still massively improving visual quality.
+
 ## Quick recommendations (best first)
 
 ### 1) Faithful (32x / 64x)
 - Website: https://faithfulpack.net/
 - Why it fits: closest look to vanilla Minecraft while still higher detail.
-- Typical use here: inventory-like item sprites (diamond, emerald, ingot, redstone) exported at 64x64.
-- License note: verify redistribution terms for bundling textures in a public web repo before committing assets.
+- Typical use here: inventory-like item sprites (diamond, emerald, ingot, redstone).
+- License note: check current terms and keep attribution link.
 
 ### 2) Compliance (32x)
 - Website: https://www.compliancepack.net/
@@ -44,22 +50,11 @@
 
 ## Integration plan for this repo
 
-1. Pick one base pack (Faithful or Compliance).
-2. Export only required items into `src/assets/minecraft-items/` as PNG (recommended: `64x64` and `128x128`).
-3. Keep naming stable:
-   - `diamond.png`
-   - `emerald.png`
-   - `gold_ingot.png`
-   - `redstone.png`
-   - `grass_block.png`
-4. Wire these paths into the `minecraft` visual stack renderer.
-5. Add/maintain attribution in `docs/ASSET_LICENSES.md`.
-
-## Legal checklist before committing textures
-
-- Confirm the pack license explicitly permits redistribution in a public GitHub repository.
-- If attribution is required, include author, pack name, URL, and license version.
-- Keep source URL + version number for every asset included in the repo.
+1. ✅ Pick one base pack (**Faithful selected**).
+2. ✅ Wire upstream item URLs into the `minecraft` visual stack renderer.
+3. ✅ Keep all Minecraft item keys mapped (resources/tools/utility/food/NPC-animal-hostile entries).
+4. ✅ Keep attribution and license source documented in `docs/ASSET_LICENSES.md`.
+5. 🔜 Optional later: add a safe asset mirroring pipeline (e.g., CDN or object storage) if upstream URL reliability becomes a concern.
 
 ## Suggested quality bar ("HIGH FIDELITY")
 

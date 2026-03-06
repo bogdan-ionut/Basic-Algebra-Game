@@ -102,29 +102,32 @@ type MinecraftAsset = {
   url: string;
 };
 
+const MINECRAFT_TEXTURE_BASE_URL =
+  'https://raw.githubusercontent.com/Faithful-Resource-Pack/Faithful-32x-Java/java-latest/assets/minecraft/textures/item';
+
 const MINECRAFT_ASSETS: Record<MinecraftItemKind, MinecraftAsset> = {
-  diamond: { label: 'Diamond', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond.png' },
-  emerald: { label: 'Emerald', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/emerald.png' },
-  amethyst_shard: { label: 'Amethyst Shard', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/amethyst_shard.png' },
-  lapis_lazuli: { label: 'Lapis Lazuli', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/lapis_lazuli.png' },
-  redstone: { label: 'Redstone', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/redstone.png' },
-  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/gold_ingot.png' },
-  iron_ingot: { label: 'Iron Ingot', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/iron_ingot.png' },
-  coal: { label: 'Coal', family: 'resource', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/coal.png' },
-  diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond_pickaxe.png' },
-  diamond_sword: { label: 'Diamond Sword', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/diamond_sword.png' },
-  iron_axe: { label: 'Iron Axe', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/iron_axe.png' },
-  bow: { label: 'Bow', family: 'tool', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/bow.png' },
-  totem_of_undying: { label: 'Totem of Undying', family: 'utility', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/totem_of_undying.png' },
-  lantern: { label: 'Lantern', family: 'utility', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/lantern.png' },
-  honey_bottle: { label: 'Honey Bottle', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/honey_bottle.png' },
-  golden_apple: { label: 'Golden Apple', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/golden_apple.png' },
-  apple: { label: 'Apple', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/apple.png' },
-  bread: { label: 'Bread', family: 'food', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/bread.png' },
-  cow_spawn_egg: { label: 'Cow', family: 'animal', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/cow_spawn_egg.png' },
-  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/wolf_spawn_egg.png' },
-  villager_spawn_egg: { label: 'Villager', family: 'npc', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/villager_spawn_egg.png' },
-  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/zombie_spawn_egg.png' },
+  diamond: { label: 'Diamond', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/diamond.png` },
+  emerald: { label: 'Emerald', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/emerald.png` },
+  amethyst_shard: { label: 'Amethyst Shard', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/amethyst_shard.png` },
+  lapis_lazuli: { label: 'Lapis Lazuli', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/lapis_lazuli.png` },
+  redstone: { label: 'Redstone', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/redstone.png` },
+  gold_ingot: { label: 'Gold Ingot', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/gold_ingot.png` },
+  iron_ingot: { label: 'Iron Ingot', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/iron_ingot.png` },
+  coal: { label: 'Coal', family: 'resource', url: `${MINECRAFT_TEXTURE_BASE_URL}/coal.png` },
+  diamond_pickaxe: { label: 'Diamond Pickaxe', family: 'tool', url: `${MINECRAFT_TEXTURE_BASE_URL}/diamond_pickaxe.png` },
+  diamond_sword: { label: 'Diamond Sword', family: 'tool', url: `${MINECRAFT_TEXTURE_BASE_URL}/diamond_sword.png` },
+  iron_axe: { label: 'Iron Axe', family: 'tool', url: `${MINECRAFT_TEXTURE_BASE_URL}/iron_axe.png` },
+  bow: { label: 'Bow', family: 'tool', url: `${MINECRAFT_TEXTURE_BASE_URL}/bow.png` },
+  totem_of_undying: { label: 'Totem of Undying', family: 'utility', url: `${MINECRAFT_TEXTURE_BASE_URL}/totem_of_undying.png` },
+  lantern: { label: 'Lantern', family: 'utility', url: `${MINECRAFT_TEXTURE_BASE_URL}/lantern.png` },
+  honey_bottle: { label: 'Honey Bottle', family: 'food', url: `${MINECRAFT_TEXTURE_BASE_URL}/honey_bottle.png` },
+  golden_apple: { label: 'Golden Apple', family: 'food', url: `${MINECRAFT_TEXTURE_BASE_URL}/golden_apple.png` },
+  apple: { label: 'Apple', family: 'food', url: `${MINECRAFT_TEXTURE_BASE_URL}/apple.png` },
+  bread: { label: 'Bread', family: 'food', url: `${MINECRAFT_TEXTURE_BASE_URL}/bread.png` },
+  cow_spawn_egg: { label: 'Cow', family: 'animal', url: `${MINECRAFT_TEXTURE_BASE_URL}/cow_spawn_egg.png` },
+  wolf_spawn_egg: { label: 'Wolf', family: 'animal', url: `${MINECRAFT_TEXTURE_BASE_URL}/wolf_spawn_egg.png` },
+  villager_spawn_egg: { label: 'Villager', family: 'npc', url: `${MINECRAFT_TEXTURE_BASE_URL}/villager_spawn_egg.png` },
+  zombie_spawn_egg: { label: 'Zombie', family: 'hostile', url: `${MINECRAFT_TEXTURE_BASE_URL}/zombie_spawn_egg.png` },
 };
 
 const COUNT_ITEM_THEMES: CountItemTheme[] = [
@@ -1308,7 +1311,7 @@ export default function App() {
                   <div className="relative flex items-center gap-3">
                     <div className="h-12 w-12 rounded-[2px] bg-[#0f172a] border-2 border-[#334155] p-1 shadow-[inset_0_0_0_2px_#1e293b]">
                       <img
-                        src="https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.2/assets/minecraft/textures/item/emerald.png"
+                        src={`${MINECRAFT_TEXTURE_BASE_URL}/emerald.png`}
                         alt="Emerald reward"
                         className="h-full w-full object-contain [image-rendering:pixelated]"
                       />
