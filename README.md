@@ -38,7 +38,9 @@ După primul deploy reușit, fiecare merge/push nou în `main` va publica automa
 
 ## Minecraft high-fidelity assets
 
-Am adăugat un ghid actualizat cu surse free și pașii de integrare:
+Am integrat texturi **Faithful 32x** pentru itemele Minecraft (resurse, unelte, mâncare, ouă pentru NPC/animale/hostile), încărcate din sursa oficială upstream pentru a evita commit-uri cu fișiere binare în repo și pentru a crește claritatea vizuală.
+
+Detalii și licențiere:
 - `docs/minecraft-free-packs.md`
 - `docs/ASSET_LICENSES.md`
 
