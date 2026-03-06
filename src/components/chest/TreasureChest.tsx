@@ -318,51 +318,53 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
               animate={latestItem !== null ? { x: [0, -1, 1, 0] } : undefined}
               transition={{ duration: 0.28, ease: 'easeInOut' }}
             >
-              <div className="absolute inset-x-8 bottom-1 h-8 rounded-[4px] border-2 border-[#0f1a26] bg-[linear-gradient(to_bottom,#123354,#071325)] shadow-[0_16px_20px_rgba(0,0,0,0.55)]" />
+              <div className="absolute inset-x-8 bottom-1 h-8 rounded-[6px] border-2 border-[#0e1a26] bg-[linear-gradient(to_bottom,#14395e,#08192d)] shadow-[0_15px_22px_rgba(0,0,0,0.56)]" />
 
-              <div className="absolute inset-x-4 top-4 bottom-10 border-4 border-[#090a0c] bg-[#5f3d1e] shadow-[0_0_0_3px_#2a1a0d,inset_0_0_0_3px_#a67445,inset_0_-10px_0_#2f1b0d,0_16px_22px_rgba(0,0,0,0.45)]">
-                <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,#8f5f30_0px,#8f5f30_12px,#7a4e27_12px,#7a4e27_24px)]" />
-                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,238,197,0.2)_0%,rgba(0,0,0,0.18)_38%,rgba(0,0,0,0.52)_100%)]" />
-                <div className="absolute inset-y-0 left-[10px] w-[6px] bg-[#170d05]" />
-                <div className="absolute inset-y-0 right-[10px] w-[6px] bg-[#170d05]" />
-                <div className="absolute inset-x-0 top-[37%] h-[4px] bg-[#140c07]" />
+              <div className="absolute inset-x-4 top-7 bottom-8 rounded-[8px] border-4 border-[#08090a] bg-[#5f3d1e] shadow-[0_0_0_3px_#2a1a0d,inset_0_0_0_3px_#a67445,inset_0_-12px_0_#2f1b0d,0_16px_24px_rgba(0,0,0,0.45)]">
+                <div className="absolute inset-0 rounded-[4px] bg-[repeating-linear-gradient(90deg,#8f5f30_0px,#8f5f30_12px,#7a4e27_12px,#7a4e27_24px)]" />
+                <div className="absolute inset-0 rounded-[4px] bg-[linear-gradient(to_bottom,rgba(255,238,197,0.2)_0%,rgba(0,0,0,0.18)_38%,rgba(0,0,0,0.52)_100%)]" />
+                <div className="absolute inset-y-0 left-[10px] w-[7px] bg-[#170d05]" />
+                <div className="absolute inset-y-0 right-[10px] w-[7px] bg-[#170d05]" />
+                <div className="absolute inset-x-0 top-[35%] h-[4px] bg-[#140c07]" />
 
-                <div className="absolute left-1/2 top-[36%] h-[70px] w-[46px] -translate-x-1/2 border-[3px] border-[#2b1909] bg-[repeating-linear-gradient(90deg,#c1894f_0px,#c1894f_11px,#a76f3e_11px,#a76f3e_22px)] shadow-[0_5px_0_#2e190b,inset_0_0_0_2px_#e0b97f]" />
+                <div className="absolute left-1/2 top-[35%] h-[74px] w-[48px] -translate-x-1/2 border-[3px] border-[#2b1909] bg-[repeating-linear-gradient(90deg,#c1894f_0px,#c1894f_11px,#a76f3e_11px,#a76f3e_22px)] shadow-[0_5px_0_#2e190b,inset_0_0_0_2px_#e0b97f]" />
                 <div className="absolute left-1/2 top-[52%] h-[18px] w-[18px] -translate-x-1/2 border-[3px] border-[#2a1a0c] bg-[linear-gradient(to_bottom,#e3ecf8,#8897af)]" />
 
-                <div className="absolute left-1/2 top-[15%] -translate-x-1/2 border-2 border-[#101e28] bg-[linear-gradient(to_bottom,#0f273c,#0a1c2f)] px-2 py-0.5 text-[10px] font-black tracking-wider text-[#8ff3ff] shadow-[0_3px_0_#050a12]">
+                <div className="absolute left-1/2 top-[5%] z-20 -translate-x-1/2 rounded-sm border-2 border-[#101e28] bg-[linear-gradient(to_bottom,#0f273c,#0a1c2f)] px-2 py-0.5 text-[10px] font-black tracking-wider text-[#8ff3ff] shadow-[0_3px_0_#050a12]">
                   CHEST {filled}/{total}
                 </div>
 
-                <div className="absolute inset-x-3 top-[26%] grid grid-cols-6 gap-1 rounded-[2px] border-2 border-[#05090f] bg-[#02070f]/70 p-2 shadow-[inset_0_0_0_2px_#18304a]">
-                  {Array.from({ length: minecraftLootVisible }).map((_, index) => (
-                    <motion.div
-                      key={`minecraft-loot-${index}`}
-                      className="h-8 w-8 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#22496f,0_5px_9px_rgba(0,0,0,0.44)]"
-                      initial={index === minecraftLootVisible - 1 ? { scale: 0.65, y: -8, opacity: 0 } : false}
-                      animate={index === minecraftLootVisible - 1 ? { scale: [0.65, 1.16, 1], y: [-8, 2, 0], opacity: 1 } : undefined}
-                      transition={{ duration: 0.36, ease: 'easeOut' }}
-                    >
-                      <img
-                        src={MINECRAFT_LOOT[index % MINECRAFT_LOOT.length]}
-                        alt="Minecraft loot"
-                        className="h-full w-full object-contain [image-rendering:pixelated] [filter:contrast(1.2)_saturate(1.35)_drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]"
-                      />
-                    </motion.div>
-                  ))}
+                <div className="absolute inset-x-4 top-[20%] z-10 h-[37%] rounded-[3px] border-2 border-[#05090f] bg-[#02070f]/75 p-1.5 shadow-[inset_0_0_0_2px_#18304a,0_8px_14px_rgba(0,0,0,0.45)]">
+                  <div className="grid h-full grid-cols-6 gap-1 overflow-hidden rounded-[2px]">
+                    {Array.from({ length: minecraftLootVisible }).map((_, index) => (
+                      <motion.div
+                        key={`minecraft-loot-${index}`}
+                        className="h-8 w-8 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#22496f,0_4px_8px_rgba(0,0,0,0.44)]"
+                        initial={index === minecraftLootVisible - 1 ? { scale: 0.65, y: -8, opacity: 0 } : false}
+                        animate={index === minecraftLootVisible - 1 ? { scale: [0.65, 1.16, 1], y: [-8, 2, 0], opacity: 1 } : undefined}
+                        transition={{ duration: 0.36, ease: 'easeOut' }}
+                      >
+                        <img
+                          src={MINECRAFT_LOOT[index % MINECRAFT_LOOT.length]}
+                          alt="Minecraft loot"
+                          className="h-full w-full object-contain [image-rendering:pixelated] [filter:contrast(1.2)_saturate(1.35)_drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
 
                 <AnimatePresence>
                   {drops.map(drop => {
                     const row = Math.floor(drop.slotIdx / 6);
                     const col = drop.slotIdx % 6;
-                    const targetX = 20 + col * 37;
-                    const targetY = 52 + row * 37;
+                    const targetX = 26 + col * 37;
+                    const targetY = 48 + row * 37;
                     return (
                       <motion.div
                         key={`minecraft-drop-${drop.id}`}
-                        className="pointer-events-none absolute h-8 w-8 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#2f7fbd,0_7px_12px_rgba(0,0,0,0.5)]"
-                        initial={{ x: 124, y: -20, scale: 0.45, rotate: -17, opacity: 0.4 }}
+                        className="pointer-events-none absolute z-30 h-8 w-8 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#2f7fbd,0_7px_12px_rgba(0,0,0,0.5)]"
+                        initial={{ x: 124, y: -26, scale: 0.45, rotate: -17, opacity: 0.4 }}
                         animate={{ x: targetX, y: targetY, scale: [0.45, 1.24, 1], rotate: [0, 10, 0], opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.62, times: [0, 0.72, 1], ease: [0.2, 0.82, 0.25, 1] }}
@@ -385,8 +387,8 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
               </div>
 
               <motion.div
-                className="absolute inset-x-4 top-0 h-24 border-4 border-[#070809] bg-[repeating-linear-gradient(90deg,#cf9655_0px,#cf9655_12px,#bb844a_12px,#bb844a_24px)] shadow-[inset_0_0_0_3px_#e3ba7f,inset_0_-7px_0_#503016,0_10px_15px_rgba(0,0,0,0.42)]"
-                animate={{ rotateX: -20 - fillRatio * 70, y: -2 - fillRatio * 16 }}
+                className="absolute inset-x-4 top-0 z-40 h-[5.85rem] rounded-t-[8px] border-4 border-[#070809] bg-[repeating-linear-gradient(90deg,#cf9655_0px,#cf9655_12px,#bb844a_12px,#bb844a_24px)] shadow-[inset_0_0_0_3px_#e3ba7f,inset_0_-7px_0_#503016,0_10px_15px_rgba(0,0,0,0.42)]"
+                animate={{ rotateX: -24 - fillRatio * 64, y: -4 - fillRatio * 18 }}
                 style={{ transformOrigin: 'center bottom' }}
                 transition={{ type: 'spring', stiffness: 190, damping: 19 }}
               >
@@ -401,11 +403,11 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
                 />
               </motion.div>
 
-              <div className="absolute inset-x-4 top-[92px] h-[4px] bg-[#0a0807]" />
+              <div className="absolute inset-x-4 top-[98px] z-30 h-[4px] bg-[#0a0807]" />
 
               {fillRatio >= 1 && (
                 <motion.div
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-2 border-[#123019] bg-[linear-gradient(to_bottom,#67de77,#35753d)] px-3 py-1 text-xs font-black text-[#ecffe4] shadow-[0_5px_0_#1f4b29]"
+                  className="absolute -bottom-2 left-1/2 z-40 -translate-x-1/2 border-2 border-[#123019] bg-[linear-gradient(to_bottom,#67de77,#35753d)] px-3 py-1 text-xs font-black text-[#ecffe4] shadow-[0_5px_0_#1f4b29]"
                   initial={{ opacity: 0, scale: 0.7 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
