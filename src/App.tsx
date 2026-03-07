@@ -367,7 +367,16 @@ function CaptainIdentityCard({
       <div className="absolute inset-[3px] border border-[#8d6a40] rounded-[2px] opacity-90" />
       <div className="relative flex items-center gap-3">
         <div className={`grid ${compact ? 'gap-1' : 'gap-1.5'}`}>
-          {Array.from({ length: stripeCount }).map((_, index) => (
+          <div className={`relative overflow-hidden rounded-md border border-[#3b2711] bg-black/30 ${compact ? 'h-10 w-10 p-1' : 'h-12 w-12 p-1.5'}`}>
+            <img
+              src={tier.badgeUrl}
+              alt={`Insigna ${tier.label}`}
+              className="h-full w-full object-contain drop-shadow-[0_0_8px_rgba(255,230,170,0.55)]"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          {Array.from({ length: Math.max(1, stripeCount - 2) }).map((_, index) => (
             <span key={`left-${index}`} className={`block rounded-sm border border-[#26190d] bg-gradient-to-b from-[#f6d572] to-[#ba8d2a] ${compact ? 'h-1.5 w-6' : 'h-2 w-7'}`} />
           ))}
         </div>
