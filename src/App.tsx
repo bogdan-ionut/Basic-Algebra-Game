@@ -949,7 +949,7 @@ export default function App() {
     const selectedUser = users.find(user => user.id === selectedUserId);
 
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#c8eeff_0%,_#eff9ff_48%,_#fff9ef_100%)] p-4 md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen min-h-[100svh] bg-[radial-gradient(circle_at_top,_#c8eeff_0%,_#eff9ff_48%,_#fff9ef_100%)] p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] md:p-8 font-sans flex items-center justify-center relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-70">
           <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-cyan-300/35 blur-3xl" />
           <div className="absolute -bottom-24 right-1/4 h-80 w-80 rounded-full bg-amber-200/45 blur-3xl" />
@@ -1136,7 +1136,7 @@ export default function App() {
   // Start Screen
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans">
+      <div className="min-h-screen min-h-[100svh] bg-sky-100 flex flex-col items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] font-sans">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1172,7 +1172,7 @@ export default function App() {
   // Session Complete Screen (The Gift of Time)
   if (isSessionComplete) {
     return (
-      <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4 font-sans">
+      <div className="min-h-screen min-h-[100svh] bg-sky-100 flex flex-col items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] font-sans">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1241,7 +1241,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[radial-gradient(circle_at_top,#3aa9e6_0%,#216ca5_42%,#0b3b6a_100%)] flex flex-col items-center justify-start sm:justify-center px-3 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] font-sans relative overflow-hidden">
+    <div className="min-h-[100dvh] min-h-[100svh] bg-[radial-gradient(circle_at_top,#3aa9e6_0%,#216ca5_42%,#0b3b6a_100%)] flex flex-col items-center justify-start sm:justify-center px-3 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] font-sans relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-25">
         <div className="absolute inset-[6%] rounded-full border border-sky-100/45" />
         <div className="absolute inset-[14%] rounded-full border border-sky-100/30" />
