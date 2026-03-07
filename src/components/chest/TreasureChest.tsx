@@ -261,6 +261,18 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
   // ── Dropping gem state ────────────────────────────────────────────────────
   const [drops, setDrops] = useState<Array<{ id: number; slotIdx: number; sparkles: boolean }>>([]);
   const prevLatestRef = useRef<number | null>(null);
+  const dropTimeoutIdsRef = useRef<number[]>([]);
+
+  const clearDropTimeouts = () => {
+    dropTimeoutIdsRef.current.forEach((id) => window.clearTimeout(id));
+    dropTimeoutIdsRef.current = [];
+  };
+
+  useEffect(() => {
+    return () => {
+      clearDropTimeouts();
+    };
+  }, []);
 
   useEffect(() => {
     if (latestItem !== null && latestItem !== prevLatestRef.current) {
@@ -269,14 +281,16 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
       setDrops(prev => [...prev, { id, slotIdx: latestItem % 10, sparkles: false }]);
 
       // Show sparkles after gem lands (~450ms)
-      setTimeout(() => {
+      const sparkleTimeoutId = window.setTimeout(() => {
         setDrops(prev => prev.map(d => d.id === id ? { ...d, sparkles: true } : d));
       }, 450);
+      dropTimeoutIdsRef.current.push(sparkleTimeoutId);
 
       // Remove after animation completes
-      setTimeout(() => {
+      const cleanupTimeoutId = window.setTimeout(() => {
         setDrops(prev => prev.filter(d => d.id !== id));
       }, 1200);
+      dropTimeoutIdsRef.current.push(cleanupTimeoutId);
     }
   }, [latestItem]);
 
@@ -294,7 +308,7 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
     prevFillRef.current = fillRatio;
   }, [fillRatio]);
 
-  const minecraftLootVisible = filled;
+  const minecraftLootVisible = Math.min(Math.max(filled, 0), MINECRAFT_LOOT_GRID.columns * MINECRAFT_LOOT_GRID.rows);
   const isMinecraft = visualStyle === 'minecraft';
   const minecraftSlotCount = MINECRAFT_LOOT_GRID.columns * MINECRAFT_LOOT_GRID.rows;
 
