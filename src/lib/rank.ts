@@ -8,15 +8,16 @@ export type RankTier = {
   accentTo: string;
   glow: string;
   emblem: string;
+  badgeUrl: string;
 };
 
 export const RANK_TIERS: RankTier[] = [
-  { key: 'cadet', label: 'Cadet', minChests: 0, accentFrom: '#4f8cbf', accentTo: '#67b7ff', glow: 'rgba(103,183,255,0.4)', emblem: '⬢' },
-  { key: 'mate', label: 'Secund', minChests: 2, accentFrom: '#3f9e6f', accentTo: '#5ce3a0', glow: 'rgba(92,227,160,0.38)', emblem: '◆' },
-  { key: 'pilot', label: 'Pilot', minChests: 5, accentFrom: '#7b64e5', accentTo: '#b491ff', glow: 'rgba(180,145,255,0.42)', emblem: '✦' },
-  { key: 'commander', label: 'Comandor', minChests: 9, accentFrom: '#b45f1f', accentTo: '#ffba5a', glow: 'rgba(255,186,90,0.45)', emblem: '✪' },
-  { key: 'admiral', label: 'Amiral', minChests: 14, accentFrom: '#a24053', accentTo: '#ff7d9a', glow: 'rgba(255,125,154,0.45)', emblem: '✹' },
-  { key: 'legend', label: 'Legendă', minChests: 20, accentFrom: '#8a791b', accentTo: '#ffe984', glow: 'rgba(255,233,132,0.5)', emblem: '👑' },
+  { key: 'cadet', label: 'Cadet', minChests: 0, accentFrom: '#4f8cbf', accentTo: '#67b7ff', glow: 'rgba(103,183,255,0.4)', emblem: '⬢', badgeUrl: 'https://openmoji.org/data/color/svg/1F6E1.svg' },
+  { key: 'mate', label: 'Secund', minChests: 2, accentFrom: '#3f9e6f', accentTo: '#5ce3a0', glow: 'rgba(92,227,160,0.38)', emblem: '◆', badgeUrl: 'https://openmoji.org/data/color/svg/1F396.svg' },
+  { key: 'pilot', label: 'Pilot', minChests: 5, accentFrom: '#7b64e5', accentTo: '#b491ff', glow: 'rgba(180,145,255,0.42)', emblem: '✦', badgeUrl: 'https://openmoji.org/data/color/svg/1F680.svg' },
+  { key: 'commander', label: 'Comandor', minChests: 9, accentFrom: '#b45f1f', accentTo: '#ffba5a', glow: 'rgba(255,186,90,0.45)', emblem: '✪', badgeUrl: 'https://openmoji.org/data/color/svg/1F3C5.svg' },
+  { key: 'admiral', label: 'Amiral', minChests: 14, accentFrom: '#a24053', accentTo: '#ff7d9a', glow: 'rgba(255,125,154,0.45)', emblem: '✹', badgeUrl: 'https://openmoji.org/data/color/svg/1F451.svg' },
+  { key: 'legend', label: 'Legendă', minChests: 20, accentFrom: '#8a791b', accentTo: '#ffe984', glow: 'rgba(255,233,132,0.5)', emblem: '👑', badgeUrl: 'https://openmoji.org/data/color/svg/1F947.svg' },
 ];
 
 export type RankSummary = {
