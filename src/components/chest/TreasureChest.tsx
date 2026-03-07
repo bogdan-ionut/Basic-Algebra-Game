@@ -298,12 +298,14 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
       {/* ── Chest counter badge ────────────────────────────────────────────── */}
       {chestCount > 0 && (
         <motion.div
-          className="absolute -top-4 right-1 z-20 flex items-center gap-2 rounded-md border-[3px] border-[#123019] bg-gradient-to-b from-[#4ca056] to-[#2f6a37] px-3 py-1.5 shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
+          className="absolute -top-4 right-2 z-30 flex items-center gap-1.5 rounded-full border-2 border-[#ffe8a8] bg-[linear-gradient(to_bottom,#ffe284,#eeb833)] px-3 py-1.5 shadow-[0_8px_16px_rgba(0,0,0,0.42)]"
           animate={{ y: [0, -1.5, 0] }}
           transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <div className="h-6 w-6 rounded-sm border-2 border-[#122518] bg-gradient-to-b from-[#7ff28e] to-[#38a14a] shadow-[inset_0_0_0_2px_#4ad060]" />
-          <span className="text-[#ecffd9] font-black text-sm tracking-wide">Nivel Minecraft {chestCount}</span>
+          <span className="text-base leading-none" aria-hidden>✨</span>
+          <span className="font-black text-xs tracking-wide text-[#5f3d00]">
+            x{chestCount} cufere
+          </span>
         </motion.div>
       )}
 
@@ -313,13 +315,13 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
         transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
       >
         {isMinecraft ? (
-          <div className="relative w-72 h-56 sm:w-80 sm:h-64 [perspective:1200px]">
+          <div className="relative h-56 w-72 sm:h-60 sm:w-80 [perspective:1200px]">
             <motion.div
               className="absolute inset-0"
               animate={latestItem !== null ? { x: [0, -1, 1, 0] } : undefined}
               transition={{ duration: 0.28, ease: 'easeInOut' }}
             >
-              <div className="absolute inset-x-8 bottom-1 h-8 rounded-[6px] border-2 border-[#0e1a26] bg-[linear-gradient(to_bottom,#14395e,#08192d)] shadow-[0_15px_22px_rgba(0,0,0,0.56)]" />
+              <div className="absolute inset-x-10 bottom-1 h-7 rounded-[6px] border-2 border-[#0f1114] bg-[linear-gradient(to_bottom,#24272d,#13161a)] shadow-[0_12px_18px_rgba(0,0,0,0.54)]" />
 
               <div className="absolute inset-x-4 top-7 bottom-8 rounded-[8px] border-4 border-[#08090a] bg-[#5f3d1e] shadow-[0_0_0_3px_#2a1a0d,inset_0_0_0_3px_#a67445,inset_0_-12px_0_#2f1b0d,0_16px_24px_rgba(0,0,0,0.45)]">
                 <MinecraftChestModel filled={filled} total={total} />
@@ -332,16 +334,12 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
                 <div className="absolute left-1/2 top-[35%] h-[74px] w-[48px] -translate-x-1/2 border-[3px] border-[#2b1909] bg-[repeating-linear-gradient(90deg,#c1894f_0px,#c1894f_11px,#a76f3e_11px,#a76f3e_22px)] shadow-[0_5px_0_#2e190b,inset_0_0_0_2px_#e0b97f]" />
                 <div className="absolute left-1/2 top-[52%] h-[18px] w-[18px] -translate-x-1/2 border-[3px] border-[#2a1a0c] bg-[linear-gradient(to_bottom,#e3ecf8,#8897af)]" />
 
-                <div className="absolute left-1/2 top-[5%] z-20 -translate-x-1/2 rounded-sm border-2 border-[#101e28] bg-[linear-gradient(to_bottom,#0f273c,#0a1c2f)] px-2 py-0.5 text-[10px] font-black tracking-wider text-[#8ff3ff] shadow-[0_3px_0_#050a12]">
-                  CHEST {filled}/{total}
-                </div>
-
-                <div className="absolute inset-x-4 top-[20%] z-10 h-[37%] rounded-[3px] border-2 border-[#05090f] bg-[#02070f]/75 p-1.5 shadow-[inset_0_0_0_2px_#18304a,0_8px_14px_rgba(0,0,0,0.45)]">
-                  <div className="grid h-full grid-cols-6 gap-1 overflow-hidden rounded-[2px]">
+                <div className="absolute inset-x-6 top-[22%] z-10 h-[42%] rounded-[3px] border-2 border-[#05090f] bg-[#02070f]/74 p-2 shadow-[inset_0_0_0_2px_#18304a,0_8px_14px_rgba(0,0,0,0.45)]">
+                  <div className="grid h-full grid-cols-5 gap-1.5 overflow-hidden rounded-[2px]">
                     {Array.from({ length: minecraftLootVisible }).map((_, index) => (
                       <motion.div
                         key={`minecraft-loot-${index}`}
-                        className="h-8 w-8 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#22496f,0_4px_8px_rgba(0,0,0,0.44)]"
+                        className="h-9 w-9 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#22496f,0_4px_8px_rgba(0,0,0,0.44)]"
                         initial={index === minecraftLootVisible - 1 ? { scale: 0.65, y: -8, opacity: 0 } : false}
                         animate={index === minecraftLootVisible - 1 ? { scale: [0.65, 1.16, 1], y: [-8, 2, 0], opacity: 1 } : undefined}
                         transition={{ duration: 0.36, ease: 'easeOut' }}
@@ -358,10 +356,10 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
 
                 <AnimatePresence>
                   {drops.map(drop => {
-                    const row = Math.floor(drop.slotIdx / 6);
-                    const col = drop.slotIdx % 6;
-                    const targetX = 26 + col * 37;
-                    const targetY = 48 + row * 37;
+                    const row = Math.floor(drop.slotIdx / 5);
+                    const col = drop.slotIdx % 5;
+                    const targetX = 38 + col * 43;
+                    const targetY = 54 + row * 43;
                     return (
                       <motion.div
                         key={`minecraft-drop-${drop.id}`}
@@ -390,7 +388,7 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
 
               <motion.div
                 className="absolute inset-x-4 top-0 z-40 h-[5.85rem] rounded-t-[8px] border-4 border-[#070809] bg-[repeating-linear-gradient(90deg,#cf9655_0px,#cf9655_12px,#bb844a_12px,#bb844a_24px)] shadow-[inset_0_0_0_3px_#e3ba7f,inset_0_-7px_0_#503016,0_10px_15px_rgba(0,0,0,0.42)]"
-                animate={{ rotateX: -24 - fillRatio * 64, y: -4 - fillRatio * 18 }}
+                animate={{ rotateX: -20 - fillRatio * 40, y: -4 - fillRatio * 12 }}
                 style={{ transformOrigin: 'center bottom' }}
                 transition={{ type: 'spring', stiffness: 190, damping: 19 }}
               >
