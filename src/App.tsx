@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil } from 'lucide-react';
 import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, updateUser, setLastActiveUserId, getLastActiveUserId, createDefaultDailyStats, createDefaultUserProfile, resetUserProgress } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
+import { getRankSummary } from './lib/rank';
 import { DailyRing } from './components/DailyRing';
 import { ParentDashboard } from './components/ParentDashboard';
 import { TreasureChest } from './components/chest/TreasureChest';
@@ -346,18 +347,23 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
 
 function CaptainIdentityCard({
   user,
-  chestCount,
+  score,
   compact = false,
 }: {
   user: GameUser;
-  chestCount: number;
+  score: number;
   compact?: boolean;
 }) {
-  const epauletteLevel = Math.min(5, Math.max(1, chestCount + 1));
-  const stripeCount = Math.min(5, chestCount + 1);
+  const { chestCount, tier, rankNumber, progressInTier, chestsToNextTier, nextTier } = getRankSummary(score);
+  const accentStyle = {
+    background: `linear-gradient(90deg, ${tier.accentFrom}, ${tier.accentTo})`,
+    boxShadow: `0 0 20px ${tier.glow}`,
+  };
+  const stripeCount = Math.min(5, Math.max(2, rankNumber + 1));
 
   return (
-    <div className={`relative rounded-md border-4 border-[#1a130b] bg-gradient-to-b from-[#5b4125] via-[#3f2e1a] to-[#2a1d11] text-[#fce7b2] shadow-[0_14px_24px_rgba(0,0,0,0.45)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
+    <div className={`relative overflow-hidden rounded-xl border-2 border-[#3e2a16] bg-gradient-to-br from-[#3e2a16] via-[#25180f] to-[#120c08] text-[#fce7b2] shadow-[0_14px_30px_rgba(0,0,0,0.45)] ${compact ? 'px-3 py-2' : 'px-4 py-3'}`}>
+      <div className="absolute inset-0 opacity-20" style={accentStyle} />
       <div className="absolute inset-[3px] border border-[#8d6a40] rounded-[2px] opacity-90" />
       <div className="relative flex items-center gap-3">
         <div className={`grid ${compact ? 'gap-1' : 'gap-1.5'}`}>
@@ -386,8 +392,16 @@ function CaptainIdentityCard({
         <div className="min-w-0">
           <p className={`font-black truncate text-[#fff2ce] drop-shadow-[1px_1px_0_#2b1f10] ${compact ? 'text-sm' : 'text-base'}`}>{user.name}</p>
           <p className={`truncate text-[#f6d588] ${compact ? 'text-[11px]' : 'text-xs'}`}>
-            Căpitan • {chestCount} cufere • rang {epauletteLevel}
+            Căpitan {tier.emblem} {tier.label} • {chestCount} cufere • rang {rankNumber}
           </p>
+          <div className="mt-1.5">
+            <div className="h-1.5 rounded-full bg-black/35 border border-white/10 overflow-hidden">
+              <div className="h-full rounded-full" style={{ ...accentStyle, width: `${Math.max(5, progressInTier * 100)}%` }} />
+            </div>
+            <p className={`mt-1 text-[#ffe4ab]/95 ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
+              {nextTier ? `${chestsToNextTier} cufere până la ${nextTier.label}` : 'Rang maxim atins ✨'}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -426,7 +440,7 @@ export default function App() {
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedUserChestCount, setSelectedUserChestCount] = useState(0);
+  const [selectedUserScore, setSelectedUserScore] = useState(0);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [newUserForm, setNewUserForm] = useState({
@@ -739,12 +753,12 @@ export default function App() {
   useEffect(() => {
     const loadSelectedUserProgress = async () => {
       if (!selectedUserId) {
-        setSelectedUserChestCount(0);
+        setSelectedUserScore(0);
         return;
       }
 
       const profile = await loadUserProfile(selectedUserId);
-      setSelectedUserChestCount(Math.floor(profile.score / 10));
+      setSelectedUserScore(profile.score);
     };
 
     loadSelectedUserProgress();
@@ -953,7 +967,7 @@ export default function App() {
 
             {selectedUser && (
               <div className="relative mt-6 flex justify-center">
-                <CaptainIdentityCard user={selectedUser} chestCount={selectedUserChestCount} compact />
+                <CaptainIdentityCard user={selectedUser} score={selectedUserScore} compact />
               </div>
             )}
           </div>
@@ -1120,7 +1134,7 @@ export default function App() {
           className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border-4 border-sky-300"
         >
           <div className="flex justify-center mb-6">
-            <CaptainIdentityCard user={activeUser} chestCount={chestProgress.totalChests} />
+            <CaptainIdentityCard user={activeUser} score={userProfile.score} />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Salut, {activeUser.name}!</h1>
           <p className="text-slate-600 mb-8">Ești gata pentru 10 minute de aventură matematică?</p>
@@ -1227,7 +1241,7 @@ export default function App() {
       {/* Top Bar with Daily Ring and Parent Access */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20 gap-3">
         <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
-        <CaptainIdentityCard user={activeUser} chestCount={chestProgress.totalChests} compact />
+        <CaptainIdentityCard user={activeUser} score={userProfile.score} compact />
         <div className="flex items-center gap-2">
           <button
             onClick={handleSwitchUser}
