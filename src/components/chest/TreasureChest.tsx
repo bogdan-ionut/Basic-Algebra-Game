@@ -60,6 +60,11 @@ const MINECRAFT_LOOT = [
   `${MINECRAFT_TEXTURE_BASE_URL}/zombie_spawn_egg.png`,
 ];
 
+const MINECRAFT_LOOT_GRID = {
+  columns: 5,
+  rows: 2,
+} as const;
+
 // ─── Gem palette ─────────────────────────────────────────────────────────────
 
 const GEM_COLORS: Array<{ light: string; mid: string; dark: string }> = [
@@ -291,6 +296,7 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
 
   const minecraftLootVisible = filled;
   const isMinecraft = visualStyle === 'minecraft';
+  const minecraftSlotCount = MINECRAFT_LOOT_GRID.columns * MINECRAFT_LOOT_GRID.rows;
 
   return (
     <div className="relative flex flex-col items-center">
@@ -334,12 +340,12 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
                 <div className="absolute left-1/2 top-[35%] h-[74px] w-[48px] -translate-x-1/2 border-[3px] border-[#2b1909] bg-[repeating-linear-gradient(90deg,#c1894f_0px,#c1894f_11px,#a76f3e_11px,#a76f3e_22px)] shadow-[0_5px_0_#2e190b,inset_0_0_0_2px_#e0b97f]" />
                 <div className="absolute left-1/2 top-[52%] h-[18px] w-[18px] -translate-x-1/2 border-[3px] border-[#2a1a0c] bg-[linear-gradient(to_bottom,#e3ecf8,#8897af)]" />
 
-                <div className="absolute inset-x-6 top-[22%] z-10 h-[42%] rounded-[3px] border-2 border-[#05090f] bg-[#02070f]/74 p-2 shadow-[inset_0_0_0_2px_#18304a,0_8px_14px_rgba(0,0,0,0.45)]">
-                  <div className="grid h-full grid-cols-5 gap-1.5 overflow-hidden rounded-[2px]">
+                <div className="absolute inset-x-6 top-[20%] z-10 h-[48%] rounded-[3px] border-2 border-[#05090f] bg-[#02070f]/80 px-2.5 py-2 shadow-[inset_0_0_0_2px_#18304a,0_8px_14px_rgba(0,0,0,0.45)]">
+                  <div className="grid h-full grid-cols-5 grid-rows-2 gap-x-1.5 gap-y-2 rounded-[2px]">
                     {Array.from({ length: minecraftLootVisible }).map((_, index) => (
                       <motion.div
                         key={`minecraft-loot-${index}`}
-                        className="h-9 w-9 border-2 border-[#0d1623] bg-[#06111f] p-[2px] shadow-[inset_0_0_0_2px_#22496f,0_4px_8px_rgba(0,0,0,0.44)]"
+                        className="h-9 w-9 place-self-center border-2 border-[#0d1623] bg-[#06111f] p-1 shadow-[inset_0_0_0_2px_#22496f,0_4px_8px_rgba(0,0,0,0.44)]"
                         initial={index === minecraftLootVisible - 1 ? { scale: 0.65, y: -8, opacity: 0 } : false}
                         animate={index === minecraftLootVisible - 1 ? { scale: [0.65, 1.16, 1], y: [-8, 2, 0], opacity: 1 } : undefined}
                         transition={{ duration: 0.36, ease: 'easeOut' }}
@@ -356,10 +362,11 @@ export function TreasureChest({ progress, latestItem, visualStyle = 'treasure' }
 
                 <AnimatePresence>
                   {drops.map(drop => {
-                    const row = Math.floor(drop.slotIdx / 5);
-                    const col = drop.slotIdx % 5;
-                    const targetX = 38 + col * 43;
-                    const targetY = 54 + row * 43;
+                    const slotIdx = drop.slotIdx % minecraftSlotCount;
+                    const row = Math.floor(slotIdx / MINECRAFT_LOOT_GRID.columns);
+                    const col = slotIdx % MINECRAFT_LOOT_GRID.columns;
+                    const targetX = 37 + col * 42;
+                    const targetY = 53 + row * 41;
                     return (
                       <motion.div
                         key={`minecraft-drop-${drop.id}`}
