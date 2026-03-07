@@ -259,7 +259,7 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
     >
       {stack === 'minecraft' ? (
         <motion.div
-          className="relative flex w-16 h-16 sm:w-20 sm:h-20 items-center justify-center rounded-[1.35rem] border-[3px] bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 shadow-[0_12px_16px_rgba(15,23,42,0.45)]"
+          className="relative flex w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 items-center justify-center rounded-[1.1rem] sm:rounded-[1.35rem] border-[3px] bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 shadow-[0_12px_16px_rgba(15,23,42,0.45)]"
           style={{ borderColor: frameColor }}
           animate={{ y: [0, -1.5, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
@@ -269,11 +269,11 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
             <img
               src={minecraftAsset.url}
               alt={minecraftAsset.label}
-              className="relative z-10 h-11 w-11 sm:h-14 sm:w-14 [image-rendering:pixelated] drop-shadow-[0_8px_10px_rgba(0,0,0,0.5)]"
+              className="relative z-10 h-9 w-9 sm:h-11 sm:w-11 lg:h-14 lg:w-14 [image-rendering:pixelated] drop-shadow-[0_8px_10px_rgba(0,0,0,0.5)]"
               onError={() => setIsImageBroken(true)}
             />
           ) : (
-            <div className="relative z-10 text-2xl sm:text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
+            <div className="relative z-10 text-xl sm:text-2xl lg:text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
               {fallbackByFamily[minecraftAsset.family]}
             </div>
           )}
@@ -282,7 +282,7 @@ function DetailedToken({ theme, delay, shapeIndex, stack }: { theme: CountItemTh
       ) : (
         <motion.svg
           viewBox="0 0 100 100"
-          className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_12px_16px_rgba(15,23,42,0.55)]"
+          className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 drop-shadow-[0_12px_16px_rgba(15,23,42,0.55)]"
           animate={{ y: [0, -1.5, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 + delay }}
         >
@@ -1241,40 +1241,58 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#3aa9e6_0%,#216ca5_42%,#0b3b6a_100%)] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[radial-gradient(circle_at_top,#3aa9e6_0%,#216ca5_42%,#0b3b6a_100%)] flex flex-col items-center justify-start sm:justify-center px-3 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] font-sans relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-25">
         <div className="absolute inset-[6%] rounded-full border border-sky-100/45" />
         <div className="absolute inset-[14%] rounded-full border border-sky-100/30" />
         <div className="absolute inset-[24%] rounded-full border border-sky-100/20" />
       </div>
       {/* Top Bar with Daily Ring and Parent Access */}
-      <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20 gap-3">
-        <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
+      <div className="z-20 w-full max-w-5xl flex flex-col gap-3 sm:absolute sm:top-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between gap-3">
+          <DailyRing currentSeconds={dailyStats.timeSpentSeconds} targetSeconds={sessionLimit} />
+          <div className="flex items-center gap-2 sm:hidden">
+            <button
+              onClick={handleSwitchUser}
+              className="min-h-11 min-w-11 p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
+              title="Schimbă user"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setIsParentDashboardOpen(true)}
+              className="min-h-11 min-w-11 p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
+              aria-label="Acces părinți"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
         <CaptainIdentityCard user={activeUser} score={userProfile.score} compact />
-        <div className="flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-2">
           <button
             onClick={handleSwitchUser}
-            className="p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
+            className="min-h-11 min-w-11 p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
             title="Schimbă user"
           >
             <LogOut className="w-6 h-6" />
           </button>
           <button
             onClick={() => setIsParentDashboardOpen(true)}
-            className="p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
+            className="min-h-11 min-w-11 p-3 bg-amber-100/85 rounded-full shadow-[0_4px_12px_rgba(60,32,6,0.32)] border-2 border-amber-300/80 backdrop-blur-sm text-amber-700 hover:text-amber-900 transition-colors"
           >
             <Settings className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      <div className="w-full max-w-2xl bg-gradient-to-b from-[#f8f3e8] via-[#f2ebdd] to-[#efe6d8] rounded-[2rem] shadow-[0_26px_65px_rgba(2,17,47,0.45)] overflow-hidden border-[5px] border-[#d7b67a] relative mt-16 z-10 mb-4">
+      <div className="w-full max-w-2xl bg-gradient-to-b from-[#f8f3e8] via-[#f2ebdd] to-[#efe6d8] rounded-[1.4rem] sm:rounded-[2rem] shadow-[0_26px_65px_rgba(2,17,47,0.45)] overflow-hidden border-[4px] sm:border-[5px] border-[#d7b67a] relative mt-3 sm:mt-20 z-10 mb-4">
 
         {/* Header */}
-        <div className="bg-gradient-to-b from-[#72502f] via-[#5a4026] to-[#43301d] border-b-4 border-[#24180f] p-6 text-center relative">
+        <div className="bg-gradient-to-b from-[#72502f] via-[#5a4026] to-[#43301d] border-b-4 border-[#24180f] p-4 sm:p-6 text-center relative">
           <div className="absolute top-1/2 left-5 -translate-y-1/2 w-3 h-3 bg-[#8ccf64] border-2 border-[#203015]" />
           <div className="absolute top-1/2 right-5 -translate-y-1/2 w-3 h-3 bg-[#8ccf64] border-2 border-[#203015]" />
-          <h1 className="text-4xl font-black text-[#ffeab8] drop-shadow-[2px_2px_0_#2a1c0d] tracking-wide">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#ffeab8] drop-shadow-[2px_2px_0_#2a1c0d] tracking-wide">
             {activeUser.name} • {getCurrentChapterLabel()}
           </h1>
         </div>
@@ -1302,11 +1320,11 @@ export default function App() {
         </div>
 
         {/* Game Area */}
-        <div className="p-6 sm:p-8 flex flex-col items-center gap-7 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9),rgba(245,234,217,0.92))]">
+        <div className="p-4 sm:p-8 flex flex-col items-center gap-5 sm:gap-7 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9),rgba(245,234,217,0.92))]">
           {/* Visual Representation */}
-          <div className="flex items-center justify-center gap-8 text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-7 shadow-inner shadow-slate-900/20">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-3xl sm:text-4xl font-bold text-amber-900 w-full rounded-3xl border-2 border-amber-200 bg-white/70 p-4 sm:p-7 shadow-inner shadow-slate-900/20">
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-2 min-h-[7rem]">
+              <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 min-h-[5rem] sm:min-h-[7rem]">
                 {Array.from({ length: num1 }).map((_, i) => (
                   <div key={`n1-${i}`}>
                     <DetailedToken
@@ -1318,13 +1336,13 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <span className="text-5xl text-[#b45309]">{num1}</span>
+              <span className="text-3xl sm:text-5xl text-[#b45309]">{num1}</span>
             </div>
 
-            <span className="text-5xl text-blue-500 pb-10 drop-shadow-[0_0_8px_rgba(59,130,246,0.35)]">+</span>
+            <span className="text-4xl sm:text-5xl text-blue-500 sm:pb-10 drop-shadow-[0_0_8px_rgba(59,130,246,0.35)]">+</span>
 
             <div className="flex flex-col items-center gap-2 flex-1">
-              <div className="flex flex-wrap justify-center gap-2 min-h-[7rem]">
+              <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 min-h-[5rem] sm:min-h-[7rem]">
                 {Array.from({ length: num2 }).map((_, i) => (
                   <div key={`n2-${i}`}>
                     <DetailedToken
@@ -1336,11 +1354,11 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <span className="text-5xl text-[#b45309]">{num2}</span>
+              <span className="text-3xl sm:text-5xl text-[#b45309]">{num2}</span>
             </div>
           </div>
 
-          <div className="text-6xl font-black text-slate-700">
+          <div className="text-5xl sm:text-6xl font-black text-slate-700">
             =
           </div>
 
