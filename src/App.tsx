@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil } from 'lucide-react';
+import { Star, Settings, Snail, ShieldAlert, Trophy, PlayCircle, UserCircle2, LogOut, Anchor, Waves, Skull, Venus, Mars, Pencil, ChevronDown } from 'lucide-react';
 import { loadDailyStats, saveDailyStats, loadUserProfile, saveUserProfile, DailyStats, UserProfile, getTodayDateString, getDateStringDaysAgo, GameUser, loadUsers, createUser, updateUser, setLastActiveUserId, getLastActiveUserId, createDefaultDailyStats, createDefaultUserProfile, resetUserProgress } from './lib/db';
 import { getChestProgress } from './lib/chestProgress';
 import { getRankSummary } from './lib/rank';
@@ -72,19 +72,52 @@ type CountItemTheme = {
 
 type VisualStack = 'treasure' | 'minecraft';
 
-const PRACTICE_OPTIONS = [5, 10, 100] as const;
+const PRACTICE_OPTIONS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
 type PracticeMax = (typeof PRACTICE_OPTIONS)[number];
 
+const STAGE_SIZE = 5;
+
+type StageId = 'warmup' | 'bridges' | 'mixed';
+type StageDefinition = {
+  id: StageId;
+  label: string;
+  minSum: number;
+  maxSum: number;
+};
+
+const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const clampPracticeMax = (value: number): PracticeMax => {
+  const normalized = Math.round(value / 10) * 10;
+  const clamped = Math.min(100, Math.max(10, normalized));
+  return clamped as PracticeMax;
+};
+
+const getStageDefinitions = (practiceMax: PracticeMax): StageDefinition[] => {
+  const earlyMax = Math.max(4, Math.min(practiceMax, Math.floor(practiceMax * 0.4)));
+  const bridgeMin = Math.max(10, Math.floor(practiceMax * 0.35));
+  const bridgeMax = Math.max(bridgeMin + 1, Math.floor(practiceMax * 0.75));
+
+  return [
+    { id: 'warmup', label: 'Stagiul 1 · Încălzire cu perechi apropiate', minSum: 2, maxSum: earlyMax },
+    { id: 'bridges', label: 'Stagiul 2 · Trecere prin 10', minSum: Math.min(bridgeMin, practiceMax), maxSum: Math.min(bridgeMax, practiceMax) },
+    { id: 'mixed', label: 'Stagiul 3 · Mix complet pe tot intervalul', minSum: 2, maxSum: practiceMax },
+  ];
+};
+
 const difficultyLevelToMax = (difficultyLevel: number): PracticeMax => {
-  if (difficultyLevel <= 1) return 5;
-  if (difficultyLevel === 2) return 10;
-  return 100;
+  if (PRACTICE_OPTIONS.includes(difficultyLevel as PracticeMax)) {
+    return difficultyLevel as PracticeMax;
+  }
+
+  if (difficultyLevel <= 3) {
+    return (difficultyLevel * 10) as PracticeMax;
+  }
+
+  return clampPracticeMax(difficultyLevel);
 };
 
 const maxToDifficultyLevel = (practiceMax: PracticeMax): number => {
-  if (practiceMax <= 5) return 1;
-  if (practiceMax <= 10) return 2;
-  return 3;
+  return practiceMax;
 };
 
 type CountItemKind = 'gem' | 'coin' | 'crown' | 'potion' | 'star';
@@ -443,7 +476,9 @@ export default function App() {
   const [sessionLimit, setSessionLimit] = useState(600); // 10 minutes
   const [latestItemIndex, setLatestItemIndex] = useState<number | null>(null);
   const [visualStack] = useState<VisualStack>('minecraft');
-  const [practiceMax, setPracticeMax] = useState<PracticeMax>(5);
+  const [practiceMax, setPracticeMax] = useState<PracticeMax>(10);
+  const [completedProblemsInStage, setCompletedProblemsInStage] = useState(0);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
 
   const [users, setUsers] = useState<GameUser[]>([]);
   const [activeUser, setActiveUser] = useState<GameUser | null>(null);
@@ -491,12 +526,33 @@ export default function App() {
     timeoutIdsRef.current.push(timeoutId);
   };
 
-  const generateProblem = (maxSum: number) => {
+  const generateProblem = (selectedPracticeMax: PracticeMax, stageIndex = activeStageIndex) => {
+    const stages = getStageDefinitions(selectedPracticeMax);
+    const safeStageIndex = Math.max(0, Math.min(stageIndex, stages.length - 1));
+    const stage = stages[safeStageIndex];
+
+    const minSum = Math.max(2, Math.min(stage.minSum, selectedPracticeMax));
+    const maxSum = Math.max(minSum, Math.min(stage.maxSum, selectedPracticeMax));
+
     const createCandidate = () => {
-      const sum = Math.floor(Math.random() * (maxSum - 1)) + 2; // 2 to maxSum
-      const n1 = Math.floor(Math.random() * (sum - 1)) + 1; // 1 to sum - 1
-      const n2 = sum - n1;
-      return { n1, n2 };
+      const targetSum = randomInt(minSum, maxSum);
+
+      if (stage.id === 'bridges' && targetSum >= 10) {
+        const n1Min = Math.max(1, targetSum - 9);
+        const n1Max = Math.min(targetSum - 1, 9);
+        if (n1Min <= n1Max) {
+          const n1 = randomInt(n1Min, n1Max);
+          return { n1, n2: targetSum - n1 };
+        }
+      }
+
+      if (stage.id === 'warmup') {
+        const n1 = randomInt(1, Math.max(1, Math.floor(targetSum / 2)));
+        return { n1, n2: targetSum - n1 };
+      }
+
+      const n1 = randomInt(1, targetSum - 1);
+      return { n1, n2: targetSum - n1 };
     };
 
     // Avoid repeating the exact same exercise twice in a row.
@@ -522,7 +578,9 @@ export default function App() {
 
   const getCurrentChapterLabel = () => {
     if (!userProfile) return 'Matematică distractivă';
-    return `Adunări până la ${practiceMax}`;
+    const stages = getStageDefinitions(practiceMax);
+    const currentStage = stages[Math.max(0, Math.min(activeStageIndex, stages.length - 1))];
+    return `Adunări până la ${practiceMax} · ${currentStage.label}`;
   };
 
   const handleResetActiveUserProgress = async () => {
@@ -547,8 +605,11 @@ export default function App() {
     setIsSpeedBumpActive(false);
     setShowSuccess(false);
     setWrongAnswer(null);
-    setPracticeMax(difficultyLevelToMax(resetProfile.difficultyLevel));
-    generateProblem(difficultyLevelToMax(resetProfile.difficultyLevel));
+    const resetPracticeMax = difficultyLevelToMax(resetProfile.difficultyLevel);
+    setPracticeMax(resetPracticeMax);
+    setActiveStageIndex(0);
+    setCompletedProblemsInStage(0);
+    generateProblem(resetPracticeMax, 0);
 
     await saveDailyStats(activeUser.id, resetStats);
     await saveUserProfile(activeUser.id, resetProfile);
@@ -584,11 +645,13 @@ export default function App() {
     setDailyStats(stats);
     setUserProfile(profile);
     setPracticeMax(currentPracticeMax);
+    setActiveStageIndex(0);
+    setCompletedProblemsInStage(0);
     setConsecutiveMistakes(0);
     setConsecutiveCorrect(0);
     setIsSessionComplete(false);
     setHasStarted(false);
-    generateProblem(currentPracticeMax);
+    generateProblem(currentPracticeMax, 0);
   };
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -858,15 +921,30 @@ export default function App() {
       // Track the latest item for animation
       setLatestItemIndex((newProfile.score - 1) % 10);
 
-      // Level up logic (Mastery)
-      if (newCorrect >= 5 && newProfile.difficultyLevel < 3) {
-        newProfile.difficultyLevel += 1;
-        newCorrect = 0;
-        setLevelNotification('up');
-        playSound('levelUp');
-        scheduleTimeout(() => setLevelNotification(null), 3000);
-        setPracticeMax(difficultyLevelToMax(newProfile.difficultyLevel));
+      const solvedInCurrentStage = completedProblemsInStage + 1;
+      const stageDefinitions = getStageDefinitions(practiceMax);
+      const hasMoreStages = activeStageIndex < stageDefinitions.length - 1;
+      let nextStageIndex = activeStageIndex;
+      let nextSolvedInStage = solvedInCurrentStage;
+
+      if (solvedInCurrentStage >= STAGE_SIZE) {
+        if (hasMoreStages) {
+          nextStageIndex += 1;
+          nextSolvedInStage = 0;
+          setLevelNotification('up');
+          playSound('levelUp');
+          scheduleTimeout(() => setLevelNotification(null), 3000);
+        } else {
+          nextStageIndex = 0;
+          nextSolvedInStage = 0;
+          setLevelNotification('up');
+          playSound('levelUp');
+          scheduleTimeout(() => setLevelNotification(null), 3000);
+        }
       }
+
+      setCompletedProblemsInStage(nextSolvedInStage);
+      setActiveStageIndex(nextStageIndex);
 
       setUserProfile(newProfile);
       await saveUserProfile(activeUser.id, newProfile);
@@ -879,7 +957,7 @@ export default function App() {
       });
       setShowSuccess(true);
       scheduleTimeout(() => {
-        generateProblem(difficultyLevelToMax(newProfile.difficultyLevel));
+        generateProblem(practiceMax, nextStageIndex);
       }, 2000);
     } else {
       playSound('error');
@@ -888,18 +966,10 @@ export default function App() {
       setWrongAnswer(ans);
       scheduleTimeout(() => setWrongAnswer(null), 500);
 
-      // Struggle detector: level down
-      if (newMistakes >= 2 && newProfile.difficultyLevel > 1) {
-        newProfile.difficultyLevel -= 1;
+      if (newMistakes >= 2) {
         newMistakes = 0;
         setLevelNotification('down');
         scheduleTimeout(() => setLevelNotification(null), 3000);
-        setPracticeMax(difficultyLevelToMax(newProfile.difficultyLevel));
-
-        // Immediately generate an easier problem
-        scheduleTimeout(() => {
-          generateProblem(difficultyLevelToMax(newProfile.difficultyLevel));
-        }, 1000);
       }
 
       setUserProfile(newProfile);
@@ -943,11 +1013,11 @@ export default function App() {
     setUserProfile(updatedProfile);
     setConsecutiveCorrect(0);
     setConsecutiveMistakes(0);
-    setLevelNotification('up');
-    scheduleTimeout(() => setLevelNotification(null), 1800);
+    setActiveStageIndex(0);
+    setCompletedProblemsInStage(0);
 
     await saveUserProfile(activeUser.id, updatedProfile);
-    generateProblem(nextPracticeMax);
+    generateProblem(nextPracticeMax, 0);
   };
 
 
@@ -1306,22 +1376,21 @@ export default function App() {
         <div className="border-b-4 border-[#d9bf90] bg-gradient-to-b from-[#d6c3a0] to-[#b59669] px-4 py-3">
           <div className="mx-auto flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
             <span className="font-black uppercase tracking-wide text-[#2f2110] text-xs sm:text-sm">Mod de joc:</span>
-            {PRACTICE_OPTIONS.map(option => {
-              const isActive = option === practiceMax;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => handlePracticeModeChange(option)}
-                  className={`relative rounded-sm border-4 px-3 py-1.5 text-xs sm:text-sm font-black transition-all ${isActive
-                    ? 'border-[#25180b] bg-gradient-to-b from-[#7ec850] to-[#436d2a] text-[#f4ffe6] shadow-[0_4px_0_#203315]'
-                    : 'border-[#53371b] bg-gradient-to-b from-[#d0aa6d] to-[#9a713f] text-[#2f2110] shadow-[0_4px_0_#664826] hover:brightness-105'
-                    }`}
-                >
-                  Adunări ≤ {option}
-                </button>
-              );
-            })}
+            <div className="relative">
+              <select
+                value={practiceMax}
+                onChange={(event) => handlePracticeModeChange(Number(event.target.value) as PracticeMax)}
+                className="appearance-none rounded-sm border-4 border-[#25180b] bg-gradient-to-b from-[#d0aa6d] to-[#9a713f] px-4 py-2 pr-10 text-xs font-black text-[#2f2110] shadow-[0_4px_0_#664826] sm:text-sm"
+                aria-label="Selectează modul de joc"
+              >
+                {PRACTICE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    Adunări ≤ {option}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#2f2110]" />
+            </div>
           </div>
         </div>
 
@@ -1468,7 +1537,7 @@ export default function App() {
               >
                 <ShieldAlert className="w-6 h-6" />
                 <span className="font-bold">
-                  {levelNotification === 'up' ? 'Nivel Nou Deblocat! 🚀' : 'Hai să exersăm mai ușor! 🎈'}
+                  {levelNotification === 'up' ? 'Stagiu nou în același mod! 🚀' : 'Respirăm și repetăm stagiul. 🎈'}
                 </span>
               </motion.div>
             )}
