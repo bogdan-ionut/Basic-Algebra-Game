@@ -470,6 +470,12 @@ export default function App() {
     avatarDataUrl: '',
   });
   const timeoutIdsRef = useRef<number[]>([]);
+  const answerInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (showSuccess || isSpeedBumpActive || !activeUser) return;
+    answerInputRef.current?.focus();
+  }, [showSuccess, isSpeedBumpActive, num1, num2, activeUser]);
 
   const clearScheduledTimeouts = () => {
     timeoutIdsRef.current.forEach(timeoutId => window.clearTimeout(timeoutId));
@@ -1371,6 +1377,7 @@ export default function App() {
           >
             <label htmlFor="answer-input" className="sr-only">Scrie răspunsul</label>
             <input
+              ref={answerInputRef}
               id="answer-input"
               type="number"
               inputMode="numeric"
